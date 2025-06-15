@@ -1,0 +1,170 @@
+.movie-player-container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+    background-color: #120c0c;
+    color: #fff;
+    font-family: Arial, sans-serif;
+  }
+  
+  .breadcrumb {
+    font-size: 16px;
+    margin-bottom: 20px;
+    color: #ccc;
+    text-align: left;
+  }
+  
+  .breadcrumb a {
+    color: #fff;
+    text-decoration: none;
+  }
+  
+  .breadcrumb a:hover {
+    text-decoration: underline;
+  }
+  
+  .breadcrumb span {
+    color: #ccc;
+  }
+  
+  .video-player {
+    background-color: #000;
+    border: 1px solid #333;
+    margin-bottom: 20px;
+  }
+  
+  .episode-list {
+    margin-bottom: 20px;
+  }
+  
+  .episode-list h3 {
+    font-size: 18px;
+    color: #fff;
+    margin-bottom: 10px;
+  }
+  
+  .episodes {
+    display: flex;
+    gap: 10px;
+  }
+  
+  .episodes button {
+    background-color: #333;
+    border-radius: 8px;
+    color: #fff;
+    border: none;
+    padding: 5px 10px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+  }
+  
+  .episodes button.active {
+    background-color: #ff4d4d;
+  }
+  
+  .episodes button:hover {
+    background-color: #555;
+  }
+  
+  .movie-player-info {
+    display: flex;
+    gap: 20px;
+
+  }
+  
+  .poster-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+  }
+  
+  .movie-poster {
+    width: 180px;
+    height: 220px;
+    object-fit: cover;
+    margin-top: 45px;
+    border-radius: 8px;
+  }
+  
+
+  .movie-details h3 {
+    font-size: 20px;
+    color: #b5e745;
+    margin-bottom: 10px;
+  }
+  
+  .movie-details p {
+    font-size: 14px;
+    line-height: 1.5;
+    color: #ccc;
+  }
+  
+  .review-section {
+    margin-top: 20px;
+  }
+  
+  .review-section h3 {
+    font-size: 1.5rem;
+    margin-bottom: 10px;
+  }
+  
+  .rating-input {
+    margin-bottom: 10px;
+  }
+  
+  .rating-input label {
+    margin-right: 10px;
+  }
+  
+  .rating-input select {
+    padding: 5px;
+    border-radius: 5px;
+    border: 1px solid #ddd;
+  }
+  
+  .review-section textarea {
+    width: 100%;
+    height: 100px;
+    padding: 10px;
+    margin-bottom: 10px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    resize: none;
+  }
+  
+  .review-button {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+  
+  .review-button:hover {
+    background-color: #0056b3;
+  }
+  
+  .reviews-list {
+    margin-top: 20px;
+  }
+  
+  .review {
+    border-bottom: 1px solid #ddd;
+    padding: 10px 0;
+  }
+  
+  .review p {
+    margin: 5px 0;
+  }
+  
+  .review p strong {
+    color: #007bff;
+  }
+  
+  .review .rating {
+    color: #f39c12;
+    font-weight: bold;
+    margin-left: 5px;
+  }

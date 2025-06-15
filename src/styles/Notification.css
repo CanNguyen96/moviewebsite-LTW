@@ -1,0 +1,25 @@
+.Notification {
+    margin: auto;
+    padding: 20px;
+    background-color: #444;
+    color: yellow;
+    font-size: 18px;
+    line-height: 1.8;
+    border-radius: 10px;
+    text-align: left;
+  }
+  
+  .Notification ul {
+    padding: 20px;
+    list-style: none;
+  }
+  
+  .Notification ul li {
+    margin-bottom: 15px;
+    font-weight: bold;
+  }
+  
+  .Notification span{
+    color: cadetblue;
+    font-weight: bold;
+  }

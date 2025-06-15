@@ -1,0 +1,135 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: Arial, sans-serif;
+}
+
+body {
+    background-color: #181818;
+    color: white;
+    text-align: center;
+}
+
+/* Container chính của form */
+.container {
+    background-color: #222;
+    width: 90%; 
+    max-width: 400px; /* Giới hạn chiều rộng */
+    margin: 60px auto; 
+    padding: 40px; 
+    border-radius: 12px;
+    box-shadow: 0 0 15px rgba(255, 255, 255, 0.1); 
+    text-align: center;
+}
+
+/* Tiêu đề */
+h2 {
+    font-size: 24px; 
+    margin-bottom: 20px;
+    color: #ffffff;
+}
+
+/* Form */
+form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+/* Label */
+label {
+    text-align: left;
+    font-weight: bold;
+    color: #ddd;
+}
+
+/* Input Fields */
+input {
+    width: 100%;
+    padding: 12px;
+    font-size: 16px;
+    border-radius: 6px;
+    border: 1px solid #555;
+    background-color: #333;
+    color: white;
+    transition: 0.3s;
+}
+
+/* Hiệu ứng khi focus vào input */
+input:focus {
+    border-color: #ff4b5c;
+    outline: none;
+    box-shadow: 0 0 8px rgba(255, 75, 92, 0.5);
+}
+
+/* Link Quên mật khẩu */
+.forgot {
+    text-align: right;
+    color: lightgray;
+    font-size: 15px;
+    transition: 0.3s;
+    text-decoration: none;
+}
+
+.forgot:hover {
+    color: #ff4b5c;
+}
+
+/* Nút Đăng Nhập */
+.btn {
+    background: linear-gradient(45deg, #ff4b5c, #ff0077);
+    color: white;
+    padding: 14px;
+    border: none;
+    cursor: pointer;
+    border-radius: 6px;
+    font-weight: bold;
+    font-size: 16px;
+    transition: 0.3s;
+}
+
+/* Hiệu ứng hover khi bấm vào */
+.btn:hover {
+    background: linear-gradient(45deg, #ff0077, #ff4b5c);
+    transform: scale(1.05);
+}
+
+/* Đăng ký */
+p {
+    margin-top: 15px;
+    font-size: 14px;
+}
+
+.register-link {
+    color: #33ff99;
+    text-decoration: none;
+    font-weight: bold;
+    transition: 0.3s;
+}
+
+.register-link:hover {
+    color: #1eff66;
+    text-decoration: underline;
+}
+
+/* Responsive cho màn hình nhỏ hơn */
+@media (max-width: 500px) {
+    .container {
+        width: 95%;
+        padding: 30px;
+    }
+
+    input {
+        font-size: 14px;
+    }
+
+    .btn {
+        font-size: 14px;
+    }
+}
+
+
+.form input:disabled {
+cursor: not-allowed;
+}
