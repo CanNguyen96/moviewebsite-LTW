@@ -112,7 +112,7 @@ const MovieDetail = () => {
 
         try {
             await axios.post(
-                "${process.env.REACT_APP_API_URL}/api/reviews",
+                `${process.env.REACT_APP_API_URL}/api/reviews`,
                 { movie_id: id, rating, comment: newComment },
                 { headers: { Authorization: `Bearer ${token}` } }
             );

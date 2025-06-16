@@ -18,11 +18,11 @@ const port = 3001;
 
 app.use(cors());
 app.use(express.json());
-app.use('/images', express.static('public/images'));
-app.use('/videos', express.static('public/videos'));
+app.use('/images', express.static('/app/public/images'));
+app.use('/videos', express.static('/app/public/videos'));
 
 // Routes
-app.use('/', authRoutes);
+app.use('/', authRoutes); 
 app.use('/', movieRoutes);
 app.use('/', reviewRoutes);
 app.use('/', userRoutes);
