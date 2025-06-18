@@ -18,8 +18,8 @@ const port = 3001;
 
 app.use(cors());
 app.use(express.json());
-app.use('/images', express.static('/app/public/images'));
-app.use('/videos', express.static('/app/public/videos'));
+app.use('/images', express.static(path.join(__dirname, 'public/images')));
+app.use('/videos', express.static(path.join(__dirname, 'public/videos')));
 
 // Routes
 app.use('/', authRoutes); 

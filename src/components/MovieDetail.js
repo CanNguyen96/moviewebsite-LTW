@@ -83,13 +83,11 @@ const MovieDetail = () => {
                     headers: { Authorization: `Bearer ${token}` },
                 });
                 setIsFavorite(false);
-                toast.success("Đã xóa khỏi danh sách yêu thích");
             } else {
                 await axios.post(`${process.env.REACT_APP_API_URL}/api/favorites`, { movie_id: id }, {
                     headers: { Authorization: `Bearer ${token}` },
                 });
                 setIsFavorite(true);
-                toast.success("Đã thêm vào danh sách yêu thích");
             }
         } catch (err) {
             console.error("Lỗi khi cập nhật yêu thích:", err.response?.data || err);
@@ -144,10 +142,10 @@ const MovieDetail = () => {
         <div className="movie-detail-page">
             {/* Background Image */}
             <div className="movie-background">
-                <img src={movie.background_url} alt="Background" className="background-img" />
+                <img src={`${process.env.REACT_APP_API_URL}${movie.background_url}`} alt="Background" className="background-img" />
                 <div className="movie-header">
                     <div className="movie-detail-poster">
-                        <img src={movie.image_url} alt={movie.title} />
+                        <img src={`${process.env.REACT_APP_API_URL}${movie.image_url}`} alt={movie.title} />
                         <div className="movie-button">
                             {newestEpisode ? (
                                 <Link to={`/movie/${id}/episode/${newestEpisode.episode}`} className="watch-movie-btn">

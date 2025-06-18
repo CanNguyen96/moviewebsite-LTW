@@ -106,7 +106,7 @@ function EditMovie() {
                 <div className="left-section">
                     <div className="image">
                         <img
-                            src={movie.image_url || '/placeholder.jpg'}
+                            src={`${process.env.REACT_APP_API_URL}${movie.image_url}` || '/placeholder.jpg'}
                             alt={movie.title}
                             onError={(e) => {
                             e.target.src = '/placeholder.jpg';

@@ -91,7 +91,7 @@ function AnimeItem({movie_id, title, image_url, genre, year, duration, episodes,
         <div className="movie-item">
             <div className="movie-image">
                 <img
-                    src={image_url || '/placeholder.jpg'}
+                    src={`${process.env.REACT_APP_API_URL}${image_url}` || `${process.env.REACT_APP_API_URL}/${image_url}`}
                     alt={title}
                     onError={(e) => {
                         e.target.src = '/placeholder.jpg';

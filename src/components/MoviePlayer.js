@@ -35,7 +35,6 @@ const MoviePlayer = () => {
         const token = localStorage.getItem("token");
         if (!token) {
             console.log("Không có token, bỏ qua ghi lịch sử.");
-            toast.error("Vui lòng đăng nhập để ghi lịch sử xem phim!");
             return;
         }
 
@@ -52,7 +51,6 @@ const MoviePlayer = () => {
                 { headers: { Authorization: `Bearer ${token}` } }
             );
             console.log("Phản hồi từ server:", response.data);
-            toast.success("Đã ghi lịch sử xem phim thành công!");
             isHistoryRecorded.current = true;
         } catch (err) {
             console.error("Lỗi chi tiết khi ghi lịch sử:", err.response?.data || err.message);
@@ -192,7 +190,7 @@ const MoviePlayer = () => {
             </div>
             <div className="movie-player-info">
                 <div className="poster-container">
-                    <img src={movie.image_url} alt={movie.title} className="movie-poster" />
+                    <img src={`${process.env.REACT_APP_API_URL}${movie.image_url}`} alt={movie.title} className="movie-poster" />
                 </div>
                 <div className="movie-details">
                     <h3>{movie.title}</h3>

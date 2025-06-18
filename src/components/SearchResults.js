@@ -36,7 +36,7 @@ function SearchResults() {
           {results.map((movie) => (
             <li key={movie.id} className="movie-card">
               <a href={`/movieDetail/${movie.id}`}>
-                <img src={movie.image_url} alt={movie.title} />
+                <img src={`${process.env.REACT_APP_API_URL}${movie.image_url}`} alt={movie.title} />
                 <div className="movie-title">{movie.title}</div>
               </a>
             </li>

@@ -67,7 +67,7 @@ export default function CategoryMovies() {
             {movies.map(m => (
               <li key={m.id}>
                 <Link to={`/movieDetail/${m.id}`}>
-                  <img src={m.image_url} alt={m.title} />
+                  <img src={`${process.env.REACT_APP_API_URL}${m.image_url}`} alt={m.title} />
                   <p>{m.title}</p>
                 </Link>
               </li>

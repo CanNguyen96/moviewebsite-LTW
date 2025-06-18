@@ -76,7 +76,7 @@ function Favorites(){
                 <div className="movie-list">
                     {favoriteMovies.map(movie =>(
                         <Link key={movie.movie_id} to = {`/movieDetail/${movie.movie_id}`} className="movie-card">
-                            <img src={movie.image_url} alt={movie.title} />
+                            <img src={`${process.env.REACT_APP_API_URL}${movie.image_url}`} alt={movie.title} />
                             <div className="movie-title">{movie.title}</div>
                         </Link>
                     ))}

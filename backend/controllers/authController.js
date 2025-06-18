@@ -74,6 +74,15 @@ const login = (req, res) => {
             return res.status(401).json({ error: 'Mật khẩu không đúng' });
         }
 
+        // Kiểm tra trạng thái status
+        if (user.status === 'Banned') {
+            return res.status(403).json({ error: 'Tài khoản của bạn đã bị cấm.' });
+        }
+
+        if (user.status !== 'Active') {
+            return res.status(403).json({ error: 'Tài khoản của bạn chưa được kích hoạt.' });
+        }
+
         const token = jwt.sign(
             { user_id: user.user_id, user_name: user.user_name, email: user.email },
             'your_secret_key',

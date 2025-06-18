@@ -63,7 +63,6 @@ function WatchHistory() {
                 headers: { Authorization: `Bearer ${token}` }
             });
             setWatchHistory(watchHistory.filter(item => item.movie_id !== movie_id));
-            toast.success("Đã xóa bản ghi lịch sử xem phim");
         } catch (err) {
             console.error("Lỗi xóa lịch sử xem phim:", err.response?.data || err);
             if (!handleTokenError(err)) {
@@ -89,7 +88,7 @@ function WatchHistory() {
                 headers: { Authorization: `Bearer ${token}` }
             });
             setWatchHistory([]);
-            toast.success("Đã xóa toàn bộ lịch sử xem phim");
+            
         } catch (err) {
             console.error("Lỗi xóa toàn bộ lịch sử xem phim:", err.response?.data || err);
             if (!handleTokenError(err)) {
@@ -121,7 +120,7 @@ function WatchHistory() {
                     {watchHistory.map(history => (
                         <div key={history.movie_id} className="movie-card-wrapper">
                             <Link to={`/movieDetail/${history.movie_id}`} className="movie-card">
-                                <img src={history.image_url} alt={history.title} />
+                                <img src={`${process.env.REACT_APP_API_URL}${history.image_url}`} alt={history.title} />
                                 <div className="movie-title">{history.title}</div>
                                 <div className="watched-at">Xem lúc: {new Date(history.watched_at).toLocaleString()}</div>
                             </Link>
