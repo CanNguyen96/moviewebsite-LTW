@@ -43,7 +43,7 @@ function Header() {
     setSearchKeyword(event.target.value);
   }
   const handleSearchSubmit=(event)=>{
-    if (event.key== 'Enter'){
+    if (event.key == 'Enter'){
       if(searchKeyword.trim() != ''){
         navigate(`/movies/search?keyword=${encodeURIComponent(searchKeyword)}`);  
         setSearchKeyword('');         
@@ -62,7 +62,7 @@ function Header() {
   const [categoryList, setCategoryList] = useState([]);
   
   useEffect(() => {
-      axios.get(`${process.env.REACT_APP_API_URL}/api/categories`)
+      axios.get('http://localhost:3001/api/categories')
           .then(res => {
               setCategoryList(res.data);
           })
@@ -137,7 +137,7 @@ function Header() {
                       <li onClick={() => {
                         navigate("/profile");
                         setShowDropdown(false); 
-                      }}>Quản lý thông tin</li>
+                      }}>Quản lý tài khoản</li>
                       <li onClick={() => {       
                         navigate("/movies/favorites");
                         setShowDropdown(false)} }>Danh sách yêu thích</li>

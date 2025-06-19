@@ -18,7 +18,7 @@ function LoginForm() {
         setLoading(true);
         setError("");
         try {
-            const res = await axios.post(`${process.env.REACT_APP_API_URL}/login`, {
+            const res = await axios.post("http://localhost:3001/login", {
                 email,
                 password,
             });
@@ -40,7 +40,7 @@ function LoginForm() {
     
             setTimeout(() => {
                 if (res.data.user.role_id === 1) {
-                    navigate("/manageuser"); // Chuyển hướng đến trang quản lý người dùng
+                    navigate("/manageuser"); 
                 } else {
                     navigate("/");
                 }

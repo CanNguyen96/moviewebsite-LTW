@@ -1,4 +1,3 @@
-import React from "react";
 
 import Notification from "../../components/Notification";
 import ForgotPassword from "../../components/ForgotPassword";

@@ -1,5 +1,5 @@
-"use client";
-import React, { useState } from "react";
+
+import { useState } from "react";
 import "../styles/Login.css";
 import axios from "axios";
 import { ToastContainer, toast } from "react-toastify";

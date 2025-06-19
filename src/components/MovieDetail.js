@@ -29,7 +29,7 @@ const MovieDetail = () => {
         const fetchMovieData = async () => {
             try {
 
-                const movieRes = await fetch(`${process.env.REACT_APP_API_URL}/api/movies/${id}`);
+                const movieRes = await fetch(`http://localhost:3001/api/movies/${id}`);
                 const movieData = await movieRes.json();
 
                 if (movieData) {
@@ -39,13 +39,13 @@ const MovieDetail = () => {
                 }
                 // 2. Fetch Đánh giá phim
                 // Gọi API backend để lấy danh sách đánh giá
-                const reviewsRes = await axios.get(`${process.env.REACT_APP_API_URL}/api/reviews/${id}`);
+                const reviewsRes = await axios.get(`http://localhost:3001/api/reviews/${id}`);
                 setReviews(reviewsRes.data); // Cập nhật state reviews
 
                 const token = localStorage.getItem("token");
                 if (token) {
                     try {
-                        const statusRes = await axios.get(`${process.env.REACT_APP_API_URL}/api/favorites/${id}/status`, {
+                        const statusRes = await axios.get(`http://localhost:3001/api/favorites/${id}/status`, {
                             headers: { Authorization: `Bearer ${token}` },
                         });
                         setIsFavorite(statusRes.data.isFavorite);
@@ -79,15 +79,17 @@ const MovieDetail = () => {
         }
         try {
             if (isFavorite) {
-                await axios.delete(`${process.env.REACT_APP_API_URL}/api/favorites/${id}`, {
+                await axios.delete(`http://localhost:3001/api/favorites/${id}`, {
                     headers: { Authorization: `Bearer ${token}` },
                 });
                 setIsFavorite(false);
+                toast.success("Đã xóa khỏi danh sách yêu thích");
             } else {
-                await axios.post(`${process.env.REACT_APP_API_URL}/api/favorites`, { movie_id: id }, {
+                await axios.post(`http://localhost:3001/api/favorites`, { movie_id: id }, {
                     headers: { Authorization: `Bearer ${token}` },
                 });
                 setIsFavorite(true);
+                toast.success("Đã thêm vào danh sách yêu thích");
             }
         } catch (err) {
             console.error("Lỗi khi cập nhật yêu thích:", err.response?.data || err);
@@ -110,14 +112,20 @@ const MovieDetail = () => {
 
         try {
             await axios.post(
-                `${process.env.REACT_APP_API_URL}/api/reviews`,
+                "http://localhost:3001/api/reviews",
                 { movie_id: id, rating, comment: newComment },
                 { headers: { Authorization: `Bearer ${token}` } }
             );
             setNewComment("");
             setRating(10);
-            const res = await axios.get(`${process.env.REACT_APP_API_URL}/api/reviews/${id}`);
+            const res = await axios.get(`http://localhost:3001/api/reviews/${id}`);
             setReviews(res.data);
+            // Fetch lại dữ liệu phim để cập nhật avg_rating và total_reviews
+            const movieRes = await fetch(`http://localhost:3001/api/movies/${id}`);
+            const movieData = await movieRes.json();
+            if (movieData) {
+                setMovie(movieData);
+            }
             toast.success("Đánh giá thành công!");
         } catch (err) {
             toast.error(
@@ -142,10 +150,10 @@ const MovieDetail = () => {
         <div className="movie-detail-page">
             {/* Background Image */}
             <div className="movie-background">
-                <img src={`${process.env.REACT_APP_API_URL}${movie.background_url}`} alt="Background" className="background-img" />
+                <img src={movie.background_url} alt="Background" className="background-img" />
                 <div className="movie-header">
                     <div className="movie-detail-poster">
-                        <img src={`${process.env.REACT_APP_API_URL}${movie.image_url}`} alt={movie.title} />
+                        <img src={movie.image_url} alt={movie.title} />
                         <div className="movie-button">
                             {newestEpisode ? (
                                 <Link to={`/movie/${id}/episode/${newestEpisode.episode}`} className="watch-movie-btn">

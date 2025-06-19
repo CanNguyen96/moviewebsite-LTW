@@ -1,5 +1,6 @@
 const jwt = require('jsonwebtoken');
 const db = require('../config/db');
+require('dotenv').config();
 
 // API: Gửi đánh giá (yêu cầu đăng nhập)
 const createReview = (req, res) => {
@@ -11,7 +12,7 @@ const createReview = (req, res) => {
     }
 
     try {
-        const decoded = jwt.verify(token, process.env.JWT_SECRET || "your_secret_key");
+        const decoded = jwt.verify(token, process.env.JWT_SECRET || 'your_secret_key' );
         const user_id = decoded.user_id;
 
         if (!movie_id || !rating || !comment) {
@@ -23,7 +24,7 @@ const createReview = (req, res) => {
             return res.status(400).json({ error: "Điểm đánh giá phải từ 1 đến 10!" });
         }
 
-        // Chèn đánh giá vào bảng reviews (không có user_name)
+        // Chèn đánh giá vào bảng reviews 
         db.query(
             "INSERT INTO reviews (movie_id, user_id, rating, comment, review_date) VALUES (?, ?, ?, ?, NOW())",
             [movie_id, user_id, rating, comment],

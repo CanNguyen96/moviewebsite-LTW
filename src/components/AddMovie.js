@@ -1,6 +1,6 @@
 import axios from "axios";
 import "../styles/AddMovie.css";
-import React, {useState} from "react";
+import  {useState} from "react";
 import { useNavigate } from "react-router-dom";
 
 function AddMovie(){ 
