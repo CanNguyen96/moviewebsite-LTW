@@ -4,6 +4,53 @@ import "../styles/MoviePlayer.css";
 import axios from "axios";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import Hls from "hls.js";
+
+// Component phát video HLS tự làm giống code HTML Vanilla của bạn
+const HlsVideoPlayer = ({ src }) => {
+    const videoRef = useRef(null);
+
+    useEffect(() => {
+        const video = videoRef.current;
+        if (!video || !src) return;
+
+        let hls;
+
+        if (Hls.isSupported()) {
+            hls = new Hls();
+            hls.loadSource(src);
+            hls.attachMedia(video);
+            hls.on(Hls.Events.MANIFEST_PARSED, function () {
+                video.play().catch(err => {
+                    console.log("Trình duyệt chặn autoplay âm thanh, người dùng cần bấm play thủ công:", err);
+                });
+            });
+        }
+        // Hỗ trợ riêng cho trình duyệt Safari (Native HLS)
+        else if (video.canPlayType('application/vnd.apple.mpegurl')) {
+            video.src = src;
+            video.addEventListener('loadedmetadata', function () {
+                video.play().catch(err => console.log(err));
+            });
+        }
+
+        // Cleanup (Dọn dẹp hls khi đổi tập hoặc rời trang)
+        return () => {
+            if (hls) {
+                hls.destroy();
+            }
+        };
+    }, [src]);
+
+    return (
+        <video 
+            ref={videoRef} 
+            controls 
+            className="react-player-styled" 
+            style={{ width: '100%', height: '100%', backgroundColor: '#000', outline: 'none' }}
+        />
+    );
+};
 
 const MoviePlayer = () => {
     const { id, episodeNumber } = useParams();
@@ -15,6 +62,19 @@ const MoviePlayer = () => {
     const [rating, setRating] = useState(10);
     const navigate = useNavigate();
     const isHistoryRecorded = useRef(false);
+
+    // Kểm tra xem URL là chuẩn video để dùng ReactPlayer hay là dạng iframe embed
+    const isVideoUrl = (url) => {
+        if (!url) return false;
+        const lowerUrl = url.toLowerCase();
+        return (
+            lowerUrl.includes(".m3u8") ||
+            lowerUrl.includes(".mp4") ||
+            lowerUrl.includes("youtube.com") ||
+            lowerUrl.includes("youtu.be") ||
+            lowerUrl.includes("vimeo.com")
+        );
+    };
 
     const handleTokenError = (err) => {
         if (err.response && err.response.status === 403 && err.response.data?.error === 'Token không hợp lệ hoặc đã hết hạn') {
@@ -150,95 +210,110 @@ const MoviePlayer = () => {
         }
     };
 
-    if (loading) return <div>Đang tải...</div>;
-    if (!movie) return <div>Không tìm thấy phim!</div>;
+    if (loading) return <div className="loading-indicator">Đang tải...</div>;
+    if (!movie) return <div className="error-message">Không tìm thấy phim!</div>;
 
     return (
-        <div className="movie-player-container">
-            <div className="breadcrumb">
-                <Link to="/">Trang chủ</Link> / <Link to={`/movie-detail/${id}`}>{movie.title}</Link> /{" "}
-                <span>{currentEpisode?.title || `Tập ${currentEpisode?.episode}`}</span>
-            </div>
-            <div className="video-player">
-                <iframe
-                    key={currentEpisode?.episode_id}
-                    width="100%"
-                    height="400"
-                    src={currentEpisode?.video_url}
-                    title={movie.title}
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                    allowFullScreen
-                ></iframe>
-            </div>
-            <div className="episode-list">
-                <h3>DANH SÁCH TẬP</h3>
-                <div className="episodes">
-                    {Array.isArray(movie.episodes) && movie.episodes.length > 0 ? (
-                        movie.episodes.map((ep, index) => (
-                            <button
-                                key={`episode-${index}`}
-                                className={Number(ep.episode) === Number(currentEpisode?.episode) ? "active" : ""}
-                                onClick={() => handleEpisodeClick(ep)}
-                            >
-                                Tập {ep.episode}
-                            </button>
-                        ))
+        <div className="movie-player-page">
+            <div className="movie-player-container">
+                <div className="breadcrumb">
+                    <Link to="/">Trang chủ</Link> / <Link to={`/movie-detail/${id}`}>{movie.title}</Link> /{" "}
+                    <span className="current-ep-text">{currentEpisode?.title || `Tập ${currentEpisode?.episode}`}</span>
+                </div>
+                
+                <div className="video-player-wrapper">
+                    {isVideoUrl(currentEpisode?.video_url) ? (
+                        <HlsVideoPlayer src={currentEpisode?.video_url} />
                     ) : (
-                        <p>Không có tập phim nào để hiển thị.</p>
+                        <iframe
+                            key={currentEpisode?.episode_id}
+                            width="100%"
+                            height="100%"
+                            src={currentEpisode?.video_url}
+                            title={movie.title}
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                            allowFullScreen
+                        ></iframe>
                     )}
                 </div>
-            </div>
-            <div className="movie-player-info">
-                <div className="poster-container">
-                    <img src={`${process.env.REACT_APP_API_URL}${movie.image_url}`} alt={movie.title} className="movie-poster" />
-                </div>
-                <div className="movie-details">
-                    <h3>{movie.title}</h3>
-                    <p>{movie.description}</p>
-                </div>
-            </div>
-            <div className="review-section">
-                <h3>ĐÁNH GIÁ</h3>
-                <form onSubmit={handleReviewSubmit}>
-                    <div className="rating-input">
-                        <label>Điểm đánh giá (1-10): </label>
-                        <select value={rating} onChange={(e) => setRating(Number(e.target.value))} required>
-                            <option value="1">1</option>
-                            <option value="2">2</option>
-                            <option value="3">3</option>
-                            <option value="4">4</option>
-                            <option value="5">5</option>
-                            <option value="6">6</option>
-                            <option value="7">7</option>
-                            <option value="8">8</option>
-                            <option value="9">9</option>
-                            <option value="10">10</option>
-                        </select>
+                
+                <div className="player-content-stacked">
+                    {/* 1. Episode List */}
+                    <div className="episode-list-card">
+                        <h3>DANH SÁCH TẬP</h3>
+                        <div className="episodes-grid">
+                            {Array.isArray(movie.episodes) && movie.episodes.length > 0 ? (
+                                [...movie.episodes]
+                                    .sort((a, b) => Number(a.episode) - Number(b.episode))
+                                    .map((ep, index) => (
+                                    <button
+                                        key={`episode-${index}`}
+                                        className={`ep-btn ${Number(ep.episode) === Number(currentEpisode?.episode) ? "active" : ""}`}
+                                        onClick={() => handleEpisodeClick(ep)}
+                                    >
+                                        {ep.episode}
+                                    </button>
+                                ))
+                            ) : (
+                                <p className="text-muted">Hiện chưa có tập phim.</p>
+                            )}
+                        </div>
                     </div>
-                    <textarea
-                        placeholder="Viết đánh giá của bạn..."
-                        value={newComment}
-                        onChange={(e) => setNewComment(e.target.value)}
-                        required
-                    ></textarea>
-                    <button type="submit" className="review-button">
-                        GỬI ĐÁNH GIÁ
-                    </button>
-                </form>
-                <div className="reviews-list">
-                    {reviews.length > 0 ? (
-                        reviews.map((review, index) => (
-                            <div key={`review-${index}`} className="review">
-                                <p>
-                                    <strong>{review.user_name}</strong> ({new Date(review.review_date).toLocaleString()}) -{" "}
-                                    <span className="rating">Điểm: {review.rating}/10</span>
-                                </p>
-                                <p>{review.comment}</p>
+
+                    {/* 2. Review Section */}
+                    <div className="review-section">
+                        <div className="review-header">
+                            <h3>Bình luận ({reviews.length})</h3>
+                            <span className="refresh-icon">↻</span>
+                        </div>
+                        
+                        <form onSubmit={handleReviewSubmit} className="comment-form">
+                            <textarea
+                                placeholder="Nhập bình luận của bạn tại đây"
+                                value={newComment}
+                                onChange={(e) => setNewComment(e.target.value)}
+                                required
+                            ></textarea>
+                            <div className="comment-actions">
+                                <div className="action-left">
+                                    <div className="rating-select-wrapper">
+                                        <label>Điểm: </label>
+                                        <select value={rating} onChange={(e) => setRating(Number(e.target.value))}>
+                                            {[...Array(10).keys()].map(i => (
+                                                <option key={i+1} value={i+1}>{i+1}</option>
+                                            ))}
+                                        </select>
+                                    </div>
+                                </div>
+                                <button type="submit" className="submit-comment-btn">Gửi</button>
                             </div>
-                        ))
-                    ) : (
-                        <p>Chưa có đánh giá nào.</p>
-                    )}
+                        </form>
+
+                        <div className="reviews-list">
+                            {reviews.length > 0 ? (
+                                reviews.map((review, index) => (
+                                    <div key={`review-${index}`} className="review-item">
+                                        <div className="review-avatar">
+                                            <img src="/images/default-avatar.png" alt="Avatar" onError={(e) => { e.target.src = 'https://ui-avatars.com/api/?name=' + review.user_name + '&background=random' }} />
+                                            <div className="user-level">Lv 12</div>
+                                        </div>
+                                        <div className="review-content">
+                                            <div className="review-user">
+                                                <strong>{review.user_name}</strong> 
+                                                <span className="rating-star-small">⭐ {review.rating}/10</span>
+                                            </div>
+                                            <p className="review-text">{review.comment}</p>
+                                            <div className="review-time">
+                                                <span className="reply-btn">Trả lời</span> {new Date(review.review_date).toLocaleString()}
+                                            </div>
+                                        </div>
+                                    </div>
+                                ))
+                            ) : (
+                                <p className="no-reviews text-muted" style={{color: '#999'}}>Chưa có đánh giá nào.</p>
+                            )}
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
