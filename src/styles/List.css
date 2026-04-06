@@ -1,7 +1,9 @@
 .list{
     display: grid;
-    grid-template-columns: repeat(5,1fr);
-    gap:25px;
+    /* Cố định luôn cỡ 150px mỗi ô, còn lại cách đều ra */
+    grid-template-columns: repeat(auto-fill, 150px);
+    justify-content: center; /* Căn giữa các ô phim ra giữa màn hình nếu còn dư */
+    gap: 25px; /* Giãn cách các thẻ nhìn cho thoáng */
     padding: 10px;
     overflow: hidden;
     max-width: 100%;
@@ -45,7 +47,7 @@
 }
 
 .anime-image{
-    height: 250px;
+    height: 220px;
     width: 100%;
     overflow: hidden;
     position: relative; /* Để tạo lớp phủ bóng overlay */
@@ -65,12 +67,23 @@
 .anime-info {
     display: flex;
     justify-content: center;
-    text-align: center;
-    margin-top: 10px;
-    color: white;
-    max-height: 24px;
-
+    align-items: center;
+    padding: 12px 10px;
+    color: #fff;
+    height: 50px; /* Cố định chiều cao */
 }
+
+.anime-info .title {
+    font-size: 15px;
+    font-weight: 500;
+    margin: 0;
+    /* Cắt chữ thêm "..." nếu quá dài */
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    width: 100%;
+}
+
 .more{
     justify-items: center;
     text-align: center;
@@ -92,6 +105,12 @@
     padding: 20px;
     border-radius: 10px;
 }
+.more {
+    margin-top: 30px;
+    display: flex;
+    justify-content: center;
+}
+
 .page-button {
     background-color: #333;
     color: white;
