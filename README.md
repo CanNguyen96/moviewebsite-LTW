@@ -55,7 +55,7 @@ Backend nằm ở [backend/server.js](backend/server.js) và dùng biến môi t
 
 Chạy backend theo 1 trong 2 cách sau:
 
-**Cách 2.1 (dễ nhất): chạy từ thư mục gốc để backend đọc được file .env**
+**Cách 2.1 : chạy từ thư mục gốc để backend đọc được file .env**
 
 ```bash
 npm install
@@ -89,18 +89,3 @@ npm start
 ```
 
 Frontend sẽ chạy ở `http://localhost:3000`.
-
-## Lưu ý quan trọng (JWT)
-
-Hiện tại backend đang **ký token** bằng chuỗi cố định `your_secret_key` nhưng middleware lại **verify token** theo `JWT_SECRET` trong [.env](.env) (nếu bạn có set).
-
-Để các API cần đăng nhập không bị lỗi 403 khi chạy, bạn có 2 lựa chọn:
-
-1) Đặt `JWT_SECRET=your_secret_key` trong [.env](.env), hoặc
-2) Bỏ dòng `JWT_SECRET=...` để backend dùng fallback `your_secret_key`.
-
-## Troubleshooting nhanh
-
-- Port bị chiếm: đổi `BACKEND_PORT` (backend) hoặc dừng tiến trình đang dùng port 3001/3000/80.
-- DB connect fail khi chạy local: kiểm tra `DB_HOST/DB_PORT` trong [.env](.env) và chắc chắn MySQL đang chạy.
-- Docker backend không start do `wait-for-it.sh`: nếu gặp lỗi kiểu `^M`, đổi line endings file `backend/wait-for-it.sh` sang LF.
