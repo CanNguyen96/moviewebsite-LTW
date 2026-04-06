@@ -1,18 +1,210 @@
 .add-movie-container {
-    background-color: #1e272e;
-    color: white;
+    background-color: #171717;
+    color: #fff;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    padding: 20px;
-    border-radius: 10px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-    max-width: 700px;
-    margin: 20px auto;
-    gap: 20px;
-    align-items: center;
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.5);
+    max-width: 900px;
+    margin: 40px auto;
 }
-.add-movie-container h2{
-    color: white;
+
+.add-movie-container h2 {
+    color: #f39c12;
     text-align: center;
-    margin-bottom: 20px;
+    margin-bottom: 30px;
+    font-weight: 600;
+    font-size: 1.8rem;
+}
+
+.add-movie-form {
+    display: flex;
+    flex-direction: column;
+}
+
+.form-main-content {
+    display: flex;
+    gap: 40px;
+    margin-bottom: 30px;
+}
+
+.form-column {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.form-column.left {
+    flex: 2;
+}
+
+.form-column.right {
+    flex: 1;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    position: relative;
+}
+
+.form-group label {
+    margin-bottom: 8px;
+    font-weight: 500;
+    color: #ccc;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.form-group input[type="text"],
+.form-group input[type="number"],
+.form-group textarea {
+    background-color: #252525;
+    color: #fff;
+    border: 1px solid #444;
+    border-radius: 6px;
+    padding: 12px;
+    font-size: 1rem;
+    transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+.form-group input:focus,
+.form-group textarea:focus {
+    outline: none;
+    border-color: #f39c12;
+    box-shadow: 0 0 0 3px rgba(243, 156, 18, 0.2);
+}
+
+.form-group-row {
+    display: flex;
+    gap: 20px;
+}
+
+.form-group-row .form-group {
+    flex: 1;
+}
+
+/* Custom Select for Categories */
+.custom-select-wrapper {
+    background-color: #252525;
+    border: 1px solid #444;
+    border-radius: 6px;
+    padding: 8px;
+    cursor: pointer;
+    min-height: 48px;
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+.selected-categories-display .placeholder {
+    color: #888;
+    padding-left: 5px;
+}
+
+.category-tag {
+    background-color: #f39c12;
+    color: #171717;
+    padding: 5px 10px;
+    border-radius: 15px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+
+.category-tag svg {
+    cursor: pointer;
+    font-size: 0.8rem;
+}
+
+.category-dropdown {
+    position: absolute;
+    background-color: #2d2d2d;
+    border: 1px solid #555;
+    border-radius: 6px;
+    top: calc(100% + 6px);
+    left: 0;
+    right: 0;
+    max-height: 200px;
+    overflow-y: auto;
+    z-index: 100;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+}
+
+.dropdown-item {
+    padding: 12px 15px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.dropdown-item:hover {
+    background-color: #444;
+}
+
+.dropdown-item.dropdown-empty {
+    color: #aaa;
+    cursor: default;
+}
+
+.dropdown-item.dropdown-empty:hover {
+    background-color: transparent;
+}
+
+/* File Input */
+.form-group input[type="file"] {
+    background-color: #252525;
+    border: 1px dashed #555;
+    padding: 20px;
+    border-radius: 6px;
+    text-align: center;
+    color: #888;
+    cursor: pointer;
+}
+
+.button-container {
+    display: flex;
+    justify-content: flex-end;
+    gap: 15px;
+    margin-top: 10px;
+    border-top: 1px solid #333;
+    padding-top: 20px;
+}
+
+.submit-button, .cancel-button {
+    padding: 12px 25px;
+    border: none;
+    border-radius: 6px;
+    font-size: 1rem;
     font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.submit-button {
+    background: linear-gradient(90deg, #f39c12, #e67e22);
+    color: white;
+}
+
+.submit-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(243, 156, 18, 0.4);
+}
+
+.cancel-button {
+    background-color: #333;
+    color: #ccc;
+}
+
+.cancel-button:hover {
+    background-color: #444;
+}
+
+@media (max-width: 768px) {
+    .form-main-content {
+        flex-direction: column;
+    }
 }

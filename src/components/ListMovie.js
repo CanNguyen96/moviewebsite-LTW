@@ -3,6 +3,15 @@ import axios from 'axios';
 import '../styles/ListMovie.css';
 import { Link } from 'react-router-dom';
 
+const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:3001';
+
+const buildImageSrc = (imageUrl) => {
+    if (!imageUrl) return '/images/placeholder.jpg';
+    if (/^https?:\/\//i.test(imageUrl)) return imageUrl;
+    const normalizedPath = imageUrl.startsWith('/') ? imageUrl : `/${imageUrl}`;
+    return `${API_BASE_URL}${normalizedPath}`;
+};
+
 function AdminList() {
     const [animeList, setAnimeList] = useState([]);
     const [currentPage, setCurrentPage]= useState(1);
@@ -91,10 +100,10 @@ function AnimeItem({movie_id, title, image_url, genre, year, duration, episodes,
         <div className="movie-item">
             <div className="movie-image">
                 <img
-                    src={`${process.env.REACT_APP_API_URL}${image_url}` || `${process.env.REACT_APP_API_URL}/${image_url}`}
+                    src={buildImageSrc(image_url)}
                     alt={title}
                     onError={(e) => {
-                        e.target.src = '/placeholder.jpg';
+                        e.currentTarget.src = '/images/placeholder.jpg';
                     }}
                 />
             </div>

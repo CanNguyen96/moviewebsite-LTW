@@ -268,6 +268,11 @@ const addMovie = (req, res) => {
     // Lưu đường dẫn vào DB (dùng path tương đối tới public/images)
     const image_url = `/images/${imageFile.filename}`;
     const background_url = `/images/${backgroundFile.filename}`;
+
+    // NOTE: movies.genre trong schema hiện là VARCHAR(45)
+    // Nếu chọn nhiều thể loại, chuỗi genre có thể vượt 45 ký tự và gây lỗi 500.
+    // Giải pháp: lưu giá trị an toàn vào bảng movies, nhưng vẫn dùng chuỗi đầy đủ để liên kết movie_categories.
+    const genreForDb = String(genre).slice(0, 45);
     const sql = `
         INSERT INTO movies (title, description, release_year, duration, image_url, genre, status, background_url)
         VALUES (?, ?, ?, ?, ?, ?, ?, ?)
@@ -280,7 +285,7 @@ const addMovie = (req, res) => {
         release_year,
         duration,
         image_url,
-        genre,
+        genreForDb,
         finalStatus, 
         background_url 
     ];
@@ -297,12 +302,14 @@ const addMovie = (req, res) => {
 
             // 2.Xử lý chuỗi genre và tìm cateogory_id
             // Tách chuỗi genre bằng dấu phẩy, loại bỏ khoảng trắng thừa 
-            const genreNames= genre.split(',').map(name=>  name.trim()).filter(name => name!= '');
+            const genreNames= genre.split(',').map(name=>  name.trim()).filter(name => name !== '');
 
             if (genreNames.length===0){
-                res.status(201).json({
+                return res.status(201).json({
                     message: 'Thêm phim thành công ( Không có thể loại nào được liên kết )',
-                    movie_id: newMovieId
+                    movie_id: newMovieId,
+                    image_url,
+                    background_url
                 });
             }
             // Chuẩn bị truy vấn để tìm category_id cho tên các thể loại 
@@ -316,15 +323,19 @@ const addMovie = (req, res) => {
                     return res.status(201).json({
                         message: 'Thêm phim thành công, nhưng gặp lỗi khi liên kết thể loại',
                         movie_id: newMovieId,
-                        category_error: errCategories.message 
+                        category_error: errCategories.message,
+                        image_url,
+                        background_url
                     });
                 }
                 if ( resultCategories.length===0){
-                    console.warn(`Không tìm thấy category_id cho các thể loại: ${genreNames.json(',')}`);
+                    console.warn(`Không tìm thấy category_id cho các thể loại: ${genreNames.join(', ')}`);
 
                     return res.status(201).json({
                         message: 'Thêm phim thành công, nhưng không tìm thấy thể loại nào tương ứng để liên kết',
                         movie_id: newMovieId,
+                        image_url,
+                        background_url
                     });
                 }
                 // 3. Chuẩn bị và thêm dữ liêu vào bảng movie_categories
@@ -342,7 +353,9 @@ const addMovie = (req, res) => {
                         return res.status(201).json({
                             message: 'Thêm phim thành công, nhưng gặp lỗi khi thêm vào bảng liên kết thể loại.',
                             movie_id: newMovieId,
-                            link_error: errMovieCategories.message
+                            link_error: errMovieCategories.message,
+                            image_url,
+                            background_url
                         });
                     }
                     // Kiểm tra số lượng bản ghi đã được thêm vào movie_categories
@@ -350,14 +363,18 @@ const addMovie = (req, res) => {
                         // 4. Hoàn thành: Gửi phản hồi thành công thêm phim và liên kết thể loại
                         res.status(201).json({
                             message: `Thêm phim thành công và liên kết với ${resultMovieCategories.affectedRows} thể loại.`,
-                            movie_id: newMovieId
+                            movie_id: newMovieId,
+                            image_url,
+                            background_url
                         });
                     } else{
                         // Trường hợp không có lỗi nhưng không có dòng nào được thêm vào movie_categories
                         console.warn('Không có dữ liệu nào được thêm vào movie_categories');
                         res.status(201).json({
                             message: 'Thêm phim thành công, nhưng không thêm được dữ liệu vào bảng movie_categories',
-                            movie_id: newMovieId
+                            movie_id: newMovieId,
+                            image_url,
+                            background_url
                         });
                     }
                 });
