@@ -15,11 +15,15 @@ const episodesRoutes = require('./routes/episodesRoutes');
 
 const app = express();
 const port = 3001;
+const fs = require('fs');
+const publicDir = fs.existsSync(path.join(__dirname, 'public'))
+  ? path.join(__dirname, 'public')        // Docker: /app/public (mount từ compose)
+  : path.join(__dirname, '..', 'public'); // Local: projectRoot/public
 
 app.use(cors());
 app.use(express.json());
-app.use('/images', express.static(path.join(__dirname, 'public/images')));
-app.use('/videos', express.static(path.join(__dirname, 'public/videos')));
+app.use('/images', express.static(path.join(publicDir, 'images')));
+app.use('/videos', express.static(path.join(publicDir, 'videos')));
 
 // Routes
 app.use('/', authRoutes); 

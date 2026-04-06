@@ -34,16 +34,10 @@ function List() {
             </div>
             <div className="list">
                 {currentMovies.map((item) => (
-                    <li>
-                    <Link 
-                        to={`/movieDetail/${item.id}`} 
-                        key={item.id}
-                    >
-                        <AnimeItem 
-                            title={item.title} 
-                            image_url={item.image_url} 
-                        />
-                    </Link>   
+                    <li key={item.id}>
+                        <Link to={`/movieDetail/${item.id}`}>
+                            <AnimeItem title={item.title} image_url={item.image_url} />
+                        </Link>
                     </li>
                 ))}
             </div>

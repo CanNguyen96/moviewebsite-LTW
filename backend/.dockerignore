@@ -1,0 +1,18 @@
+# dependencies
+node_modules
+
+# logs / temp
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+*.log
+
+# VCS / editor
+.git
+.vscode
+.idea
+
+# env files (tuỳ bạn: nếu backend cần .env trong image thì bỏ 2 dòng này)
+.env
+.env.*
