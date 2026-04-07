@@ -59,7 +59,7 @@
 }
 
 .add-episode-section .cancel-button {
-  background-color: #6c757d; /* Màu xám cho nút Hủy */
+  background-color: #6c757d;
   color: #fff;
   border: none;
   padding: 10px 18px;
@@ -105,7 +105,7 @@
   padding: 6px 12px;
   border-radius: 5px;
   cursor: pointer;
-  margin: 0 5px; /* Thêm khoảng cách giữa các nút */
+  margin: 0 5px;
 }
 
 .action-button:hover {
@@ -113,7 +113,7 @@
 }
 
 .action-button.edit-button {
-  background-color: #28a745; /* Màu xanh lá cho nút Sửa */
+  background-color: #28a745;
 }
 
 .action-button.edit-button:hover {

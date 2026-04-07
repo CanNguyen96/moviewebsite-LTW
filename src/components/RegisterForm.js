@@ -1,6 +1,6 @@
 
 import { useState } from "react";
-import "../styles/Login.css";
+import styles from "../styles/Login.module.css";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { ToastContainer, toast } from "react-toastify";
@@ -62,10 +62,10 @@ function RegisterForm() {
     };
 
     return (
-        <div className="container">
+        <div className={styles.container}>
             <ToastContainer />
             <h2>Đăng Ký</h2>
-            <form className="form" onSubmit={handleSubmit}>
+            <form className={styles.form} onSubmit={handleSubmit}>
                 <label>Họ và Tên</label>
                 <input
                     type="text"
@@ -99,13 +99,13 @@ function RegisterForm() {
                     required
                 />
                 {error && <p className="error-message">{error}</p>}
-                <button type="submit" className="btn" disabled={loading}>
+                <button type="submit" className={styles.btn} disabled={loading}>
                     {loading ? "Đang xử lý..." : "Đăng Ký"}
                 </button>
             </form>
             <p>
                 Đã có tài khoản?{" "}
-                <Link to="/login" className="register-link">
+                <Link to="/login" className={styles['register-link']}>
                     Đăng nhập
                 </Link>
             </p>

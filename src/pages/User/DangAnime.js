@@ -1,5 +1,5 @@
 
-import '../../styles/Home.css'; 
+import styles from '../../styles/Home.module.css'; 
 import Notification from '../../components/Notification';
 import List from '../../components/List';
 
@@ -7,7 +7,7 @@ import List from '../../components/List';
 function DangAnime(){
     return(
         <div>
-            <div className="content">
+            <div className={styles.content}>
                 <Notification />
                 <List />
             </div>

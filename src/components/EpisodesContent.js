@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
 import { useParams } from 'react-router-dom';
-import '../styles/EpisodesMovie.css';
+import styles from '../styles/EpisodesMovie.module.css';
 
 function EpisodesContent() {
     const { movie_id } = useParams();
@@ -88,11 +88,11 @@ function EpisodesContent() {
     };
 
     return (
-        <div className="episode-manager-container">
+        <div className={styles['episode-manager-container']}>
             <h2>Quản lý tập phim (Movie ID: {movie_id})</h2>
 
             {/* Thêm hoặc sửa tập phim */}
-            <div className="add-episode-section">
+            <div className={styles['add-episode-section']}>
                 <input
                     type="number"
                     placeholder="Số tập"
@@ -118,7 +118,7 @@ function EpisodesContent() {
                     {editingEpisodeId ? 'Cập nhật' : 'Thêm tập'}
                 </button>
                 {editingEpisodeId && (
-                    <button onClick={handleCancelEdit} className="cancel-button">
+                    <button onClick={handleCancelEdit} className={styles['cancel-button']}>
                         Hủy
                     </button>
                 )}
@@ -126,7 +126,7 @@ function EpisodesContent() {
 
             {/* Danh sách tập phim */}
             <h3> Danh sách tập phim</h3>
-            <table className="episode-list-table">
+            <table className={styles['episode-list-table']}>
                 <thead>
                     <tr>
                         <th>STT</th>
@@ -139,7 +139,7 @@ function EpisodesContent() {
                 <tbody>
                     {episodes.length === 0 ? (
                         <tr>
-                            <td colSpan="5" className="empty-message">Chưa có tập phim nào</td>
+                            <td colSpan="5" className={styles['empty-message']}>Chưa có tập phim nào</td>
                         </tr>
                     ) : (
                         episodes.map((ep, index) => (
@@ -151,8 +151,8 @@ function EpisodesContent() {
                                     <a href={ep.video_url} target="_blank" rel="noopener noreferrer">Xem</a>
                                 </td>
                                 <td>
-                                    <button className="action-button edit-button" onClick={() => handleEdit(ep)}>Sửa</button>
-                                    <button className="action-button" onClick={() => handleDelete(ep.episode_id)}>Xóa</button>
+                                    <button className={`${styles['action-button']} ${styles['edit-button']}`} onClick={() => handleEdit(ep)}>Sửa</button>
+                                    <button className={styles['action-button']} onClick={() => handleDelete(ep.episode_id)}>Xóa</button>
                                 </td>
                             </tr>
                         ))

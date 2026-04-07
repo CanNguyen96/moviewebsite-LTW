@@ -1,5 +1,5 @@
 import axios from "axios";
-import "../styles/AddMovie.css";
+import styles from "../styles/AddMovie.module.css";
 import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { FaFilm, FaCalendarAlt, FaClock, FaAlignLeft, FaImage, FaImages, FaTag, FaTimes } from 'react-icons/fa';
@@ -130,81 +130,81 @@ function AddMovie() {
     };
 
     return (
-        <div className="add-movie-container">
+        <div className={styles['add-movie-container']}>
             <h2>Thêm Phim Mới</h2>
-            <form className="add-movie-form" onSubmit={handleSubmit}>
-                <div className="form-main-content">
+            <form className={styles['add-movie-form']} onSubmit={handleSubmit}>
+                <div className={styles['form-main-content']}>
                     {/* Cột trái */}
-                    <div className="form-column left">
-                        <div className="form-group">
+                    <div className={`${styles['form-column']} ${styles.left}`}>
+                        <div className={styles['form-group']}>
                             <label><FaFilm /> Tên phim</label>
                             <input type="text" name="title" value={formData.title} onChange={handleInputChange} required />
                         </div>
 
-                        <div className="form-group" ref={categoryRef}>
+                        <div className={styles['form-group']} ref={categoryRef}>
                             <label><FaTag /> Thể loại</label>
-                            <div className="custom-select-wrapper" onClick={() => setIsCategoryDropdownOpen(!isCategoryDropdownOpen)}>
-                                <div className="selected-categories-display">
+                            <div className={styles['custom-select-wrapper']} onClick={() => setIsCategoryDropdownOpen(!isCategoryDropdownOpen)}>
+                                <div className={styles['selected-categories-display']}>
                                     {selectedCategories.length > 0 ? (
                                         selectedCategories.map(cat => (
-                                            <span key={cat.category_id} className="category-tag">
+                                            <span key={cat.category_id} className={styles['category-tag']}>
                                                 {cat.name}
                                                 <FaTimes onClick={(e) => { e.stopPropagation(); handleRemoveCategory(cat); }} />
                                             </span>
                                         ))
                                     ) : (
-                                        <span className="placeholder">Chọn thể loại...</span>
+                                        <span className={styles.placeholder}>Chọn thể loại...</span>
                                     )}
                                 </div>
                             </div>
                             {isCategoryDropdownOpen && (
-                                <div className="category-dropdown">
+                                <div className={styles['category-dropdown']}>
                                     {allCategories.length > 0 ? (
                                         allCategories.map((cat) => (
-                                            <div key={cat.category_id} className="dropdown-item" onClick={() => handleCategorySelect(cat)}>
+                                            <div key={cat.category_id} className={styles['dropdown-item']} onClick={() => handleCategorySelect(cat)}>
                                                 {cat.name}
                                             </div>
                                         ))
                                     ) : (
-                                        <div className="dropdown-item dropdown-empty">Không có thể loại</div>
+                                        <div className={`${styles['dropdown-item']} ${styles['dropdown-empty']}`}>Không có thể loại</div>
                                     )}
                                 </div>
                             )}
                         </div>
 
-                        <div className="form-group-row">
-                            <div className="form-group">
+                        <div className={styles['form-group-row']}>
+                            <div className={styles['form-group']}>
                                 <label><FaCalendarAlt /> Năm phát hành</label>
                                 <input type="number" name="release_year" value={formData.release_year} onChange={handleInputChange} required />
                             </div>
-                            <div className="form-group">
+                            <div className={styles['form-group']}>
                                 <label><FaClock /> Thời lượng (phút)</label>
                                 <input type="number" name="duration" value={formData.duration} onChange={handleInputChange} required />
                             </div>
                         </div>
 
-                        <div className="form-group">
+                        <div className={styles['form-group']}>
                             <label><FaAlignLeft /> Mô tả</label>
                             <textarea name="description" value={formData.description} onChange={handleInputChange} rows="6" required></textarea>
                         </div>
                     </div>
 
                     {/* Cột phải */}
-                    <div className="form-column right">
-                        <div className="form-group">
+                    <div className={`${styles['form-column']} ${styles.right}`}>
+                        <div className={styles['form-group']}>
                             <label><FaImage /> Poster (Ảnh dọc)</label>
                             <input type="file" name="image" accept="image/*" onChange={handleFileChange} required />
                         </div>
-                        <div className="form-group">
+                        <div className={styles['form-group']}>
                             <label><FaImages /> Ảnh nền (Background ngang)</label>
                             <input type="file" name="background" accept="image/*" onChange={handleFileChange} required />
                         </div>
                     </div>
                 </div>
 
-                <div className="button-container">
-                    <button type="submit" className="submit-button">Thêm Phim</button>
-                    <button type="button" onClick={() => navigate(-1)} className="cancel-button">Hủy</button>
+                <div className={styles['button-container']}>
+                    <button type="submit" className={styles['submit-button']}>Thêm Phim</button>
+                    <button type="button" onClick={() => navigate(-1)} className={styles['cancel-button']}>Hủy</button>
                 </div>
             </form>
         </div>

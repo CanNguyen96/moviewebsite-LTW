@@ -31,7 +31,6 @@
 
 /* Style cho từng item phim (li) */
 .movie-grid li {
-    /* Các style cho mỗi card phim nếu cần, ví dụ: border, box-shadow */
     background-color: #333; /* Màu nền cho mỗi item phim */
     border-radius: 8px; /* Bo tròn góc */
     overflow: hidden; /* Đảm bảo ảnh không tràn ra ngoài */
@@ -56,14 +55,13 @@
     height: 100%; /* Chiều cao đầy đủ của li */
 }
 
-/* Style cho vùng chứa ảnh (không có class riêng, nhắm mục tiêu img trong li) */
+/* Style cho vùng chứa ảnh */
 .movie-grid li img {
     width: 100%; /* Ảnh chiếm toàn bộ chiều rộng của item li */
-    height: 250px; /* Chiều cao cố định cho ảnh (tương tự .anime-image) */
+    height: 250px; /* Chiều cao cố định cho ảnh */
     object-fit: cover; /* Đảm bảo ảnh không bị méo khi crop */
     border-top-left-radius: 8px; /* Bo tròn góc trên bên trái ảnh */
     border-top-right-radius: 8px; /* Bo tròn góc trên bên phải ảnh */
-    /* border-radius: 5px; /* Nếu muốn bo tròn toàn bộ ảnh */
 }
 
 /* Style cho tên phim (p tag bên trong link) */
@@ -73,9 +71,9 @@
     padding: 0 5px; /* Padding hai bên tên phim */
     font-size: 0.9em; /* Cỡ chữ nhỏ hơn một chút */
     font-weight: bold; /* Chữ đậm */
-    /* Giới hạn số dòng tên phim nếu quá dài */
     display: -webkit-box;
     -webkit-line-clamp: 2; /* Giới hạn 2 dòng */
+    line-clamp: 2; /* Giới hạn 2 dòng (chuẩn) */
     -webkit-box-orient: vertical;
     overflow: hidden;
     text-overflow: ellipsis;

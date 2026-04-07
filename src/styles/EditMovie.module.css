@@ -64,16 +64,6 @@
     background-color: #34495e;
 }
 
-.form-group select {
-    background-color: #252525;
-    color: #fff;
-    border: 1px solid #444;
-    border-radius: 6px;
-    padding: 12px;
-    font-size: 1rem;
-    width: 100%;
-}
-
 /* Style cho phần hiển thị tên file và nút chọn file mới */
 .file-info {
     background-color: #252525;
@@ -110,5 +100,3 @@
 .file-input-label:hover {
     background-color: #4a4a4a;
 }
-
-

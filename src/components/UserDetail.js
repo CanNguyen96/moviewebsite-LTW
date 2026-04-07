@@ -1,7 +1,7 @@
-import '../styles/UserDetail.css';
+import styles from '../styles/UserDetail.module.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faUserCircle } from '@fortawesome/free-solid-svg-icons';
-import { useEffect,useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 
 function UserDetail(){   
@@ -12,7 +12,7 @@ function UserDetail(){
     const navigate = useNavigate();
 
     // Hàm lấy thông tin user
-    const fetchUser = () => {
+    const fetchUser = useCallback(() => {
         fetch(`${process.env.REACT_APP_API_URL}/api/users/${userId}`)
             .then((res) => {
                 if (!res.ok) {
@@ -29,10 +29,10 @@ function UserDetail(){
                 setError(err.message);
                 setLoading(false);
             });
-    };
+    }, [userId]);
     useEffect(()=>{
         fetchUser();
-    }, [userId]);
+    }, [fetchUser]);
     // Hàm cập nhật trạng thái
     const updateStatus = (newStatus) => {
         fetch(`${process.env.REACT_APP_API_URL}/api/users/${userId}/status`, {
@@ -70,26 +70,26 @@ function UserDetail(){
     const isActive = normalizedStatus === 'active';
 
     return(
-        <div className="user-detail">
-            <div className="tag">
+        <div className={styles['user-detail']}>
+            <div className={styles.tag}>
                 <h3>Quản lí tài khoản</h3>
             </div>
-            <div className="avatar">
+            <div className={styles.avatar}>
                 <li><FontAwesomeIcon icon={faUserCircle} size="3x" /></li>
             </div>
-            <div className="infor">
+            <div className={styles.infor}>
                 <ul>
                     <li><strong>Id tài khoản: </strong> {user.user_id}</li>
                     <li><strong>Tên tài khoản: </strong> {user.user_name}</li>
                     <li><strong>Email: </strong>{user.email}</li>
-                    <li><strong>Vai trò: </strong>{user.role_id == 1 ? 'Admin' : 'User'}</li>
+                    <li><strong>Vai trò: </strong>{Number(user.role_id) === 1 ? 'Admin' : 'User'}</li>
                     <li><strong>Ngày tạo tài khoản: </strong>{new Date(user.created_at).toLocaleDateString('vi-VN')}</li>
                     <li><strong>Trạng thái tài khoản: </strong>{isActive ? 'Active' : 'Banned'}</li>
                 </ul>
             </div>
-            <div className="actions">
-                <button className='ban' onClick={()=> updateStatus('Banned')}  disabled={!isActive}>Banned</button>
-                <button className='active' onClick={()=> updateStatus('Active')} disabled={isActive}>Active</button>
+            <div className={styles.actions}>
+                <button className={styles.ban} onClick={()=> updateStatus('Banned')}  disabled={!isActive}>Banned</button>
+                <button className={styles.active} onClick={()=> updateStatus('Active')} disabled={isActive}>Active</button>
             </div>
 
         </div>

@@ -1,4 +1,4 @@
-nav{
+.nav{
     display: flex;
     width: 100vw;
     justify-content: space-between;
@@ -6,6 +6,7 @@ nav{
     background-color: #111;
     padding: 15px 200px;
 }
+
 .logo img {
     width: 120px;
     cursor: pointer;
@@ -26,6 +27,7 @@ nav{
     text-decoration: none;
     position: relative;
 }
+
 .header li:hover{
     color: aquamarine;
 }
@@ -34,20 +36,24 @@ nav{
     align-items: center;
     list-style: none;
 }
+
 .search input{
     border-radius: 20px;
     padding: 8px;
     width: 200px;
 }
+
 .user-infor li{
     color: white;
     list-style: none;
     font-weight: bold;
 
 }
+
 .user-infor li:hover{
     color: aquamarine;
 }
+
 .button-logout {
   background-color: brown;
   color: white;

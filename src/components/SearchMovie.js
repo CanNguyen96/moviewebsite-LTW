@@ -1,6 +1,6 @@
 import axios from "axios";
 import { useLocation,Link } from "react-router-dom";
-import '../styles/ListMovie.css';
+import styles from '../styles/ListMovie.module.css';
 import { useEffect, useState } from "react";
 
 
@@ -40,12 +40,12 @@ function SearchMovie(){
 
     return(
         <div className="list-movies">
-            <div className="list-movie-tag">
+            <div className={styles['list-movie-tag']}>
                 <li>Kết quả tìm kiếm cho: "{movieName}</li>
             </div>
             {movies.length>0 ?(
                 <>
-                <div className="list-movie">
+                <div className={styles['list-movie']}>
                 {movies.map((item) => (
                     <AnimeItem
                         key={item.movie_id}
@@ -57,19 +57,20 @@ function SearchMovie(){
                         duration={item.duration}
                         episodes={item.episodes}
                         status={item.status}
+                        styles={styles}
                     />
                 ))}
                 </div>    
                 </>
             ):(
-                <p className="No">Không tìm thấy phim </p>
+                <p className={styles.No}>Không tìm thấy phim </p>
             )}
             
         </div>
     )
 }
 
-function AnimeItem({movie_id, title, image_url, genre, year, duration, episodes, status }) {
+function AnimeItem({movie_id, title, image_url, genre, year, duration, episodes, status, styles }) {
     // Định dạng trạng thái
     const getStatusClass = () => {
         if (status === 'Approved') return 'approved';
@@ -92,8 +93,8 @@ function AnimeItem({movie_id, title, image_url, genre, year, duration, episodes,
     };
 
     return (
-        <div className="movie-item">
-            <div className="movie-image">
+        <div className={styles['movie-item']}>
+            <div className={styles['movie-image']}>
                 <img
                     src={`${process.env.REACT_APP_API_URL}${image_url}` || '/placeholder.jpg'}
                     alt={title}
@@ -102,18 +103,18 @@ function AnimeItem({movie_id, title, image_url, genre, year, duration, episodes,
                     }}
                 />
             </div>
-            <div className="movie-info">
+            <div className={styles['movie-info']}>
                 <p><strong>Tên phim:</strong> {title}</p>
                 <p><strong>Thể loại:</strong> {genre}</p>
                 <p><strong>Năm phát hành:</strong> {year}</p>
                 <p><strong>Thời lượng:</strong> {duration} phút</p>
                 {<p><strong>Số tập:</strong> {episodes} ( Đang cập nhật )</p>}
-                <div className={`status ${getStatusClass()}`}>
-                    <span className="dot" />
+                <div className={`${styles.status} ${styles[getStatusClass()]}`}>
+                    <span className={styles.dot} />
                     Trạng thái: {status}
                 </div>
             </div>
-            <div className="actions">
+            <div className={styles.actions}>
                 <Link to={`/admin/edit/${movie_id}`}>
                     <button>Sửa thông tin phim</button>
                 </Link>

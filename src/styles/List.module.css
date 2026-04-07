@@ -1,3 +1,6 @@
+.list-main {
+}
+
 .list{
     display: grid;
     /* Cố định luôn cỡ 150px mỗi ô, còn lại cách đều ra */
@@ -9,6 +12,7 @@
     max-width: 100%;
     margin: 0 auto;
 }
+
 .list-tag li{
     list-style: none;
     padding: 8px 24px;
@@ -37,6 +41,7 @@
     cursor: pointer; /* Đổi con trỏ chuột thành pointer */
     box-shadow: 0 4px 6px rgba(0,0,0,0.5); /* Đổ bóng nhẹ lúc bình thường */
 }
+
 .anime-item:hover{
     transform: translateY(-8px);
     box-shadow: 0 10px 15px rgba(255, 65, 108, 0.4); /* Đổ bóng màu đỏ/hồng nhẹ */
@@ -93,18 +98,21 @@
     padding: 10px;
     margin: 10px;
 }
+
 .more ul{
     list-style: none;
     display: flex;
     gap: 10px; /* Khoảng cách đều giữa các nút */
     padding: 0;
 }
+
 .more a{
     border: 20px;
     background-color: #444;
     padding: 20px;
     border-radius: 10px;
 }
+
 .more {
     margin-top: 30px;
     display: flex;
@@ -122,11 +130,19 @@
     border: 2px solid transparent;
     transition: all 0.2s ease;
 }
+
 .page-button:hover {
     background-color: #555;
     border-color: #ff4b2b;
 }
+
 .page-button.active {
+    background: linear-gradient(to right, #ff416c, #ff4b2b);
+    color: white;
+    box-shadow: 0 4px 10px rgba(255, 75, 43, 0.4);
+}
+
+.active {
     background: linear-gradient(to right, #ff416c, #ff4b2b);
     color: white;
     box-shadow: 0 4px 10px rgba(255, 75, 43, 0.4);

@@ -107,6 +107,17 @@
     box-shadow: 0 2px 8px rgba(255, 75, 107, 0.4);
 }
 
+.active {
+    background: #ff4b6b;
+    color: #fff;
+    border-color: #ff4b6b;
+    box-shadow: 0 2px 8px rgba(255, 75, 107, 0.4);
+}
+
+.text-muted {
+    color: #999;
+}
+
 /* -- Review Section (Kế thừa phong cách MovieDetail) -- */
 .review-section {
     background: #252525;
@@ -188,6 +199,7 @@
     cursor: pointer;
     font-weight: bold;
 }
+
 .submit-comment-btn:hover {
     background: #aaa;
 }

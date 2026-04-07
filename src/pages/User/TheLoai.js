@@ -1,5 +1,5 @@
 
-import '../../styles/Home.css'; 
+import styles from '../../styles/Home.module.css'; 
 import Notification from '../../components/Notification';
 import CategoryMovies from '../../components/CategoryMovies';
 
@@ -7,7 +7,7 @@ import CategoryMovies from '../../components/CategoryMovies';
 function TheLoai(){
     return(
         <div>
-            <div className="content">
+            <div className={styles.content}>
                 <Notification />
                 <CategoryMovies />
             </div>

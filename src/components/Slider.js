@@ -3,7 +3,7 @@ import {useEffect, useState} from "react";
 import Slider from "react-slick";
 import "slick-carousel/slick/slick.css"; 
 import "slick-carousel/slick/slick-theme.css";
-import "../styles/Slider.css";
+import styles from "../styles/Slider.module.css";
 import axios from "axios";
 import {useNavigate} from 'react-router-dom';
 
@@ -37,17 +37,17 @@ const AnimeSlider=() => {
     };
     return(
 
-        <div className="slider-container">
+        <div className={styles['slider-container']}>
             <Slider {...Settings}>
                 {sliderData.map((slide)=>(
-                    <div key={slide.movie_id} className="slide">
-                        <div className="slide-info">
+                    <div key={slide.movie_id} className={styles.slide}>
+                        <div className={styles['slide-info']}>
                             <h2>{slide.title}</h2>
                             <p>{slide.description}</p>
                             <p><strong>Thể loại:</strong>{slide.genre}</p>
-                            <button className="watch-btn" onClick={()=> handleWatchClick(slide.movie_id)}>Xem Phim</button>
+                            <button className={styles['watch-btn']} onClick={()=> handleWatchClick(slide.movie_id)}>Xem Phim</button>
                         </div>
-                        <div className="slide-background">
+                        <div className={styles['slide-background']}>
                             <img src={`${process.env.REACT_APP_API_URL}${slide.background_url}`} alt={slide.title}  /> slide.background_url
                         </div>
                     </div>

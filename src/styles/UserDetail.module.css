@@ -65,7 +65,7 @@ button.active {
     font-weight: bold;
 }
 
-button:disabled {
+.actions button:disabled {
     opacity: 0.5;
     cursor: not-allowed;
 }

@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
-import '../styles/List.css';
+import styles from '../styles/List.module.css';
 
 function List() {
     const [animeList, setAnimeList] = useState([]);
@@ -28,11 +28,11 @@ function List() {
     }
 
     return (
-        <div className="list-main">
-            <div className="list-tag">
+        <div className={styles['list-main']}>
+            <div className={styles['list-tag']}>
                 <li>MỚI CẬP NHẬT</li>
             </div>
-            <div className="list">
+            <div className={styles.list}>
                 {currentMovies.map((item) => (
                     <li key={item.id}>
                         <Link to={`/movieDetail/${item.id}`}>
@@ -41,11 +41,11 @@ function List() {
                     </li>
                 ))}
             </div>
-            <div className="more">
+            <div className={styles.more}>
                 <ul>
                     {Array.from({length: totalPages}, (_, index) =>(
                         <li key={index}>
-                            <button className={`page-button ${currentPage === index +1 ? 'active' :''}`} 
+                            <button className={`${styles['page-button']} ${currentPage === index + 1 ? styles.active : ''}`} 
                                 onClick={()=> handlePageChange(index+1)}
                                 >
                                 {index+1}
@@ -60,8 +60,8 @@ function List() {
 
 function AnimeItem({ title, image_url }) {
     return (
-        <div className="anime-item">
-            <div className="anime-image">
+        <div className={styles['anime-item']}>
+            <div className={styles['anime-image']}>
                 <img 
                     src={`${process.env.REACT_APP_API_URL}${image_url}` || '/images/placeholder.jpg'} 
                     alt={title}
@@ -70,8 +70,8 @@ function AnimeItem({ title, image_url }) {
                     }}
                 />
             </div>
-            <div className="anime-info">
-                <h3 className="title">{title}</h3>
+            <div className={styles['anime-info']}>
+                <h3 className={styles.title}>{title}</h3>
             </div>
         </div>
     );

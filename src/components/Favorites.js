@@ -2,7 +2,7 @@ import {useEffect, useState} from "react";
 import axios from "axios";
 import { toast } from "react-toastify";
 import {Link, useNavigate } from "react-router-dom";
-import '../styles/Favorites.css';
+import styles from '../styles/Favorites.module.css';
 
 
 function Favorites(){
@@ -63,21 +63,21 @@ function Favorites(){
         return <div>Đang tải danh sách phim yêu thích...</div>
     }
     return(
-        <div className="favorite-movies-container">
+        <div className={styles['favorite-movies-container']}>
             <h2>Danh sách phim yêu thích của bạn</h2>
             {/* Kiểm tra nếu không loading và danh sách rỗng */}
             {!loading && favoriteMovies.length===0 ? (
                 // Kiểm tra lại token để chắc chắn người dùng đã đăng nhập trước đó
                 localStorage.getItem('token') ? (
-                    <div className="no-favorites">Bạn chưa có phim trong danh sách yêu thích</div>
+                    <div className={styles['no-favorites']}>Bạn chưa có phim trong danh sách yêu thích</div>
                 ):null // Nếu chưa đăng nhập, hiện thị thông báo trên
             ):(
                 //Nếu không loading và danh sách không rỗng, hiện thị danh sách phim
-                <div className="movie-list">
+                <div className={styles['movie-list']}>
                     {favoriteMovies.map(movie =>(
-                        <Link key={movie.movie_id} to = {`/movieDetail/${movie.movie_id}`} className="movie-card">
+                        <Link key={movie.movie_id} to = {`/movieDetail/${movie.movie_id}`} className={styles['movie-card']}>
                             <img src={`${process.env.REACT_APP_API_URL}${movie.image_url}`} alt={movie.title} />
-                            <div className="movie-title">{movie.title}</div>
+                            <div className={styles['movie-title']}>{movie.title}</div>
                         </Link>
                     ))}
                 </div>

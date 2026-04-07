@@ -5,6 +5,7 @@
     padding: 20px;
     width: 100%;
 }
+
 .list-movie-tag{
     align-items: center;
     justify-content: center;
@@ -56,9 +57,11 @@
     margin: 0;
     font-size: 14px;
 }
+
 .movie-info strong{
     color: rgb(79, 254, 3);
 }
+
 .movie-info .status {
     display: flex;
     align-items:flex-start;
@@ -73,7 +76,6 @@
     border-radius: 50%;
     margin-right: 8px;
 }
-
 
 .status.pending .dot {
     background-color: red;
@@ -119,9 +121,11 @@
     margin: auto;
     align-items: center;
 }
+
 .button-add button:hover{
     background-color: #888
 }
+
 .No {
     color: rgb(174, 9, 9);
     font-weight: bold;

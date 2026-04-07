@@ -2,7 +2,7 @@ import { useParams } from "react-router-dom";
 import axios from "axios";
 import { useEffect, useState } from "react";
 import { Link } from 'react-router-dom';
-import '../styles/CategoryMovies.css';
+import styles from '../styles/CategoryMovies.module.css';
 
 export default function CategoryMovies() {
   const { name } = useParams();
@@ -54,7 +54,7 @@ export default function CategoryMovies() {
   }, [categoryName]); // Effect chạy lại khi categoryName thay đổi
 
   return (
-    <div className="category-page">
+    <div className={styles['category-page']}>
       <h2>Thể loại: {categoryName}</h2>
 
       {loading && <p>Đang tải danh sách phim...</p>} {/* Hiển thị khi đang tải */}
@@ -63,7 +63,7 @@ export default function CategoryMovies() {
 
       {!loading && !error && ( // Chỉ hiển thị nội dung này khi không tải và không có lỗi
         movies.length > 0 ? ( // Kiểm tra xem có phim hay không
-          <ul className="movie-grid">
+          <ul className={styles['movie-grid']}>
             {movies.map(m => (
               <li key={m.id}>
                 <Link to={`/movieDetail/${m.id}`}>

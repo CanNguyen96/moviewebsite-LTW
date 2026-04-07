@@ -1,4 +1,4 @@
-nav {
+.nav {
   width: 100vw;
   display: flex;
   justify-content: space-between;
@@ -20,7 +20,7 @@ nav {
 }
 
 .Header li {
-  position: relative; 
+  position: relative;
 }
 
 .Header li a {
@@ -33,8 +33,6 @@ nav {
 .Header li a:hover {
   color: aquamarine;
 }
-
-
 
 /* Định dạng dropdown */
 .dropdown {
@@ -57,6 +55,7 @@ nav {
   grid-template-columns: repeat(3, auto);
   gap: 15px;
 }
+
 .dropdown-title {
   font-weight: bold;
   color: white;
@@ -73,7 +72,6 @@ nav {
 .dropdown-content a:hover {
   text-decoration: underline;
 }
-
 
 .Search ul {
   display: flex;
@@ -108,13 +106,16 @@ nav {
   align-items: center;
   gap: 10px;
 }
+
 .user-dropdown{
   position: relative;
   display: inline-block;
 }
+
 .user-name{
   cursor: pointer;
 }
+
 .dropdown-menu{
   position: absolute;
   top: 100%;
@@ -130,6 +131,7 @@ nav {
   display: flex;
   flex-wrap: wrap;
 }
+
 .dropdown-menu li{
   padding: 5px 10px;
   cursor: pointer;
@@ -138,9 +140,11 @@ nav {
   flex-basis: auto;
   transition: background-color 0.2s ease;
 }
+
 .dropdown-menu li:hover{
   color: aquamarine;
 }
+
 .logout-btn {
   background-color: brown;
   color: white;

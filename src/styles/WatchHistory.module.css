@@ -37,7 +37,7 @@
     display: flex;
     flex-wrap: wrap;
     gap: 20px;
-    justify-content: flex-start; /* Căn trái danh sách phim */
+    justify-content: flex-start;
 }
 
 .movie-card-wrapper {

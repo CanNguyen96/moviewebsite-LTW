@@ -28,11 +28,13 @@
     height: 100%;
     box-sizing: border-box;
 }
+
 .slide-info h2 {
     font-size: 2.5em;
     margin-bottom: 10px;
     text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5); /* Tùy chọn: thêm đổ bóng chữ */
 }
+
 .slide-info p {
     font-size: 1em;
     margin-bottom: 15px;
@@ -44,9 +46,11 @@
     overflow: hidden;
     text-overflow: ellipsis;
 }
+
 .slide-info strong{
     color: #f0c040;
 }
+
 .slide-background{
     flex: 1; /* Nền chiếm không gian còn lại */
     position: absolute;
@@ -56,6 +60,7 @@
     height: 100%;
     overflow: hidden;
 }
+
 .slide-background img{
     width: 100%;
     height: 100%;
@@ -63,9 +68,11 @@
     display: block;/* Xóa khoảng trống thừa bên dưới ảnh */
     filter: brightness(60%);/* Làm tối ảnh nền một chút để chữ dễ đọc hơn */
 }
+
 .slide-background:hover{
     cursor: pointer;
 }
+
 .watch-btn{
     background-color: brown;
     color: white;
@@ -78,17 +85,19 @@
     margin-top: 20px;
     align-self: center;
 }
+
 .watch-btn:hover {
     background-color: #c05050; /* Nhạt hơn một chút khi di chuột qua */
 }
+
 /* Ẩn điều hướng dạng chấm */
-.slick-dots {
+:global(.slick-dots) {
     display: none !important;
 }
 
 /* Kiểu dáng và vị trí của các mũi tên */
-.slick-prev,
-.slick-next {
+:global(.slick-prev),
+:global(.slick-next) {
     z-index: 2; /* Đảm bảo các mũi tên nằm trên các slide */
     width: 30px; /* Làm cho vùng nhấp của mũi tên lớn hơn */
     height: 30px;
@@ -96,25 +105,25 @@
     transition: opacity 0.3s ease;
 }
 
-.slick-prev:hover,
-.slick-next:hover {
+:global(.slick-prev:hover),
+:global(.slick-next:hover) {
     opacity: 1;
 }
 
-.slick-prev:before,
-.slick-next:before {
+:global(.slick-prev):before,
+:global(.slick-next):before {
     font-size: 30px; /* Kích thước biểu tượng mũi tên */
     color: white; /* Màu mũi tên trắng */
     opacity: 1; /* Đảm bảo biểu tượng hoàn toàn mờ đục */
 }
 
 /* Vị trí mũi tên quay lại */
-.slick-prev {
+:global(.slick-prev) {
     left: 10px; /* Khoảng cách từ cạnh trái */
 }
 
 /* Vị trí mũi tên tiếp theo */
-.slick-next {
+:global(.slick-next) {
     right: 10px; /* Khoảng cách từ cạnh phải */
 }
 
@@ -157,8 +166,8 @@
         align-self: center; /* Căn giữa nút trên màn hình nhỏ hơn */
     }
 
-     .slick-prev,
-    .slick-next {
+     :global(.slick-prev),
+    :global(.slick-next) {
         top: 50%; /* Căn giữa mũi tên theo chiều dọc */
         transform: translateY(-50%);
         /* Điều chỉnh vị trí lề trái/phải nếu cần */

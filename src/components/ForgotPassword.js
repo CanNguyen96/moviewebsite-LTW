@@ -1,6 +1,6 @@
 
 import { useState } from "react";
-import "../styles/Login.css";
+import styles from "../styles/Login.module.css";
 import axios from "axios";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -60,10 +60,10 @@ function ForgotPassword() {
     };
 
     return (
-        <div className="container">
+        <div className={styles.container}>
             <ToastContainer />
             <h2>Quên Mật Khẩu</h2>
-            <form className="form" onSubmit={handleForgotPasswordSubmit}>
+            <form className={styles.form} onSubmit={handleForgotPasswordSubmit}>
                 <label>Tên Người Dùng</label>
                 <input
                     type="text"
@@ -91,12 +91,12 @@ function ForgotPassword() {
                     required
                     disabled={loading}
                 />
-                <button type="submit" className="btn" disabled={loading}>
+                <button type="submit" className={styles.btn} disabled={loading}>
                     {loading ? "Đang xử lý..." : "Cập Nhật Mật Khẩu"}
                 </button>
                 <button 
                     type="button" 
-                    className="btn" 
+                    className={styles.btn} 
                     onClick={() => { 
                         setUserName(""); 
                         setEmail(""); 

@@ -2,8 +2,8 @@ import { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 import { useParams, useNavigate } from 'react-router-dom';
 import { FaFilm, FaCalendarAlt, FaClock, FaAlignLeft, FaImage, FaImages, FaTag, FaTimes, FaSave, FaTimesCircle, FaPlusSquare } from 'react-icons/fa';
-import '../styles/AddMovie.css'; // Tái sử dụng CSS từ AddMovie
-import '../styles/EditMovie.css';
+import addStyles from '../styles/AddMovie.module.css'; // Tái sử dụng CSS từ AddMovie
+import styles from '../styles/EditMovie.module.css';
 
 function EditMovie() {
     const { movieId } = useParams();
@@ -137,88 +137,88 @@ function EditMovie() {
         });
     };
 
-    if (loading) return <div className="loading-container">Đang tải thông tin phim...</div>;
-    if (error) return <div className="error-container">Lỗi: {error}</div>;
+    if (loading) return <div className={styles['loading-container']}>Đang tải thông tin phim...</div>;
+    if (error) return <div className={styles['error-container']}>Lỗi: {error}</div>;
 
     return (
-        <div className="add-movie-container">
+        <div className={addStyles['add-movie-container']}>
             <h2>Sửa Thông Tin Phim</h2>
-            <form className="add-movie-form" onSubmit={handleSubmit}>
-                <div className="form-main-content">
+            <form className={addStyles['add-movie-form']} onSubmit={handleSubmit}>
+                <div className={addStyles['form-main-content']}>
                     {/* Cột trái */}
-                    <div className="form-column left">
-                        <div className="form-group">
+                    <div className={`${addStyles['form-column']} ${addStyles.left}`}>
+                        <div className={addStyles['form-group']}>
                             <label><FaFilm /> Tên phim</label>
                             <input type="text" name="title" value={movie.title} onChange={handleChange} required />
                         </div>
 
-                        <div className="form-group" ref={categoryRef}>
+                        <div className={addStyles['form-group']} ref={categoryRef}>
                             <label><FaTag /> Thể loại</label>
-                            <div className="custom-select-wrapper" onClick={() => setIsCategoryDropdownOpen(!isCategoryDropdownOpen)}>
-                                <div className="selected-categories-display">
+                            <div className={addStyles['custom-select-wrapper']} onClick={() => setIsCategoryDropdownOpen(!isCategoryDropdownOpen)}>
+                                <div className={addStyles['selected-categories-display']}>
                                     {selectedCategories.length > 0 ? (
                                         selectedCategories.map(cat => (
-                                            <span key={cat.category_id} className="category-tag">
+                                            <span key={cat.category_id} className={addStyles['category-tag']}>
                                                 {cat.name}
                                                 <FaTimes onClick={(e) => { e.stopPropagation(); handleRemoveCategory(cat); }} />
                                             </span>
                                         ))
                                     ) : (
-                                        <span className="placeholder">Chọn thể loại...</span>
+                                        <span className={addStyles.placeholder}>Chọn thể loại...</span>
                                     )}
                                 </div>
                             </div>
                             {isCategoryDropdownOpen && (
-                                <div className="category-dropdown">
+                                <div className={addStyles['category-dropdown']}>
                                     {allCategories.length > 0 ? (
                                         allCategories.map((cat) => (
-                                            <div key={cat.category_id} className="dropdown-item" onClick={() => handleCategorySelect(cat)}>
+                                            <div key={cat.category_id} className={addStyles['dropdown-item']} onClick={() => handleCategorySelect(cat)}>
                                                 {cat.name}
                                             </div>
                                         ))
                                     ) : (
-                                        <div className="dropdown-item dropdown-empty">Không có thể loại</div>
+                                        <div className={`${addStyles['dropdown-item']} ${addStyles['dropdown-empty']}`}>Không có thể loại</div>
                                     )}
                                 </div>
                             )}
                         </div>
 
-                        <div className="form-group-row">
-                            <div className="form-group">
+                        <div className={addStyles['form-group-row']}>
+                            <div className={addStyles['form-group']}>
                                 <label><FaCalendarAlt /> Năm phát hành</label>
                                 <input type="number" name="release_year" value={movie.release_year} onChange={handleChange} required />
                             </div>
-                            <div className="form-group">
+                            <div className={addStyles['form-group']}>
                                 <label><FaClock /> Thời lượng (phút)</label>
                                 <input type="number" name="duration" value={movie.duration} onChange={handleChange} required />
                             </div>
                         </div>
 
-                        <div className="form-group">
+                        <div className={addStyles['form-group']}>
                             <label><FaAlignLeft /> Mô tả</label>
                             <textarea name="description" value={movie.description} onChange={handleChange} rows="6" required></textarea>
                         </div>
                     </div>
 
                     {/* Cột phải */}
-                    <div className="form-column right">
-                        <div className="form-group">
+                    <div className={`${addStyles['form-column']} ${addStyles.right}`}>
+                        <div className={addStyles['form-group']}>
                             <label><FaImage /> Poster (Ảnh dọc)</label>
-                            <div className="file-info">
+                            <div className={styles['file-info']}>
                                 <span>{imageFile ? imageFile.name : (movie.image_url || '').split('/').pop() || 'Chưa có ảnh'}</span>
                             </div>
-                            <input type="file" name="image" id="image-upload" className="file-input-hidden" accept="image/*" onChange={handleFileChange} />
-                            <label htmlFor="image-upload" className="file-input-label">Chọn file khác</label>
+                            <input type="file" name="image" id="image-upload" className={styles['file-input-hidden']} accept="image/*" onChange={handleFileChange} />
+                            <label htmlFor="image-upload" className={styles['file-input-label']}>Chọn file khác</label>
                         </div>
-                        <div className="form-group">
+                        <div className={addStyles['form-group']}>
                             <label><FaImages /> Ảnh nền (Background ngang)</label>
-                            <div className="file-info">
+                            <div className={styles['file-info']}>
                                 <span>{backgroundFile ? backgroundFile.name : (movie.background_url || '').split('/').pop() || 'Chưa có ảnh'}</span>
                             </div>
-                            <input type="file" name="background" id="background-upload" className="file-input-hidden" accept="image/*" onChange={handleFileChange} />
-                             <label htmlFor="background-upload" className="file-input-label">Chọn file khác</label>
+                            <input type="file" name="background" id="background-upload" className={styles['file-input-hidden']} accept="image/*" onChange={handleFileChange} />
+                             <label htmlFor="background-upload" className={styles['file-input-label']}>Chọn file khác</label>
                         </div>
-                         <div className="form-group">
+                         <div className={addStyles['form-group']}>
                             <label>Trạng thái</label>
                             <select name="status" value={movie.status} onChange={handleChange}>
                                 <option value="Approved">Approved</option>
@@ -228,13 +228,13 @@ function EditMovie() {
                     </div>
                 </div>
 
-                <div className="button-container">
-                    <button type="button" onClick={() => navigate(`/admin/episodes/${movieId}`)} className="add-episode-button">
+                <div className={styles['button-container']}>
+                    <button type="button" onClick={() => navigate(`/admin/episodes/${movieId}`)} className={styles['add-episode-button']}>
                         <FaPlusSquare /> Quản lý tập phim
                     </button>
-                    <div className="button-actions">
-                        <button type="submit" className="submit-button"><FaSave /> Lưu Thay Đổi</button>
-                        <button type="button" onClick={() => navigate('/managemovie')} className="cancel-button"><FaTimesCircle /> Hủy</button>
+                    <div className={styles['button-actions']}>
+                        <button type="submit" className={styles['submit-button']}><FaSave /> Lưu Thay Đổi</button>
+                        <button type="button" onClick={() => navigate('/managemovie')} className={styles['cancel-button']}><FaTimesCircle /> Hủy</button>
                     </div>
                 </div>
             </form>

@@ -1,10 +1,10 @@
-import '../../styles/Home.css';
+import styles from '../../styles/Home.module.css';
 import SearchUser from '../../components/SearchUser';
 
 function Home(){
     return(
         <div>
-            <div className="content">
+            <div className={styles.content}>
             <SearchUser></SearchUser>
             </div>
         </div>

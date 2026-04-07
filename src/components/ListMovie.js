@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
-import '../styles/ListMovie.css';
+import styles from '../styles/ListMovie.module.css';
+import paginationStyles from '../styles/List.module.css';
 import { Link } from 'react-router-dom';
 
 const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:3001';
@@ -34,15 +35,15 @@ function AdminList() {
     }
     return (
         <div className="list-movies">
-            <div className="list-movie-tag">
+            <div className={styles['list-movie-tag']}>
                 <li>Quản lý phim</li>
             </div>
-            <div className="button-add">
+            <div className={styles['button-add']}>
                 <Link to={`/admin/add`}>
                     <button>THÊM PHIM</button>
                 </Link>
             </div>
-            <div className="list-movie">
+            <div className={styles['list-movie']}>
                 {currentMovies.map((item) => (
                     <AnimeItem
                         key={item.movie_id}
@@ -54,14 +55,15 @@ function AdminList() {
                         duration={item.duration}
                         episodes={item.episodes}
                         status={item.status}
+                        styles={styles}
                     />
                 ))}
             </div>
-            <div className="more">
+            <div className={paginationStyles.more}>
                 <ul>
                     {Array.from({length: totalPages}, (_, index) =>(
                         <li key={index}>
-                            <button className={`page-button ${currentPage === index +1 ? 'active' :''}`} 
+                            <button className={`${paginationStyles['page-button']} ${currentPage === index + 1 ? paginationStyles.active : ''}`} 
                                 onClick={()=> handlePageChange(index+1)}
                                 >
                                 {index+1}
@@ -74,7 +76,7 @@ function AdminList() {
     );
 }
 
-function AnimeItem({movie_id, title, image_url, genre, year, duration, episodes, status }) {
+function AnimeItem({movie_id, title, image_url, genre, year, duration, episodes, status, styles }) {
     // Định dạng trạng thái
     const getStatusClass = () => {
         if (status === 'Approved') return 'approved';
@@ -97,8 +99,8 @@ function AnimeItem({movie_id, title, image_url, genre, year, duration, episodes,
     };
 
     return (
-        <div className="movie-item">
-            <div className="movie-image">
+        <div className={styles['movie-item']}>
+            <div className={styles['movie-image']}>
                 <img
                     src={buildImageSrc(image_url)}
                     alt={title}
@@ -107,18 +109,18 @@ function AnimeItem({movie_id, title, image_url, genre, year, duration, episodes,
                     }}
                 />
             </div>
-            <div className="movie-info">
+            <div className={styles['movie-info']}>
                 <p><strong>Tên phim:</strong> {title}</p>
                 <p><strong>Thể loại:</strong> {genre}</p>
                 <p><strong>Năm phát hành:</strong> {year}</p>
                 <p><strong>Thời lượng:</strong> {duration} phút</p>
                 {episodes && <p><strong>Số tập:</strong> {episodes} ( Đang cập nhật )</p>}
-                <div className={`status ${getStatusClass()}`}>
-                    <span className="dot" />
+                <div className={`${styles.status} ${styles[getStatusClass()]}`}>
+                    <span className={styles.dot} />
                     Trạng thái: {status}
                 </div>
             </div>
-            <div className="actions">
+            <div className={styles.actions}>
                 <Link to={`/admin/edit/${movie_id}`}>
                     <button>Sửa thông tin phim</button>
                 </Link>

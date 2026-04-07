@@ -1,8 +1,8 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import axios from "axios";
 import { toast } from "react-toastify";
 import { Link, useNavigate } from "react-router-dom";
-import '../styles/WatchHistory.css';
+import styles from '../styles/WatchHistory.module.css';
 
 function WatchHistory() {
     const [watchHistory, setWatchHistory] = useState([]);
@@ -10,7 +10,7 @@ function WatchHistory() {
     const navigate = useNavigate();
 
     // Hàm xử lý lỗi token
-    const handleTokenError = (err) => {
+    const handleTokenError = useCallback((err) => {
         if (err.response && err.response.status === 403 && err.response.data?.error === 'Token không hợp lệ hoặc đã hết hạn') {
             toast.error("Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại");
             localStorage.removeItem("token");
@@ -18,7 +18,7 @@ function WatchHistory() {
             return true;
         }
         return false;
-    };
+    }, [navigate]);
 
     useEffect(() => {
         setLoading(true);
@@ -48,7 +48,7 @@ function WatchHistory() {
             }
         };
         fetchWatchHistory();
-    }, [navigate]);
+    }, [handleTokenError]);
 
     // Hàm xóa một bản ghi lịch sử
     const handleDeleteHistoryItem = async (movie_id) => {
@@ -102,30 +102,30 @@ function WatchHistory() {
     }
 
     return (
-        <div className="watch-history-container">
-            <div className="header-container">
+        <div className={styles['watch-history-container']}>
+            <div className={styles['header-container']}>
                 <h2>Lịch sử xem phim của bạn</h2>
                 {watchHistory.length > 0 && (
-                    <button className="delete-all-button" onClick={handleDeleteAllHistory}>
+                    <button className={styles['delete-all-button']} onClick={handleDeleteAllHistory}>
                         Xóa toàn bộ lịch sử
                     </button>
                 )}
             </div>
             {!loading && watchHistory.length === 0 ? (
                 localStorage.getItem('token') ? (
-                    <div className="no-history">Bạn chưa xem phim nào</div>
+                    <div className={styles['no-history']}>Bạn chưa xem phim nào</div>
                 ) : null
             ) : (
-                <div className="movie-list">
+                <div className={styles['movie-list']}>
                     {watchHistory.map(history => (
-                        <div key={history.movie_id} className="movie-card-wrapper">
-                            <Link to={`/movieDetail/${history.movie_id}`} className="movie-card">
+                        <div key={history.movie_id} className={styles['movie-card-wrapper']}>
+                            <Link to={`/movieDetail/${history.movie_id}`} className={styles['movie-card']}>
                                 <img src={`${process.env.REACT_APP_API_URL}${history.image_url}`} alt={history.title} />
-                                <div className="movie-title">{history.title}</div>
-                                <div className="watched-at">Xem lúc: {new Date(history.watched_at).toLocaleString()}</div>
+                                <div className={styles['movie-title']}>{history.title}</div>
+                                <div className={styles['watched-at']}>Xem lúc: {new Date(history.watched_at).toLocaleString()}</div>
                             </Link>
                             <button
-                                className="delete-button"
+                                className={styles['delete-button']}
                                 onClick={() => handleDeleteHistoryItem(history.movie_id)}
                             >
                                 Xóa

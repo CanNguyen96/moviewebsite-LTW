@@ -1,6 +1,6 @@
 "use client";
 import React, { useState } from "react";
-import "../styles/Login.css";
+import styles from "../styles/Login.module.css";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { ToastContainer, toast } from "react-toastify";
@@ -54,10 +54,10 @@ function LoginForm() {
     };
 
     return (
-        <div className="container">
+        <div className={styles.container}>
             <ToastContainer />
             <h2>Đăng Nhập</h2>
-            <form className="form" onSubmit={handleSubmit}>
+            <form className={styles.form} onSubmit={handleSubmit}>
                 <label>Email</label>
                 <input
                     type="email"
@@ -75,16 +75,16 @@ function LoginForm() {
                     required
                 />
                 {error && <p className="error-message">{error}</p>}
-                <Link to="/forgot-password" className="link-style">
+                <Link to="/forgot-password" className={styles.forgot}>
                     Quên mật khẩu?
                 </Link>
-                <button type="submit" className="btn" disabled={loading}>
+                <button type="submit" className={styles.btn} disabled={loading}>
                     {loading ? "Đang xử lý..." : "Đăng Nhập"}
                 </button>
             </form>
             <p>
                 Chưa có tài khoản?{" "}
-                <Link to="/register" className="register-link">
+                <Link to="/register" className={styles['register-link']}>
                     Đăng kí
                 </Link>
             </p>

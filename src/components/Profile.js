@@ -1,6 +1,6 @@
 "use client";
 import React, { useState, useEffect } from "react";
-import "../styles/Login.css";
+import styles from "../styles/Login.module.css";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { toast, ToastContainer } from "react-toastify";
@@ -71,10 +71,10 @@ function Profile() {
     if (!user) return <div>Đang tải...</div>;
 
     return (
-        <div className="container">
+        <div className={styles.container}>
             <ToastContainer />
             <h2>Quản Lý Tài Khoản</h2>
-            <form className="form" onSubmit={handleSubmit}>
+            <form className={styles.form} onSubmit={handleSubmit}>
                 <label>Tên người dùng</label>
                 <input
                     type="text"
@@ -106,7 +106,7 @@ function Profile() {
                     onChange={(e) => setPassword(e.target.value)}
                 />
                 {error && <p className="error-message">{error}</p>}
-                <button type="submit" className="btn" disabled={loading}>
+                <button type="submit" className={styles.btn} disabled={loading}>
                     {loading ? "Đang xử lý..." : "Cập Nhật"}
                 </button>
             </form>
