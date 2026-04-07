@@ -3,8 +3,8 @@
 
 .list{
     display: grid;
-    /* Cố định luôn cỡ 150px mỗi ô, còn lại cách đều ra */
-    grid-template-columns: repeat(auto-fill, 150px);
+    /* Desktop: 5 cột, mỗi ô lớn hơn để nhìn rõ */
+    grid-template-columns: repeat(5, 180px);
     justify-content: center; /* Căn giữa các ô phim ra giữa màn hình nếu còn dư */
     gap: 25px; /* Giãn cách các thẻ nhìn cho thoáng */
     padding: 10px;
@@ -52,10 +52,19 @@
 }
 
 .anime-image{
-    height: 220px;
+    height: 260px;
     width: 100%;
     overflow: hidden;
     position: relative; /* Để tạo lớp phủ bóng overlay */
+}
+
+@media (max-width: 1100px) {
+    .list{
+        grid-template-columns: repeat(auto-fill, 160px);
+    }
+    .anime-image{
+        height: 230px;
+    }
 }
 
 .anime-image img{

@@ -292,21 +292,26 @@
 
 /* Nút chọn tập */
 .episode-selection {
-    display: flex;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, 60px);
     justify-content: center;
     gap: 10px;
     margin-bottom: 40px;
-    flex-wrap: wrap;
 }
 
 .episode-btn-square {
     background: #2a2a2a;
     color: #aaa;
-    padding: 10px 35px;
+    width: 60px;
+    height: 36px;
+    padding: 0;
     text-decoration: none;
     border-radius: 4px;
     font-weight: bold;
-    transition: background 0.3s;
+    transition: background 0.3s, color 0.3s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .episode-btn-square:hover, .episode-btn-square.active {

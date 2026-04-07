@@ -6,7 +6,7 @@ import styles from '../styles/List.module.css';
 function List() {
     const [animeList, setAnimeList] = useState([]);
     const [currentPage, setCurrentPage]= useState(1);
-    const moviesPerPage= 10;
+    const moviesPerPage= 20;
 
     useEffect(() => {
         axios.get(`${process.env.REACT_APP_API_URL}/api/movies`)
