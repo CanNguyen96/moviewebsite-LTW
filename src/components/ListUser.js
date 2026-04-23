@@ -1,15 +1,24 @@
 import {useEffect,useState} from 'react';
 import styles from '../styles/ListUser.module.css';
 import {Link} from 'react-router-dom';
+import { userService } from '../services/userService';
 
 function ListUser() {
   const [users, setUsers] = useState([]);
     // Gọi API khi component mount
     useEffect(() => {
-      fetch(`${process.env.REACT_APP_API_URL}/api/users`) // backend server của bạn
-        .then((res) => res.json())
-        .then((data) => setUsers(data))
-        .catch((err) => console.error('Lỗi lấy danh sách user:', err));
+        userService.getUsers()
+            .then((data) => {
+                if (Array.isArray(data)) {
+                    setUsers(data);
+                } else {
+                    setUsers([]);
+                }
+            })
+            .catch((err) => {
+                console.error('Lỗi lấy danh sách user:', err);
+                setUsers([]);
+            });
     }, []);
   return (
     <div className={styles['list-users']}>

@@ -42,7 +42,7 @@ const register = async (req, res) => {
                         console.log('Lỗi khi thêm user:', err);
                         return res.status(500).json({ error: err.message });
                     }
-                    const user = { user_id: result.insertId, user_name: name, email };
+                    const user = { user_id: result.insertId, user_name: name, email, role_id: 4 };
                     const token = jwt.sign(user, process.env.JWT_SECRET || 'your_secret_key', { expiresIn: '3h' });
 
                     res.status(201).json({
@@ -84,7 +84,7 @@ const login = (req, res) => {
         }
 
         const token = jwt.sign(
-            { user_id: user.user_id, user_name: user.user_name, email: user.email },
+            { user_id: user.user_id, user_name: user.user_name, email: user.email, role_id: user.role_id },
             process.env.JWT_SECRET || 'your_secret_key',
             { expiresIn: '3h' }
         );
@@ -241,6 +241,10 @@ const updateUser = async (req, res) => {
 
 // API: Quên mật khẩu
 const forgotPassword = (req, res) => {
+    // Tạm thời vô hiệu hóa API này vì lý do bảo mật (chưa có xác thực qua Email)
+    return res.status(501).json({ error: 'Chức năng Quên mật khẩu đang được bảo trì để nâng cấp bảo mật.' });
+
+    /* Logic cũ bị khóa:
     const { user_name, email, new_password } = req.body;
 
     if (!user_name || !email || !new_password) {
@@ -275,6 +279,7 @@ const forgotPassword = (req, res) => {
             }
         );
     });
+    */
 };
 
 // API: Đăng nhập bằng Google
@@ -303,7 +308,7 @@ const googleLogin = async (req, res) => {
                 }
 
                 const jwtToken = jwt.sign(
-                    { user_id: user.user_id, user_name: user.user_name, email: user.email },
+                    { user_id: user.user_id, user_name: user.user_name, email: user.email, role_id: user.role_id },
                     process.env.JWT_SECRET || 'your_secret_key',
                     { expiresIn: '3h' }
                 );
@@ -330,7 +335,7 @@ const googleLogin = async (req, res) => {
                             return res.status(500).json({ error: err.message });
                         }
                         
-                        const newUser = { user_id: insertResult.insertId, user_name: uniqueUserName, email };
+                        const newUser = { user_id: insertResult.insertId, user_name: uniqueUserName, email, role_id: 4 };
                         const jwtToken = jwt.sign(newUser, process.env.JWT_SECRET || 'your_secret_key', { expiresIn: '3h' });
 
                         res.status(201).json({

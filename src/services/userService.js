@@ -57,5 +57,20 @@ export const userService = {
     searchUsers: async (userName) => {
         const response = await axiosInstance.get(`/api/users/search?userName=${encodeURIComponent(userName.trim())}`);
         return response.data;
+    },
+
+    getUsers: async () => {
+        const response = await axiosInstance.get('/api/users');
+        return response.data;
+    },
+
+    getUserById: async (userId) => {
+        const response = await axiosInstance.get(`/api/users/${userId}`);
+        return response.data;
+    },
+
+    updateUserStatus: async (userId, newStatus) => {
+        const response = await axiosInstance.put(`/api/users/${userId}/status`, { status: newStatus });
+        return response.data;
     }
 };

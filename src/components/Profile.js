@@ -40,6 +40,13 @@ function Profile() {
         }
     };
 
+    const getAvatarSrc = (avatar) => {
+        if (!avatar) return "/images/default-avatar.png";
+        if (avatar.startsWith("http") || avatar.startsWith("blob")) return avatar;
+        if (avatar.startsWith("/")) return `${process.env.REACT_APP_API_URL || 'http://localhost:3001'}${avatar}`;
+        return `${process.env.REACT_APP_API_URL || 'http://localhost:3001'}/${avatar}`;
+    };
+
     const handleAvatarClick = () => {
         if (fileInputRef.current) {
             fileInputRef.current.click();
@@ -99,7 +106,7 @@ function Profile() {
             <div className={styles['avatar-section']}>
                 <div className={styles['avatar-wrapper']} onClick={handleAvatarClick}>
                     <img 
-                        src={avatarPreview.startsWith('http') || avatarPreview.startsWith('/images') || avatarPreview.startsWith('blob') ? avatarPreview : `http://localhost:3001${avatarPreview}`} 
+                        src={getAvatarSrc(avatarPreview)} 
                         alt="Avatar" 
                         className={styles['avatar-img']} 
                         onError={(e) => { e.target.src = 'https://ui-avatars.com/api/?name=' + userName + '&background=random' }} 

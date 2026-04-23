@@ -5,6 +5,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { userService } from '../services/userService';
 
 function UserDetail(){   
     const {userId}= useParams();
@@ -15,13 +16,7 @@ function UserDetail(){
 
     // Hàm lấy thông tin user
     const fetchUser = useCallback(() => {
-        fetch(`${process.env.REACT_APP_API_URL}/api/users/${userId}`)
-            .then((res) => {
-                if (!res.ok) {
-                    throw new Error('Không thể tải thông tin người dùng!');
-                }
-                return res.json();
-            })
+        userService.getUserById(userId)
             .then((data) => {
                 setUser(data);
                 setLoading(false);
@@ -37,19 +32,7 @@ function UserDetail(){
     }, [fetchUser]);
     // Hàm cập nhật trạng thái
     const updateStatus = (newStatus) => {
-        fetch(`${process.env.REACT_APP_API_URL}/api/users/${userId}/status`, {
-            method: 'PUT',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ status: newStatus })
-        })
-            .then((res) => {
-                if (!res.ok) {
-                    throw new Error('Không thể cập nhật trạng thái!');
-                }
-                return res.json();
-            })
+        userService.updateUserStatus(userId, newStatus)
             .then((data) => {
                 setUser(data);
                 toast.success('Cập nhật trạng thái thành công!'); 

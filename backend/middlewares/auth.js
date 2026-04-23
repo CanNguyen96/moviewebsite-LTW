@@ -17,6 +17,16 @@ const authenticateToken = (req, res, next) => {
     });
 };
 
+// Middleware kiểm tra quyền Admin
+const isAdmin = (req, res, next) => {
+    // req.user được gán từ authenticateToken
+    if (!req.user || Number(req.user.role_id) !== 1) {
+        return res.status(403).json({ error: 'Bạn không có quyền thực hiện hành động này. Yêu cầu quyền Admin.' });
+    }
+    next();
+};
+
 module.exports = {
-    authenticateToken
+    authenticateToken,
+    isAdmin
 };
