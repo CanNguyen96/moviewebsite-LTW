@@ -33,8 +33,22 @@ function ForgotPassword() {
         }
     };
 
+    const validatePassword = (pass) => {
+        if (pass.length < 6) return 'Mật khẩu phải có ít nhất 6 ký tự';
+        if (!/\d/.test(pass)) return 'Mật khẩu phải chứa ít nhất 1 chữ số (0-9)';
+        if (!/[!@#$%^&*()[\]{}|<>?~=_+-]/.test(pass)) return 'Mật khẩu phải chứa ít nhất 1 ký tự đặc biệt';
+        return null;
+    };
+
     const handleForgotPasswordSubmit = async (e) => {
         e.preventDefault();
+
+        const passwordError = validatePassword(newPassword);
+        if (passwordError) {
+            setError(passwordError);
+            return;
+        }
+
         setLoading(true);
         setError("");
 
