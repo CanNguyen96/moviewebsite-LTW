@@ -1,7 +1,7 @@
 "use client";
 import React, { useState, useEffect, useRef } from "react";
 import styles from "../styles/Profile.module.css";
-import axios from "axios";
+import { userService } from "../services/userService";
 import { useNavigate } from "react-router-dom";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -67,22 +67,13 @@ function Profile() {
         if (avatarFile) formData.append("avatar", avatarFile);
 
         try {
-            const res = await axios.put(
-                `${process.env.REACT_APP_API_URL || 'http://localhost:3001'}/api/user`,
-                formData,
-                { 
-                    headers: { 
-                        Authorization: `Bearer ${token}`,
-                        "Content-Type": "multipart/form-data" 
-                    } 
-                }
-            );
-            localStorage.setItem("token", res.data.token);
-            localStorage.setItem("user", JSON.stringify(res.data.user));
-            setUser(res.data.user);
-            setUserName(res.data.user.user_name);
-            if (res.data.user.avatar_url) {
-                setAvatarPreview(res.data.user.avatar_url);
+            const data = await userService.updateProfile(formData);
+            localStorage.setItem("token", data.token);
+            localStorage.setItem("user", JSON.stringify(data.user));
+            setUser(data.user);
+            setUserName(data.user.user_name);
+            if (data.user.avatar_url) {
+                setAvatarPreview(data.user.avatar_url);
             }
             setOldPassword("");
             setPassword("");

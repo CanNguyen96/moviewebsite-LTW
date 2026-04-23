@@ -1,4 +1,4 @@
-import axios from "axios";
+import { movieService } from "../services/movieService";
 import styles from "../styles/AddMovie.module.css";
 import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
@@ -26,12 +26,11 @@ function AddMovie() {
     useEffect(() => {
         let isMounted = true;
 
-        axios
-            .get(`${API_BASE_URL}/api/categories`)
-            .then((res) => {
+        movieService.getCategories()
+            .then((data) => {
                 if (!isMounted) return;
 
-                const raw = Array.isArray(res.data) ? res.data : [];
+                const raw = Array.isArray(data) ? data : [];
                 const normalized = raw
                     .map((c) => ({
                         category_id: c.category_id,
@@ -109,23 +108,14 @@ function AddMovie() {
         formPayload.append("image", formData.image);
         formPayload.append("background", formData.background);
 
-        axios
-            .post(`${API_BASE_URL}/api/movies/add`, formPayload, {
-                headers: {
-                    "Content-Type": "multipart/form-data"
-                }
-            })
+        movieService.addMovie(formPayload)
             .then((response) => {
                 alert("Thêm phim thành công!");
                 navigate(-1);
             })
             .catch((error) => {
                 console.error("Lỗi khi thêm phim:", error);
-                if (error.response?.data?.error) {
-                    alert(`Thêm phim thất bại: ${error.response.data.error}`);
-                } else {
-                    alert("Thêm phim thất bại. Vui lòng thử lại.");
-                }
+                alert("Thêm phim thất bại. Vui lòng thử lại.");
             });
     };
 

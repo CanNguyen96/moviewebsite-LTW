@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
-import axios from "axios";
+import { userService } from "../services/userService";
 import { toast } from "react-toastify";
 import { Link, useNavigate } from "react-router-dom";
 import styles from '../styles/WatchHistory.module.css';
@@ -8,17 +8,6 @@ function WatchHistory() {
     const [watchHistory, setWatchHistory] = useState([]);
     const [loading, setLoading] = useState(true);
     const navigate = useNavigate();
-
-    // Hàm xử lý lỗi token
-    const handleTokenError = useCallback((err) => {
-        if (err.response && err.response.status === 403 && err.response.data?.error === 'Token không hợp lệ hoặc đã hết hạn') {
-            toast.error("Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại");
-            localStorage.removeItem("token");
-            navigate("/login");
-            return true;
-        }
-        return false;
-    }, [navigate]);
 
     useEffect(() => {
         setLoading(true);
@@ -30,44 +19,29 @@ function WatchHistory() {
             return;
         }
 
-        // Hàm fetch danh sách lịch sử xem phim từ API
         const fetchWatchHistory = async () => {
             try {
-                const res = await axios.get(`${process.env.REACT_APP_API_URL}/api/watch-history`, {
-                    headers: { Authorization: `Bearer ${token}` }
-                });
-                setWatchHistory(res.data);
+                const data = await userService.getWatchHistory();
+                setWatchHistory(data);
             } catch (err) {
-                console.error("Lỗi lấy danh sách lịch sử xem phim", err.response?.data || err);
-                if (!handleTokenError(err)) {
-                    toast.error("Không thể tải lịch sử xem phim");
-                }
+                console.error("Lỗi lấy danh sách lịch sử xem phim", err);
+                toast.error("Không thể tải lịch sử xem phim");
                 setWatchHistory([]);
             } finally {
                 setLoading(false);
             }
         };
         fetchWatchHistory();
-    }, [handleTokenError]);
+    }, []);
 
     // Hàm xóa một bản ghi lịch sử
     const handleDeleteHistoryItem = async (movie_id) => {
-        const token = localStorage.getItem('token');
-        if (!token) {
-            toast.info("Vui lòng đăng nhập để xóa lịch sử xem phim");
-            return;
-        }
-
         try {
-            await axios.delete(`${process.env.REACT_APP_API_URL}/api/watch-history/${movie_id}`, {
-                headers: { Authorization: `Bearer ${token}` }
-            });
+            await userService.deleteWatchHistory(movie_id);
             setWatchHistory(watchHistory.filter(item => item.movie_id !== movie_id));
         } catch (err) {
-            console.error("Lỗi xóa lịch sử xem phim:", err.response?.data || err);
-            if (!handleTokenError(err)) {
-                toast.error("Không thể xóa bản ghi lịch sử xem phim");
-            }
+            console.error("Lỗi xóa lịch sử xem phim:", err);
+            toast.error("Không thể xóa bản ghi lịch sử xem phim");
         }
     };
 
@@ -77,23 +51,13 @@ function WatchHistory() {
             return;
         }
 
-        const token = localStorage.getItem('token');
-        if (!token) {
-            toast.info("Vui lòng đăng nhập để xóa lịch sử xem phim");
-            return;
-        }
-
         try {
-            await axios.delete(`${process.env.REACT_APP_API_URL}/api/watch-history`, {
-                headers: { Authorization: `Bearer ${token}` }
-            });
+            await userService.deleteAllWatchHistory();
             setWatchHistory([]);
             
         } catch (err) {
-            console.error("Lỗi xóa toàn bộ lịch sử xem phim:", err.response?.data || err);
-            if (!handleTokenError(err)) {
-                toast.error("Không thể xóa toàn bộ lịch sử xem phim");
-            }
+            console.error("Lỗi xóa toàn bộ lịch sử xem phim:", err);
+            toast.error("Không thể xóa toàn bộ lịch sử xem phim");
         }
     };
 

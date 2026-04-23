@@ -21,7 +21,7 @@ export const authService = {
 
     // Các tính năng quên mật khẩu...
     forgotPassword: async (userName, email, newPassword) => {
-        const response = await axiosInstance.post('/forgot-password', {
+        const response = await axiosInstance.put('/forgot-password', {
             user_name: userName,
             email,
             new_password: newPassword

@@ -1,4 +1,4 @@
-import axios from "axios";
+import { movieService } from "../services/movieService";
 import { useLocation,Link } from "react-router-dom";
 import styles from '../styles/ListMovie.module.css';
 import { useEffect, useState } from "react";
@@ -22,9 +22,9 @@ function SearchMovie(){
             return;
         }
         setLoading(true);
-        axios.get(`${process.env.REACT_APP_API_URL}/api/movies/searchAdmin?movieName=${encodeURIComponent(movieName.trim())}`)
-            .then((response)=>{
-                setMovies(response.data);
+        movieService.searchAdminMovies(movieName)
+            .then((data)=>{
+                setMovies(data);
                 setLoading(false);
             })
             .catch((err)=>{
@@ -78,17 +78,16 @@ function AnimeItem({movie_id, title, image_url, genre, year, duration, episodes,
         return 'review';
     };
     //
-    const handleDelete = (movie_id) => {
+    const handleDelete = async (movie_id) => {
         if (window.confirm("Bạn có chắc muốn xóa phim này không?")) {
-            axios.delete(`${process.env.REACT_APP_API_URL}/api/movies/${movie_id}`)
-                .then(() => {
-                    alert("Xóa phim thành công!");
-                    window.location.reload(); // Load lại danh sách
-                })
-                .catch(err => {
-                    console.error("Lỗi khi xóa:", err);
-                    alert("Xóa thất bại!");
-                });
+            try {
+                await movieService.deleteMovie(movie_id);
+                alert("Xóa phim thành công!");
+                window.location.reload(); // Load lại danh sách
+            } catch (err) {
+                console.error("Lỗi khi xóa:", err);
+                alert("Xóa thất bại!");
+            }
         }
     };
 

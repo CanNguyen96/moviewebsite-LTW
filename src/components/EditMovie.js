@@ -1,8 +1,8 @@
 import { useState, useEffect, useRef } from 'react';
-import axios from 'axios';
+import { movieService } from '../services/movieService';
 import { useParams, useNavigate } from 'react-router-dom';
 import { FaFilm, FaCalendarAlt, FaClock, FaAlignLeft, FaImage, FaImages, FaTag, FaTimes, FaSave, FaTimesCircle, FaPlusSquare } from 'react-icons/fa';
-import addStyles from '../styles/AddMovie.module.css'; // Tái sử dụng CSS từ AddMovie
+import addStyles from '../styles/AddMovie.module.css';
 import styles from '../styles/EditMovie.module.css';
 
 function EditMovie() {
@@ -22,7 +22,7 @@ function EditMovie() {
 
     const [imageFile, setImageFile] = useState(null);
     const [backgroundFile, setBackgroundFile] = useState(null);
-    
+
     const [allCategories, setAllCategories] = useState([]);
     const [selectedCategories, setSelectedCategories] = useState([]);
     const [isCategoryDropdownOpen, setIsCategoryDropdownOpen] = useState(false);
@@ -33,8 +33,8 @@ function EditMovie() {
 
     // 1. Fetch all available categories
     useEffect(() => {
-        axios.get(`${API_BASE_URL}/api/categories`)
-            .then(({ data }) => {
+        movieService.getCategories()
+            .then((data) => {
                 const raw = Array.isArray(data) ? data : [];
                 const normalized = raw.map(c => ({
                     category_id: c.category_id,
@@ -47,8 +47,8 @@ function EditMovie() {
 
     // 2. Fetch movie details
     useEffect(() => {
-        axios.get(`${API_BASE_URL}/api/movies/${movieId}/edit`)
-            .then(({ data }) => {
+        movieService.getMovieForEdit(movieId)
+            .then((data) => {
                 setMovie({
                     title: data.title || '',
                     release_year: data.release_year?.toString() || '',
@@ -58,14 +58,14 @@ function EditMovie() {
                     image_url: data.image_url || '',
                     background_url: data.background_url || '',
                 });
-                
+
                 // Pre-select categories based on fetched movie genre
                 const movieGenres = (Array.isArray(data.genre) ? data.genre : (data.genre || '').split(',')).map(g => g.trim());
                 if (allCategories.length > 0) {
                     const preSelected = allCategories.filter(cat => movieGenres.includes(cat.name));
                     setSelectedCategories(preSelected);
                 }
-                
+
                 setLoading(false);
             })
             .catch(err => {
@@ -124,17 +124,15 @@ function EditMovie() {
         if (backgroundFile) formData.append('background', backgroundFile);
         else formData.append('existing_background_url', movie.background_url);
 
-        axios.put(`${API_BASE_URL}/api/movies/${movieId}`, formData, {
-            headers: { 'Content-Type': 'multipart/form-data' }
-        })
-        .then(() => {
-            alert("Cập nhật thành công!");
-            navigate('/managemovie');
-        })
-        .catch(err => {
-            console.error("Lỗi cập nhật:", err.response ? err.response.data : err.message);
-            setError('Đã xảy ra lỗi khi cập nhật thông tin phim.');
-        });
+        movieService.updateMovie(movieId, formData)
+            .then(() => {
+                alert("Cập nhật thành công!");
+                navigate('/managemovie');
+            })
+            .catch(err => {
+                console.error("Lỗi cập nhật:", err);
+                setError('Đã xảy ra lỗi khi cập nhật thông tin phim.');
+            });
     };
 
     if (loading) return <div className={styles['loading-container']}>Đang tải thông tin phim...</div>;
@@ -216,9 +214,9 @@ function EditMovie() {
                                 <span>{backgroundFile ? backgroundFile.name : (movie.background_url || '').split('/').pop() || 'Chưa có ảnh'}</span>
                             </div>
                             <input type="file" name="background" id="background-upload" className={styles['file-input-hidden']} accept="image/*" onChange={handleFileChange} />
-                             <label htmlFor="background-upload" className={styles['file-input-label']}>Chọn file khác</label>
+                            <label htmlFor="background-upload" className={styles['file-input-label']}>Chọn file khác</label>
                         </div>
-                         <div className={addStyles['form-group']}>
+                        <div className={addStyles['form-group']}>
                             <label>Trạng thái</label>
                             <select name="status" value={movie.status} onChange={handleChange}>
                                 <option value="Approved">Approved</option>

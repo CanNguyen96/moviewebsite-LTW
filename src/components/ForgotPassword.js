@@ -1,7 +1,7 @@
 
 import { useState } from "react";
 import styles from "../styles/Login.module.css";
-import axios from "axios";
+import { authService } from "../services/authService";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useNavigate } from "react-router-dom";
@@ -18,15 +18,9 @@ function ForgotPassword() {
         setLoading(true);
 
         try {
-            const response = await axios.put(`${process.env.REACT_APP_API_URL}/forgot-password`, {
-                user_name: userName,
-                email,
-                new_password: newPassword
-            }, {
-                headers: { 'Content-Type': 'application/json' }
-            });
+            const data = await authService.forgotPassword(userName, email, newPassword);
 
-            toast.success(response.data.message, {
+            toast.success(data.message, {
                 position: "top-right",
                 autoClose: 2000,
                 hideProgressBar: false,

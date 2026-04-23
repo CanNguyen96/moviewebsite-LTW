@@ -4,7 +4,7 @@ import Slider from "react-slick";
 import "slick-carousel/slick/slick.css"; 
 import "slick-carousel/slick/slick-theme.css";
 import styles from "../styles/Slider.module.css";
-import axios from "axios";
+import { movieService } from "../services/movieService";
 import {useNavigate} from 'react-router-dom';
 
 const AnimeSlider=() => {
@@ -12,9 +12,9 @@ const AnimeSlider=() => {
     const navigate= useNavigate();
 
     useEffect (()=>{
-        axios.get(`${process.env.REACT_APP_API_URL}/api/slider-movies`)
-            .then(res => {
-                setSliderData(res.data);
+        movieService.getSliderMovies()
+            .then(data => {
+                setSliderData(data);
             })
             .catch(err=> console.error("Lỗi", err));
     },[]);

@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useLocation, Link } from 'react-router-dom';
-import axios from 'axios';
+import { userService } from '../services/userService';
 import styles from '../styles/ListUser.module.css';
 
 // Hook tùy chỉnh để lấy query parameters từ URL
@@ -24,10 +24,9 @@ function SearchUser() {
         }
 
         setLoading(true);
-        axios
-            .get(`${process.env.REACT_APP_API_URL}/api/users/search?userName=${encodeURIComponent(userName.trim())}`)
-            .then((response) => {
-                setUsers(response.data);
+        userService.searchUsers(userName)
+            .then((data) => {
+                setUsers(data);
                 setLoading(false);
             })
             .catch((err) => {

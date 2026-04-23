@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
-import axios from "axios";
+import { movieService } from "../services/movieService";
 import styles from '../styles/SearchResults.module.css';
 
 function useQuery() {
@@ -14,9 +14,8 @@ function SearchResults() {
 
   useEffect(() => {
     if (keyword) {
-      axios
-        .get(`${process.env.REACT_APP_API_URL}/api/movies/search?q=${encodeURIComponent(keyword.trim())}`)
-        .then((res) => setResults(res.data))
+      movieService.searchMovies(keyword)
+        .then((data) => setResults(data))
         .catch((err) => console.error("Lỗi tìm kiếm:", err));
     }
   }, [keyword]);

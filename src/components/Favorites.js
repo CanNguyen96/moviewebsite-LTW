@@ -1,5 +1,5 @@
 import {useEffect, useState} from "react";
-import axios from "axios";
+import { userService } from "../services/userService";
 import { toast } from "react-toastify";
 import {Link, useNavigate } from "react-router-dom";
 import styles from '../styles/Favorites.module.css';
@@ -12,48 +12,25 @@ function Favorites(){
     
 
     useEffect(()=>{
-        // Hàm xử lý lỗi token
-        const handleTokenError= (err) =>{
-            // Kiểm tra lỗi nếu có response từ server, mã trạng thái 403 và tbao lỗi cụ thể mà backend trả về
-            if(err.response && err.response.status === 403 && err.response.data?.error==='Token không hợp lệ hoặc đã hết hạn'){
-            // Hiện thị thông báo lỗi
-                toast.error("Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại")
-            // Xóa token cũ/hết hạn
-                localStorage.removeItem("token");
-            // Điều hướng về trang đăng nhập
-                navigate("/login");
-                return true;
-            }
-            return false;
-        };
         setLoading(true);
 
         const token= localStorage.getItem('token');
-        // Kiểm tra nếu không có token
         if(!token){
             toast.info("Vui lòng đăng nhập để xem danh sách yêu thích");
             setLoading(false);
-
             return;
         }
-        // Hàm fetch danh sách phim yêu thích từ API
+
         const fetchFavoriteMovies= async ()=>{
             try{
-                // Gọi API backend GET /api/favorites
-                const res= await axios.get(`${process.env.REACT_APP_API_URL}/api/favorites`,{
-                    headers:{Authorization:`Bearer ${token}`}
-                });
-                setFavoriteMovies(res.data);
+                const data = await userService.getFavorites();
+                setFavoriteMovies(data);
             }catch(err){
-                console.error("Lỗi lấy danh sách phim yêu thích",err.response?.data||err);
-                // Sử dụng hàm xử lý lỗi token
-                if(!handleTokenError(err)) {
-                    // Nếu không phỉa lỗi token, hiện thị thông báo lỗi chung
-                    toast.error("Không thể tải danh sách phim yêu thích")
-                }
-                setFavoriteMovies([]); // Đảm bảo danh sách rỗng khi có lỗi
+                console.error("Lỗi lấy danh sách phim yêu thích", err);
+                toast.error("Không thể tải danh sách phim yêu thích");
+                setFavoriteMovies([]);
             } finally{
-                setLoading(false); // Dừng loading sau khi fetch xog hoặc gặp lỗi
+                setLoading(false);
             }
         };
         fetchFavoriteMovies();

@@ -1,5 +1,5 @@
 import { useParams } from "react-router-dom";
-import axios from "axios";
+import { movieService } from "../services/movieService";
 import { useEffect, useState } from "react";
 import { Link } from 'react-router-dom';
 import styles from '../styles/CategoryMovies.module.css';
@@ -21,13 +21,10 @@ export default function CategoryMovies() {
     setLoading(true); // Bắt đầu tải dữ liệu
     setError(null);   // Xóa lỗi cũ (nếu có) trước khi fetch mới
 
-    axios
-      .get(
-        `${process.env.REACT_APP_API_URL}/api/categories/${encodeURIComponent(categoryName)}`
-      )
-      .then(res => {
-        console.log('API call successful, data received:', res.data); // LOG: API thành công
-        setMovies(res.data);
+    movieService.getCategoryMovies(categoryName)
+      .then(data => {
+        console.log('API call successful, data received:', data); // LOG: API thành công
+        setMovies(data);
         // Không cần setError(null) ở đây vì đã set ở đầu effect
         // Nếu server trả về 200 với mảng rỗng, điều này vẫn đúng
       })

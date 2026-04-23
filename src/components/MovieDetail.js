@@ -1,7 +1,9 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import styles from "../styles/MovieDetail.module.css";
-import axios from "axios";
+import { movieService } from "../services/movieService";
+import { reviewService } from "../services/reviewService";
+import { userService } from "../services/userService";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
@@ -16,22 +18,10 @@ const MovieDetail = () => {
     const [hoverStar, setHoverStar] = useState(0);
     const navigate = useNavigate();
 
-    const handleTokenError = useCallback((err) => {
-        if (err.response && err.response.status === 403 && err.response.data?.error === 'Token không hợp lệ hoặc đã hết hạn') {
-            toast.error("Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.");
-            localStorage.removeItem("token");
-            navigate("/login");
-            return true;
-        }
-        return false;
-    }, [navigate]);
-
     useEffect(() => {
         const fetchMovieData = async () => {
             try {
-
-                const movieRes = await fetch(`http://localhost:3001/api/movies/${id}`);
-                const movieData = await movieRes.json();
+                const movieData = await movieService.getMovieById(id);
 
                 if (movieData) {
                     setMovie(movieData);
@@ -39,22 +29,17 @@ const MovieDetail = () => {
                     setMovie(null);
                 }
                 // 2. Fetch Đánh giá phim
-                // Gọi API backend để lấy danh sách đánh giá
-                const reviewsRes = await axios.get(`http://localhost:3001/api/reviews/${id}`);
-                setReviews(reviewsRes.data); // Cập nhật state reviews
+                const reviewsData = await reviewService.getReviewsByMovieId(id);
+                setReviews(reviewsData);
 
                 const token = localStorage.getItem("token");
                 if (token) {
                     try {
-                        const statusRes = await axios.get(`http://localhost:3001/api/favorites/${id}/status`, {
-                            headers: { Authorization: `Bearer ${token}` },
-                        });
-                        setIsFavorite(statusRes.data.isFavorite);
+                        const statusData = await userService.checkFavoriteStatus(id);
+                        setIsFavorite(statusData.isFavorite);
                     } catch (statusErr) {
-                        console.error("Lỗi kiểm tra trạng thái yêu thích:", statusErr.response?.data || statusErr);
-                        if (!handleTokenError(statusErr)) {
-                            setIsFavorite(false);
-                        }
+                        console.error("Lỗi kiểm tra trạng thái yêu thích:", statusErr);
+                        setIsFavorite(false);
                     }
                 } else {
                     setIsFavorite(false);
@@ -62,7 +47,7 @@ const MovieDetail = () => {
 
                 // Gọi API tăng lượt xem
                 try {
-                    await axios.post(`http://localhost:3001/api/movies/${id}/view`);
+                    await movieService.increaseView(id);
                 } catch (viewErr) {
                     console.error("Lỗi tăng lượt xem:", viewErr);
                 }
@@ -77,7 +62,7 @@ const MovieDetail = () => {
         };
 
         fetchMovieData();
-    }, [id, handleTokenError]);
+    }, [id]);
 
     const toggleFavorite = async () => {
         const token = localStorage.getItem("token");
@@ -88,25 +73,17 @@ const MovieDetail = () => {
         }
         try {
             if (isFavorite) {
-                await axios.delete(`http://localhost:3001/api/favorites/${id}`, {
-                    headers: { Authorization: `Bearer ${token}` },
-                });
+                await userService.removeFavorite(id);
                 setIsFavorite(false);
                 toast.success("Đã xóa khỏi danh sách yêu thích");
             } else {
-                await axios.post(`http://localhost:3001/api/favorites`, { movie_id: id }, {
-                    headers: { Authorization: `Bearer ${token}` },
-                });
+                await userService.addFavorite(id);
                 setIsFavorite(true);
                 toast.success("Đã thêm vào danh sách yêu thích");
             }
         } catch (err) {
-            console.error("Lỗi khi cập nhật yêu thích:", err.response?.data || err);
-            if (!handleTokenError(err)) {
-                toast.error(
-                    "Có lỗi khi cập nhật yêu thích: " + (err.response?.data?.message || err.message || "Thử lại sau")
-                );
-            }
+            console.error("Lỗi khi cập nhật yêu thích:", err);
+            toast.error("Có lỗi khi cập nhật yêu thích. Thử lại sau!");
         }
     };
     // Hàm xử lý gửi bình luận mới 
@@ -120,19 +97,13 @@ const MovieDetail = () => {
         }
 
         try {
-            await axios.post(
-                `${process.env.REACT_APP_API_URL}/api/reviews`,
-                { movie_id: id, comment: newComment },
-                { headers: { Authorization: `Bearer ${token}` } }
-            );
+            await reviewService.addReview(id, newComment);
             setNewComment("");
-            const res = await axios.get(`${process.env.REACT_APP_API_URL}/api/reviews/${id}`);
-            setReviews(res.data);
+            const reviewsData = await reviewService.getReviewsByMovieId(id);
+            setReviews(reviewsData);
             toast.success("Gửi bình luận thành công!");
         } catch (err) {
-            toast.error(
-                "Lỗi khi gửi bình luận: " + (err.response?.data?.error || "Thử lại sau")
-            );
+            toast.error("Lỗi khi gửi bình luận. Thử lại sau!");
         }
     };
 
@@ -146,23 +117,17 @@ const MovieDetail = () => {
         }
 
         try {
-            const resRating = await axios.post(
-                `${process.env.REACT_APP_API_URL}/api/movies/${id}/rate`,
-                { rating: selectedRating },
-                { headers: { Authorization: `Bearer ${token}` } }
-            );
+            const resRating = await movieService.rateMovie(id, selectedRating);
             setShowRatingModal(false);
             
             // Cập nhật lại thông tin phim để hiển thị rating mới
             setMovie(prev => ({
                 ...prev,
-                avg_rating: parseFloat(resRating.data.average_rating).toFixed(1)
+                avg_rating: parseFloat(resRating.average_rating).toFixed(1)
             }));
             toast.success("Đánh giá điểm phim thành công!");
         } catch (err) {
-            toast.error(
-                "Lỗi khi gửi đánh giá: " + (err.response?.data?.error || "Thử lại sau")
-            );
+            toast.error("Lỗi khi gửi đánh giá. Thử lại sau!");
         }
     };
 

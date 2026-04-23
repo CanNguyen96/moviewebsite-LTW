@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import axios from 'axios';
+import { movieService } from '../services/movieService';
 import { useParams } from 'react-router-dom';
 import styles from '../styles/EpisodesMovie.module.css';
 
@@ -15,8 +15,8 @@ function EpisodesContent() {
 
     // Memoize fetchEpisodes để tránh ESLint warning
     const fetchEpisodes = useCallback(() => {
-        axios.get(`${process.env.REACT_APP_API_URL}/api/episodes/movie/${movie_id}`)
-            .then(res => setEpisodes(res.data))
+        movieService.getEpisodes(movie_id)
+            .then(data => setEpisodes(data))
             .catch(err => console.error('Lỗi khi lấy danh sách tập phim:', err));
     }, [movie_id]);
 
@@ -34,12 +34,12 @@ function EpisodesContent() {
     };
 
     const handleAddOrUpdateEpisode = () => {
+        const payload = {
+            ...newEpisode,
+            movie_id: parseInt(movie_id)
+        };
         if (editingEpisodeId) {
-            // Logic cập nhật (giữ nguyên vì bạn đã sửa)
-            axios.put(`${process.env.REACT_APP_API_URL}/api/episodes/${editingEpisodeId}`, {
-                ...newEpisode,
-                movie_id: parseInt(movie_id)
-            })
+            movieService.updateEpisode(editingEpisodeId, payload)
             .then(() => {
                 alert('Cập nhật tập phim thành công!');
                 setNewEpisode({ episode_number: '', title: '', video_url: '' });
@@ -48,11 +48,7 @@ function EpisodesContent() {
             })
             .catch(err => console.error('Lỗi khi cập nhật tập:', err));
         } else {
-            // Logic thêm mới
-            axios.post(`${process.env.REACT_APP_API_URL}/api/episodes`, {
-                ...newEpisode,
-                movie_id: parseInt(movie_id)
-            })
+            movieService.addEpisode(payload)
             .then(() => {
                 alert('Thêm tập phim thành công!');
                 setNewEpisode({ episode_number: '', title: '', video_url: '' });
@@ -73,7 +69,7 @@ function EpisodesContent() {
 
     const handleDelete = (episode_id) => {
         if (window.confirm('Bạn có chắc muốn xóa tập này không?')) {
-            axios.delete(`${process.env.REACT_APP_API_URL}/api/episodes/${episode_id}`)
+            movieService.deleteEpisode(episode_id)
                 .then(() => {
                     alert('Đã xóa!');
                     fetchEpisodes();

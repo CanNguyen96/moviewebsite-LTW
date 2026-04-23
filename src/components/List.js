@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import axios from 'axios';
+import { movieService } from '../services/movieService';
 import styles from '../styles/List.module.css';
 
 function List() {
@@ -9,9 +9,9 @@ function List() {
     const moviesPerPage= 20;
 
     useEffect(() => {
-        axios.get(`${process.env.REACT_APP_API_URL}/api/movies`)
-            .then(res => {
-                setAnimeList(res.data);
+        movieService.getMovies()
+            .then(data => {
+                setAnimeList(data);
             })
             .catch(err => console.error("Lỗi:", err));
     }, []);
