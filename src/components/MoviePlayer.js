@@ -59,7 +59,6 @@ const MoviePlayer = () => {
     const [loading, setLoading] = useState(true);
     const [reviews, setReviews] = useState([]);
     const [newComment, setNewComment] = useState("");
-    const [rating, setRating] = useState(10);
     const navigate = useNavigate();
     const isHistoryRecorded = useRef(false);
 
@@ -188,16 +187,15 @@ const MoviePlayer = () => {
         try {
             await axios.post(
                 `${process.env.REACT_APP_API_URL}/api/reviews`,
-                { movie_id: id, rating, comment: newComment },
+                { movie_id: id, comment: newComment },
                 { headers: { Authorization: `Bearer ${token}` } }
             );
             setNewComment("");
-            setRating(10);
             const res = await axios.get(`${process.env.REACT_APP_API_URL}/api/reviews/${id}`);
             setReviews(res.data);
-            toast.success("Đánh giá thành công!");
+            toast.success("Gửi bình luận thành công!");
         } catch (err) {
-            toast.error("Lỗi khi gửi đánh giá: " + (err.response?.data?.error || "Thử lại sau"));
+            toast.error("Lỗi khi gửi bình luận: " + (err.response?.data?.error || "Thử lại sau"));
         }
     };
 
@@ -217,7 +215,7 @@ const MoviePlayer = () => {
         <div className={styles['movie-player-page']}>
             <div className={styles['movie-player-container']}>
                 <div className={styles.breadcrumb}>
-                    <Link to="/">Trang chủ</Link> / <Link to={`/movie-detail/${id}`}>{movie.title}</Link> /{" "}
+                    <Link to="/">Trang chủ</Link> / <Link to={`/movieDetail/${id}`}>{movie.title}</Link> /{" "}
                     <span className={styles['current-ep-text']}>{currentEpisode?.title || `Tập ${currentEpisode?.episode}`}</span>
                 </div>
                 
@@ -276,14 +274,6 @@ const MoviePlayer = () => {
                             ></textarea>
                             <div className={styles['comment-actions']}>
                                 <div className="action-left">
-                                    <div className={styles['rating-select-wrapper']}>
-                                        <label>Điểm: </label>
-                                        <select value={rating} onChange={(e) => setRating(Number(e.target.value))}>
-                                            {[...Array(10).keys()].map(i => (
-                                                <option key={i+1} value={i+1}>{i+1}</option>
-                                            ))}
-                                        </select>
-                                    </div>
                                 </div>
                                 <button type="submit" className={styles['submit-comment-btn']}>Gửi</button>
                             </div>
@@ -294,13 +284,12 @@ const MoviePlayer = () => {
                                 reviews.map((review, index) => (
                                     <div key={`review-${index}`} className={styles['review-item']}>
                                         <div className={styles['review-avatar']}>
-                                            <img src="/images/default-avatar.png" alt="Avatar" onError={(e) => { e.target.src = 'https://ui-avatars.com/api/?name=' + review.user_name + '&background=random' }} />
+                                            <img src={review.avatar_url || "/images/default-avatar.png"} alt="Avatar" onError={(e) => { e.target.src = 'https://ui-avatars.com/api/?name=' + review.user_name + '&background=random' }} />
                                             <div className={styles['user-level']}>Lv 12</div>
                                         </div>
                                         <div className={styles['review-content']}>
                                             <div className={styles['review-user']}>
                                                 <strong>{review.user_name}</strong> 
-                                                <span className={styles['rating-star-small']}>⭐ {review.rating}/10</span>
                                             </div>
                                             <p className={styles['review-text']}>{review.comment}</p>
                                             <div className={styles['review-time']}>

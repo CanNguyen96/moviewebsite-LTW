@@ -12,7 +12,6 @@ const MovieDetail = () => {
     const [isFavorite, setIsFavorite] = useState(false);
     const [reviews, setReviews] = useState([]);
     const [newComment, setNewComment] = useState("");
-    const [rating, setRating] = useState(10);
     const [showRatingModal, setShowRatingModal] = useState(false);
     const [hoverStar, setHoverStar] = useState(0);
     const navigate = useNavigate();
@@ -60,6 +59,14 @@ const MovieDetail = () => {
                 } else {
                     setIsFavorite(false);
                 }
+
+                // Gọi API tăng lượt xem
+                try {
+                    await axios.post(`http://localhost:3001/api/movies/${id}/view`);
+                } catch (viewErr) {
+                    console.error("Lỗi tăng lượt xem:", viewErr);
+                }
+
             } catch (err) {
                 console.error("Lỗi fetch dữ liệu phim:", err);
                 toast.error("Không thể tải dữ liệu phim.");
@@ -102,12 +109,12 @@ const MovieDetail = () => {
             }
         }
     };
-    // Hàm xử lý gửi đánh giá mới 
+    // Hàm xử lý gửi bình luận mới 
     const handleReviewSubmit = async (e) => {
         e.preventDefault();
         const token = localStorage.getItem("token");
         if (!token) {
-            toast.error("Vui lòng đăng nhập để gửi đánh giá!");
+            toast.error("Vui lòng đăng nhập để gửi bình luận!");
             navigate("/login");
             return;
         }
@@ -115,23 +122,16 @@ const MovieDetail = () => {
         try {
             await axios.post(
                 `${process.env.REACT_APP_API_URL}/api/reviews`,
-                { movie_id: id, rating, comment: newComment },
+                { movie_id: id, comment: newComment },
                 { headers: { Authorization: `Bearer ${token}` } }
             );
             setNewComment("");
-            setRating(10);
             const res = await axios.get(`${process.env.REACT_APP_API_URL}/api/reviews/${id}`);
             setReviews(res.data);
-            // Fetch lại dữ liệu phim để cập nhật avg_rating và total_reviews
-            const movieRes = await fetch(`${process.env.REACT_APP_API_URL}/api/movies/${id}`);
-            const movieData = await movieRes.json();
-            if (movieData) {
-                setMovie(movieData);
-            }
-            toast.success("Đánh giá thành công!");
+            toast.success("Gửi bình luận thành công!");
         } catch (err) {
             toast.error(
-                "Lỗi khi gửi đánh giá: " + (err.response?.data?.error || "Thử lại sau")
+                "Lỗi khi gửi bình luận: " + (err.response?.data?.error || "Thử lại sau")
             );
         }
     };
@@ -146,18 +146,19 @@ const MovieDetail = () => {
         }
 
         try {
-            await axios.post(
-                `${process.env.REACT_APP_API_URL}/api/reviews`,
-                { movie_id: id, rating: selectedRating, comment: "Đã đánh giá thông qua sao" },
+            const resRating = await axios.post(
+                `${process.env.REACT_APP_API_URL}/api/movies/${id}/rate`,
+                { rating: selectedRating },
                 { headers: { Authorization: `Bearer ${token}` } }
             );
             setShowRatingModal(false);
-            const res = await axios.get(`${process.env.REACT_APP_API_URL}/api/reviews/${id}`);
-            setReviews(res.data);
-            const movieRes = await fetch(`${process.env.REACT_APP_API_URL}/api/movies/${id}`);
-            const movieData = await movieRes.json();
-            if (movieData) setMovie(movieData);
-            toast.success("Đánh giá thành công!");
+            
+            // Cập nhật lại thông tin phim để hiển thị rating mới
+            setMovie(prev => ({
+                ...prev,
+                avg_rating: parseFloat(resRating.data.average_rating).toFixed(1)
+            }));
+            toast.success("Đánh giá điểm phim thành công!");
         } catch (err) {
             toast.error(
                 "Lỗi khi gửi đánh giá: " + (err.response?.data?.error || "Thử lại sau")
@@ -226,6 +227,10 @@ const MovieDetail = () => {
                             <span className={styles['info-value']}>
                                 <span className={styles['badge-new']}>{newestEpisode ? `Tập ${newestEpisode.episode}` : 'Đang cập nhật'}</span>
                             </span>
+                        </div>
+                        <div className={styles['info-row']}>
+                            <span className={styles['info-label']}>Lượt Xem</span>
+                            <span className={`${styles['info-value']} ${styles['text-muted']}`}>👁 {movie.views_count || 0} lượt xem</span>
                         </div>
                         <div className={styles['info-row']}>
                             <span className={styles['info-label']}>Thông Tin Khác</span>
@@ -306,14 +311,6 @@ const MovieDetail = () => {
                         ></textarea>
                         <div className={styles['comment-actions']}>
                             <div className="action-left">
-                                <div className={styles['rating-select-wrapper']}>
-                                    <label>Điểm: </label>
-                                    <select value={rating} onChange={(e) => setRating(Number(e.target.value))}>
-                                        {[...Array(10).keys()].map(i => (
-                                            <option key={i+1} value={i+1}>{i+1}</option>
-                                        ))}
-                                    </select>
-                                </div>
                             </div>
                             <button type="submit" className={styles['submit-comment-btn']}>Gửi</button>
                         </div>
@@ -324,13 +321,12 @@ const MovieDetail = () => {
                             reviews.map((review) => (
                                 <div key={review.review_id} className={styles['review-item']}>
                                     <div className={styles['review-avatar']}>
-                                        <img src="/images/default-avatar.png" alt="Avatar" onError={(e) => { e.target.src = 'https://ui-avatars.com/api/?name=' + review.user_name + '&background=random' }} />
+                                        <img src={review.avatar_url || "/images/default-avatar.png"} alt="Avatar" onError={(e) => { e.target.src = 'https://ui-avatars.com/api/?name=' + review.user_name + '&background=random' }} />
                                         <div className={styles['user-level']}>Lv 12</div>
                                     </div>
                                     <div className={styles['review-content']}>
                                         <div className={styles['review-user']}>
                                             <strong>{review.user_name}</strong> 
-                                            <span className={styles['rating-star-small']}>⭐ {review.rating}/10</span>
                                         </div>
                                         <p className={styles['review-text']}>{review.comment}</p>
                                         <div className={styles['review-time']}>

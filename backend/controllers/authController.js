@@ -43,7 +43,7 @@ const register = async (req, res) => {
                         return res.status(500).json({ error: err.message });
                     }
                     const user = { user_id: result.insertId, user_name: name, email };
-                    const token = jwt.sign(user, process.env.JWT_SECRET || 'your_secret_key', { expiresIn: '1h' });
+                    const token = jwt.sign(user, process.env.JWT_SECRET || 'your_secret_key', { expiresIn: '3h' });
 
                     res.status(201).json({
                         message: 'Đăng ký thành công!',
@@ -86,7 +86,7 @@ const login = (req, res) => {
         const token = jwt.sign(
             { user_id: user.user_id, user_name: user.user_name, email: user.email },
             process.env.JWT_SECRET || 'your_secret_key',
-            { expiresIn: '1h' }
+            { expiresIn: '3h' }
         );
 
         res.json({
@@ -105,6 +105,11 @@ const updateUser = async (req, res) => {
 
     const { user_name, oldPassword, password } = req.body;
     const user_id = req.user.user_id;
+    let avatar_url = null;
+    
+    if (req.file) {
+        avatar_url = `/images/${req.file.filename}`;
+    }
 
     try {
         // Kiểm tra user_name đã tồn tại
@@ -158,6 +163,10 @@ const updateUser = async (req, res) => {
                             updateFields.push('password = ?');
                             updateValues.push(hashedPassword);
                         }
+                        if (avatar_url) {
+                            updateFields.push('avatar_url = ?');
+                            updateValues.push(avatar_url);
+                        }
 
                         if (updateFields.length === 0) {
                             return res.status(400).json({ error: 'Không có thông tin nào để cập nhật' });
@@ -171,8 +180,10 @@ const updateUser = async (req, res) => {
                                 console.log('Lỗi khi cập nhật user:', err);
                                 return res.status(500).json({ error: err.message });
                             }
-                            const updatedUser = { user_id, user_name: user_name || req.user.user_name, email: req.user.email };
-                            const newToken = jwt.sign(updatedUser, process.env.JWT_SECRET || 'your_secret_key', { expiresIn: '1h' });
+                            
+                            const finalAvatarUrl = avatar_url || req.user.avatar_url;
+                            const updatedUser = { user_id, user_name: user_name || req.user.user_name, email: req.user.email, avatar_url: finalAvatarUrl, role_id: req.user.role_id };
+                            const newToken = jwt.sign(updatedUser, process.env.JWT_SECRET || 'your_secret_key', { expiresIn: '3h' });
                             res.json({
                                 message: 'Cập nhật thông tin thành công!',
                                 token: newToken,
@@ -192,6 +203,10 @@ const updateUser = async (req, res) => {
                         updateFields.push('user_name = ?');
                         updateValues.push(user_name);
                     }
+                    if (avatar_url) {
+                        updateFields.push('avatar_url = ?');
+                        updateValues.push(avatar_url);
+                    }
 
                     if (updateFields.length === 0) {
                         return res.status(400).json({ error: 'Không có thông tin nào để cập nhật' });
@@ -205,8 +220,10 @@ const updateUser = async (req, res) => {
                             console.log('Lỗi khi cập nhật user:', err);
                             return res.status(500).json({ error: err.message });
                         }
-                        const updatedUser = { user_id, user_name: user_name || req.user.user_name, email: req.user.email };
-                        const newToken = jwt.sign(updatedUser, process.env.JWT_SECRET || 'your_secret_key', { expiresIn: '1h' });
+                        
+                        const finalAvatarUrl = avatar_url || req.user.avatar_url;
+                        const updatedUser = { user_id, user_name: user_name || req.user.user_name, email: req.user.email, avatar_url: finalAvatarUrl, role_id: req.user.role_id };
+                        const newToken = jwt.sign(updatedUser, process.env.JWT_SECRET || 'your_secret_key', { expiresIn: '3h' });
                         res.json({
                             message: 'Cập nhật thông tin thành công!',
                             token: newToken,
@@ -288,7 +305,7 @@ const googleLogin = async (req, res) => {
                 const jwtToken = jwt.sign(
                     { user_id: user.user_id, user_name: user.user_name, email: user.email },
                     process.env.JWT_SECRET || 'your_secret_key',
-                    { expiresIn: '1h' }
+                    { expiresIn: '3h' }
                 );
 
                 res.json({
@@ -314,7 +331,7 @@ const googleLogin = async (req, res) => {
                         }
                         
                         const newUser = { user_id: insertResult.insertId, user_name: uniqueUserName, email };
-                        const jwtToken = jwt.sign(newUser, process.env.JWT_SECRET || 'your_secret_key', { expiresIn: '1h' });
+                        const jwtToken = jwt.sign(newUser, process.env.JWT_SECRET || 'your_secret_key', { expiresIn: '3h' });
 
                         res.status(201).json({
                             message: 'Đăng nhập thành công!',

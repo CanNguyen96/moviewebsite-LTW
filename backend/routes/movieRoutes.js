@@ -1,7 +1,9 @@
 const express = require('express');
 const router = express.Router();
 const movieController = require('../controllers/movieController');
+const ratingController = require('../controllers/ratingController');
 const upload = require('../middlewares/upload');
+const { authenticateToken } = require('../middlewares/auth');
 
 router.get('/api/movies/searchAdmin', movieController.searchMoviesForAdmin);
 router.get('/api/movies/search', movieController.searchMovies); // Tìm kiếm phim theo tên
@@ -14,5 +16,12 @@ router.post('/api/movies/:movieId/episodes',movieController.addEpisode); // Thê
 router.delete('/api/movies/:movie_id', movieController.deleteMovie); // Xóa một bộ phim 
 router.get('/api/slider-movies', movieController.getSliderMovie); // Lấy danh sách phim hiện thị Slider
 router.post('/api/movies/add', upload.fields([ { name: 'image', maxCount: 1 },{ name: 'background', maxCount: 1 }]), movieController.addMovie);
+
+// Tăng lượt xem phim
+router.post('/api/movies/:id/view', movieController.addView);
+
+// Đánh giá phim
+router.post('/api/movies/:id/rate', authenticateToken, ratingController.rateMovie);
+router.get('/api/movies/:id/rate', authenticateToken, ratingController.getUserRating);
 
 module.exports = router;

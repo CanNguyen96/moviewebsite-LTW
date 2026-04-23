@@ -7,7 +7,9 @@ const getMovies = (req, res) => {
             movie_id as id,
             title,
             image_url,
-            status
+            status,
+            views_count,
+            average_rating
         FROM movies
         WHERE status = 'Approved'
         ORDER BY movie_id DESC    
@@ -33,7 +35,8 @@ const getMovieDetails = (req, res) => {
             m.image_url,
             m.background_url,
             m.status,
-            (SELECT AVG(r.rating) FROM reviews r WHERE r.movie_id=m.movie_id) AS avg_rating,
+            m.average_rating AS avg_rating,
+            m.views_count,
             (SELECT COUNT(r.review_id) FROM reviews r WHERE r.movie_id=m.movie_id) AS total_reviews
         FROM movies m
         WHERE m.movie_id = ? AND m.status = 'Approved'
@@ -425,7 +428,9 @@ const getSliderMovie = (req, res) =>{
             title,
             background_url,
             genre,
-            description
+            description,
+            views_count,
+            average_rating
         FROM movies
         WHERE status = 'Approved' 
         ORDER BY movie_id DESC 
@@ -455,7 +460,9 @@ const searchMovies = (req, res) => {
             image_url,
             genre,
             description,
-            status
+            status,
+            views_count,
+            average_rating
         FROM movies
         WHERE (title LIKE ? OR genre LIKE ?) AND status = 'Approved'
         ORDER BY movie_id DESC
@@ -506,6 +513,20 @@ const searchMoviesForAdmin= (req, res) =>{
 
 
 
+// API: Tăng lượt xem phim
+const addView = (req, res) => {
+    const movieId = req.params.id;
+
+    const sql = 'UPDATE movies SET views_count = views_count + 1 WHERE movie_id = ?';
+    db.query(sql, [movieId], (err, result) => {
+        if (err) {
+            console.error('Lỗi khi tăng lượt xem phim:', err);
+            return res.status(500).json({ message: 'Lỗi máy chủ', error: err.message });
+        }
+        res.status(200).json({ message: 'Tăng lượt xem thành công' });
+    });
+};
+
 module.exports = {
     getMovies,
     getMovieDetails,
@@ -518,6 +539,5 @@ module.exports = {
     getSliderMovie,
     searchMovies,
     searchMoviesForAdmin,
-
+    addView
 };
-
