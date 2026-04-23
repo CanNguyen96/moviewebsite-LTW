@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import axios from 'axios';
+import { movieService } from '../services/movieService';
 import styles from '../styles/ListMovie.module.css';
 import paginationStyles from '../styles/List.module.css';
 import { Link } from 'react-router-dom';
@@ -18,11 +18,15 @@ function AdminList() {
     const [currentPage, setCurrentPage]= useState(1);
     const moviesPerPage= 5;
     useEffect(() => {
-        axios.get(`${process.env.REACT_APP_API_URL}/api/moviesad`)
-            .then(res => {
-                setAnimeList(res.data);
-            })
-            .catch(err => console.error("Lỗi:", err));
+        const fetchMovies = async () => {
+            try {
+                const data = await movieService.getAdminMovies();
+                setAnimeList(data);
+            } catch (err) {
+                console.error("Lỗi:", err);
+            }
+        };
+        fetchMovies();
     }, []);
     const totalPages= Math.ceil(animeList.length/moviesPerPage);
     // Tính danh sách phim hiện thị theo trang 
@@ -84,17 +88,16 @@ function AnimeItem({movie_id, title, image_url, genre, year, duration, episodes,
         return 'review';
     };
     //
-    const handleDelete = (id) => {
+    const handleDelete = async (id) => {
         if (window.confirm("Bạn có chắc muốn xóa phim này không?")) {
-            axios.delete(`${process.env.REACT_APP_API_URL}/api/movies/${movie_id}`)
-                .then(() => {
-                    alert("Xóa phim thành công!");
-                    window.location.reload(); // Load lại danh sách
-                })
-                .catch(err => {
-                    console.error("Lỗi khi xóa:", err);
-                    alert("Xóa thất bại!");
-                });
+            try {
+                await movieService.deleteMovie(movie_id);
+                alert("Xóa phim thành công!");
+                window.location.reload(); // Load lại danh sách
+            } catch (err) {
+                console.error("Lỗi khi xóa:", err);
+                alert("Xóa thất bại!");
+            }
         }
     };
 

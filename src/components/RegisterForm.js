@@ -2,7 +2,7 @@
 import { useState } from "react";
 import styles from "../styles/Login.module.css";
 import { Link, useNavigate } from "react-router-dom";
-import axios from "axios";
+import { authService } from "../services/authService";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
@@ -26,19 +26,15 @@ function RegisterForm() {
         setLoading(true);
         setError("");
         try {
-            const res = await axios.post(`${process.env.REACT_APP_API_URL}/register`, {
-                name,
-                email,
-                password,
-            });
+            const data = await authService.register(name, email, password);
             // Kiểm tra dữ liệu từ API
-            if (!res.data.user) {
+            if (!data.user) {
                 throw new Error("Dữ liệu người dùng không hợp lệ từ API /register");
             }
             // Lưu token và thông tin user vào localStorage
-            localStorage.setItem("token", res.data.token);
-            localStorage.setItem("user", JSON.stringify(res.data.user));
-            toast.success(res.data.message, {
+            localStorage.setItem("token", data.token);
+            localStorage.setItem("user", JSON.stringify(data.user));
+            toast.success(data.message, {
                 position: "top-right",
                 autoClose: 2000,
                 hideProgressBar: false,

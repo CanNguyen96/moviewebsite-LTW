@@ -1,56 +1,14 @@
 import { useCallback, useEffect, useState, useRef } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import styles from "../styles/MoviePlayer.module.css";
-import axios from "axios";
+import { movieService } from "../services/movieService";
+import { reviewService } from "../services/reviewService";
+import { userService } from "../services/userService";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import Hls from "hls.js";
-
-// Component phát video HLS tự làm giống code HTML Vanilla của bạn
-const HlsVideoPlayer = ({ src }) => {
-    const videoRef = useRef(null);
-
-    useEffect(() => {
-        const video = videoRef.current;
-        if (!video || !src) return;
-
-        let hls;
-
-        if (Hls.isSupported()) {
-            hls = new Hls();
-            hls.loadSource(src);
-            hls.attachMedia(video);
-            hls.on(Hls.Events.MANIFEST_PARSED, function () {
-                video.play().catch(err => {
-                    console.log("Trình duyệt chặn autoplay âm thanh, người dùng cần bấm play thủ công:", err);
-                });
-            });
-        }
-        // Hỗ trợ riêng cho trình duyệt Safari (Native HLS)
-        else if (video.canPlayType('application/vnd.apple.mpegurl')) {
-            video.src = src;
-            video.addEventListener('loadedmetadata', function () {
-                video.play().catch(err => console.log(err));
-            });
-        }
-
-        // Cleanup (Dọn dẹp hls khi đổi tập hoặc rời trang)
-        return () => {
-            if (hls) {
-                hls.destroy();
-            }
-        };
-    }, [src]);
-
-    return (
-        <video 
-            ref={videoRef} 
-            controls 
-            className={styles['react-player-styled']} 
-            style={{ width: '100%', height: '100%', backgroundColor: '#000', outline: 'none' }}
-        />
-    );
-};
+import HlsVideoPlayer from "./movie-player/HlsVideoPlayer";
+import EpisodeList from "./movie-player/EpisodeList";
+import ReviewSection from "./movie-player/ReviewSection";
 
 const MoviePlayer = () => {
     const { id, episodeNumber } = useParams();
@@ -104,12 +62,8 @@ const MoviePlayer = () => {
         }
 
         try {
-            const response = await axios.post(
-                `${process.env.REACT_APP_API_URL}/api/watch-history`,
-                { movie_id: movieId },
-                { headers: { Authorization: `Bearer ${token}` } }
-            );
-            console.log("Phản hồi từ server:", response.data);
+            const response = await userService.recordWatchHistory(movieId);
+            console.log("Phản hồi từ server:", response);
             isHistoryRecorded.current = true;
         } catch (err) {
             console.error("Lỗi chi tiết khi ghi lịch sử:", err.response?.data || err.message);
@@ -125,8 +79,7 @@ const MoviePlayer = () => {
 
         const fetchMovieData = async () => {
             try {
-                const movieRes = await fetch(`${process.env.REACT_APP_API_URL}/api/movies/${id}`);
-                const movieData = await movieRes.json();
+                const movieData = await movieService.getMovieById(id);
                 console.log("Dữ liệu phim chi tiết:", movieData);
 
                 if (!isMounted) return;
@@ -151,9 +104,9 @@ const MoviePlayer = () => {
                     await recordHistoryToDB(id);
                 }
 
-                const reviewsRes = await axios.get(`${process.env.REACT_APP_API_URL}/api/reviews/${id}`);
+                const reviewsData = await reviewService.getReviewsByMovieId(id);
                 if (isMounted) {
-                    setReviews(reviewsRes.data);
+                    setReviews(reviewsData);
                 }
             } catch (err) {
                 console.error("Lỗi fetch dữ liệu phim:", err);
@@ -185,14 +138,10 @@ const MoviePlayer = () => {
         }
 
         try {
-            await axios.post(
-                `${process.env.REACT_APP_API_URL}/api/reviews`,
-                { movie_id: id, comment: newComment },
-                { headers: { Authorization: `Bearer ${token}` } }
-            );
+            await reviewService.addReview(id, newComment);
             setNewComment("");
-            const res = await axios.get(`${process.env.REACT_APP_API_URL}/api/reviews/${id}`);
-            setReviews(res.data);
+            const data = await reviewService.getReviewsByMovieId(id);
+            setReviews(data);
             toast.success("Gửi bình luận thành công!");
         } catch (err) {
             toast.error("Lỗi khi gửi bình luận: " + (err.response?.data?.error || "Thử lại sau"));
@@ -221,7 +170,7 @@ const MoviePlayer = () => {
                 
                 <div className={styles['video-player-wrapper']}>
                     {isVideoUrl(currentEpisode?.video_url) ? (
-                        <HlsVideoPlayer src={currentEpisode?.video_url} />
+                        <HlsVideoPlayer src={currentEpisode?.video_url} styles={styles} />
                     ) : (
                         <iframe
                             key={currentEpisode?.episode_id}
@@ -237,72 +186,21 @@ const MoviePlayer = () => {
                 
                 <div className={styles['player-content-stacked']}>
                     {/* 1. Episode List */}
-                    <div className={styles['episode-list-card']}>
-                        <h3>DANH SÁCH TẬP</h3>
-                        <div className={styles['episodes-grid']}>
-                            {Array.isArray(movie.episodes) && movie.episodes.length > 0 ? (
-                                [...movie.episodes]
-                                    .sort((a, b) => Number(a.episode) - Number(b.episode))
-                                    .map((ep, index) => (
-                                    <button
-                                        key={`episode-${index}`}
-                                        className={`${styles['ep-btn']} ${Number(ep.episode) === Number(currentEpisode?.episode) ? styles.active : ""}`}
-                                        onClick={() => handleEpisodeClick(ep)}
-                                    >
-                                        {ep.episode}
-                                    </button>
-                                ))
-                            ) : (
-                                <p className={styles['text-muted']}>Hiện chưa có tập phim.</p>
-                            )}
-                        </div>
-                    </div>
+                    <EpisodeList 
+                        movie={movie} 
+                        currentEpisode={currentEpisode} 
+                        onEpisodeClick={handleEpisodeClick} 
+                        styles={styles} 
+                    />
 
                     {/* 2. Review Section */}
-                    <div className={styles['review-section']}>
-                        <div className={styles['review-header']}>
-                            <h3>Bình luận ({reviews.length})</h3>
-                            <span className={styles['refresh-icon']}>↻</span>
-                        </div>
-                        
-                        <form onSubmit={handleReviewSubmit} className={styles['comment-form']}>
-                            <textarea
-                                placeholder="Nhập bình luận của bạn tại đây"
-                                value={newComment}
-                                onChange={(e) => setNewComment(e.target.value)}
-                                required
-                            ></textarea>
-                            <div className={styles['comment-actions']}>
-                                <div className="action-left">
-                                </div>
-                                <button type="submit" className={styles['submit-comment-btn']}>Gửi</button>
-                            </div>
-                        </form>
-
-                        <div className="reviews-list">
-                            {reviews.length > 0 ? (
-                                reviews.map((review, index) => (
-                                    <div key={`review-${index}`} className={styles['review-item']}>
-                                        <div className={styles['review-avatar']}>
-                                            <img src={review.avatar_url || "/images/default-avatar.png"} alt="Avatar" onError={(e) => { e.target.src = 'https://ui-avatars.com/api/?name=' + review.user_name + '&background=random' }} />
-                                            <div className={styles['user-level']}>Lv 12</div>
-                                        </div>
-                                        <div className={styles['review-content']}>
-                                            <div className={styles['review-user']}>
-                                                <strong>{review.user_name}</strong> 
-                                            </div>
-                                            <p className={styles['review-text']}>{review.comment}</p>
-                                            <div className={styles['review-time']}>
-                                                <span className={styles['reply-btn']}>Trả lời</span> {new Date(review.review_date).toLocaleString()}
-                                            </div>
-                                        </div>
-                                    </div>
-                                ))
-                            ) : (
-                                <p className={styles['text-muted']} style={{color: '#999'}}>Chưa có đánh giá nào.</p>
-                            )}
-                        </div>
-                    </div>
+                    <ReviewSection 
+                        reviews={reviews} 
+                        newComment={newComment} 
+                        setNewComment={setNewComment} 
+                        onReviewSubmit={handleReviewSubmit} 
+                        styles={styles} 
+                    />
                 </div>
             </div>
         </div>

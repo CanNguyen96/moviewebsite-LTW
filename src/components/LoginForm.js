@@ -2,7 +2,7 @@
 import React, { useState } from "react";
 import styles from "../styles/Login.module.css";
 import { Link, useNavigate } from "react-router-dom";
-import axios from "axios";
+import { authService } from "../services/authService";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { GoogleLogin } from "@react-oauth/google";
@@ -19,18 +19,15 @@ function LoginForm() {
         setLoading(true);
         setError("");
         try {
-            const res = await axios.post("http://localhost:3001/login", {
-                email,
-                password,
-            });
+            const data = await authService.login(email, password);
     
-            if (!res.data.user) {
+            if (!data.user) {
                 throw new Error("Dữ liệu người dùng không hợp lệ từ API /login");
             }
     
             // Lưu token và user vào localStorage
-            localStorage.setItem("token", res.data.token);
-            localStorage.setItem("user", JSON.stringify(res.data.user));
+            localStorage.setItem("token", data.token);
+            localStorage.setItem("user", JSON.stringify(data.user));
     
             toast.success("Đăng nhập thành công!", {
                 position: "top-right",
@@ -40,7 +37,7 @@ function LoginForm() {
             window.dispatchEvent(new Event("userChanged"));
     
             setTimeout(() => {
-                if (res.data.user.role_id === 1) {
+                if (data.user.role_id === 1) {
                     navigate("/manageuser"); 
                 } else {
                     navigate("/");
@@ -58,17 +55,15 @@ function LoginForm() {
         setLoading(true);
         setError("");
         try {
-            const res = await axios.post("http://localhost:3001/google", {
-                token: credentialResponse.credential,
-            });
+            const data = await authService.googleLogin(credentialResponse.credential);
 
-            if (!res.data.user) {
+            if (!data.user) {
                 throw new Error("Dữ liệu người dùng không hợp lệ từ API");
             }
 
             // Lưu token và user vào localStorage
-            localStorage.setItem("token", res.data.token);
-            localStorage.setItem("user", JSON.stringify(res.data.user));
+            localStorage.setItem("token", data.token);
+            localStorage.setItem("user", JSON.stringify(data.user));
 
             toast.success("Đăng nhập bằng Google thành công!", {
                 position: "top-right",
@@ -78,7 +73,7 @@ function LoginForm() {
             window.dispatchEvent(new Event("userChanged"));
 
             setTimeout(() => {
-                if (res.data.user.role_id === 1) {
+                if (data.user.role_id === 1) {
                     navigate("/manageuser"); 
                 } else {
                     navigate("/");
