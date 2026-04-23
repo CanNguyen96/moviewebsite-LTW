@@ -33,7 +33,7 @@ export const movieService = {
 
     // Thêm phim mới
     addMovie: async (formData) => {
-        const response = await axiosInstance.post('/api/movies', formData, {
+        const response = await axiosInstance.post('/api/movies/add', formData, {
             headers: { 'Content-Type': 'multipart/form-data' }
         });
         return response.data;

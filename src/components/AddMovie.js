@@ -2,6 +2,8 @@ import { movieService } from "../services/movieService";
 import styles from "../styles/AddMovie.module.css";
 import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import { FaFilm, FaCalendarAlt, FaClock, FaAlignLeft, FaImage, FaImages, FaTag, FaTimes } from 'react-icons/fa';
 
 function AddMovie() {
@@ -94,7 +96,7 @@ function AddMovie() {
             !formData.title || !formData.description || !formData.release_year ||
             !formData.duration || selectedCategories.length === 0 || !formData.image || !formData.background
         ) {
-            alert("Vui lòng điền đầy đủ thông tin, chọn ít nhất một thể loại và tải lên đủ các ảnh!");
+            toast.warning("Vui lòng điền đầy đủ thông tin, chọn ít nhất một thể loại và tải lên đủ các ảnh!");
             return;
         }
 
@@ -110,17 +112,20 @@ function AddMovie() {
 
         movieService.addMovie(formPayload)
             .then((response) => {
-                alert("Thêm phim thành công!");
-                navigate(-1);
+                toast.success("Thêm phim thành công!");
+                setTimeout(() => {
+                    navigate(-1);
+                }, 1500);
             })
             .catch((error) => {
                 console.error("Lỗi khi thêm phim:", error);
-                alert("Thêm phim thất bại. Vui lòng thử lại.");
+                toast.error("Thêm phim thất bại. Vui lòng thử lại.");
             });
     };
 
     return (
         <div className={styles['add-movie-container']}>
+            <ToastContainer />
             <h2>Thêm Phim Mới</h2>
             <form className={styles['add-movie-form']} onSubmit={handleSubmit}>
                 <div className={styles['form-main-content']}>

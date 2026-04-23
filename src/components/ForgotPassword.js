@@ -33,7 +33,6 @@ function ForgotPassword() {
             setEmail("");
             setNewPassword("");
 
-            window.dispatchEvent(new Event("userChanged"));
             setTimeout(() => {
                 navigate("/login");
             }, 2000);

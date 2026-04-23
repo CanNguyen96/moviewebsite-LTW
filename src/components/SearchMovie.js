@@ -2,6 +2,9 @@ import { movieService } from "../services/movieService";
 import { useLocation,Link } from "react-router-dom";
 import styles from '../styles/ListMovie.module.css';
 import { useEffect, useState } from "react";
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import ConfirmModal from './ConfirmModal';
 
 
 function useQuery(){
@@ -14,6 +17,7 @@ function SearchMovie(){
 
     const [movies, setMovies]= useState([]);
     const [loading, setLoading]= useState(true);
+    const [modalConfig, setModalConfig] = useState({ isOpen: false, movieId: null });
 
     useEffect(()=>{
         if(!movieName){
@@ -38,8 +42,36 @@ function SearchMovie(){
         return <div>Đang tải kết quả tìm kiếm</div>
     }
 
+    const handleDeleteClick = (id) => {
+        setModalConfig({ isOpen: true, movieId: id });
+    };
+
+    const confirmDelete = async () => {
+        const { movieId } = modalConfig;
+        setModalConfig({ isOpen: false, movieId: null });
+        try {
+            await movieService.deleteMovie(movieId);
+            toast.success("Xóa phim thành công!");
+            setMovies(movies.filter(item => item.movie_id !== movieId));
+        } catch (err) {
+            console.error("Lỗi khi xóa:", err);
+            toast.error("Xóa thất bại!");
+        }
+    };
+
+    const cancelDelete = () => {
+        setModalConfig({ isOpen: false, movieId: null });
+    };
+
     return(
         <div className="list-movies">
+            <ToastContainer />
+            <ConfirmModal 
+                isOpen={modalConfig.isOpen}
+                message="Bạn có chắc muốn xóa phim này không?"
+                onConfirm={confirmDelete}
+                onCancel={cancelDelete}
+            />
             <div className={styles['list-movie-tag']}>
                 <li>Kết quả tìm kiếm cho: "{movieName}</li>
             </div>
@@ -58,6 +90,7 @@ function SearchMovie(){
                         episodes={item.episodes}
                         status={item.status}
                         styles={styles}
+                        onDelete={() => handleDeleteClick(item.movie_id)}
                     />
                 ))}
                 </div>    
@@ -70,25 +103,12 @@ function SearchMovie(){
     )
 }
 
-function AnimeItem({movie_id, title, image_url, genre, year, duration, episodes, status, styles }) {
+function AnimeItem({movie_id, title, image_url, genre, year, duration, episodes, status, styles, onDelete }) {
     // Định dạng trạng thái
     const getStatusClass = () => {
         if (status === 'Approved') return 'approved';
         if (status === 'Pending') return 'pending';
         return 'review';
-    };
-    //
-    const handleDelete = async (movie_id) => {
-        if (window.confirm("Bạn có chắc muốn xóa phim này không?")) {
-            try {
-                await movieService.deleteMovie(movie_id);
-                alert("Xóa phim thành công!");
-                window.location.reload(); // Load lại danh sách
-            } catch (err) {
-                console.error("Lỗi khi xóa:", err);
-                alert("Xóa thất bại!");
-            }
-        }
     };
 
     return (
@@ -117,7 +137,7 @@ function AnimeItem({movie_id, title, image_url, genre, year, duration, episodes,
                 <Link to={`/admin/edit/${movie_id}`}>
                     <button>Sửa thông tin phim</button>
                 </Link>
-                <button onClick={() => handleDelete(movie_id)}>Xóa Phim</button>
+                <button onClick={onDelete}>Xóa Phim</button>
                 <Link to={`/admin/episodes/${movie_id}`}>
                     <button>Quản lý tập phim</button>
                 </Link>              

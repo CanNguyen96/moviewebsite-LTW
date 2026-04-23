@@ -4,69 +4,42 @@ import styles from "../styles/Header.module.css";
 import { Link, useNavigate } from "react-router-dom";
 import logo_web from "../picture/logo-1.webp";
 import { movieService } from "../services/movieService";
+import { useAuth } from "../contexts/AuthContext";
 
 
 function Header() {
-  const [user, setUser] = useState(null);
+  const { user, logout } = useAuth();
   const navigate = useNavigate();
   const [searchKeyword, setSearchKeyword] = useState("");
-  const [showDropdown, setShowDropdown]= useState(false);
+  const [showDropdown, setShowDropdown] = useState(false);
 
   const dropdownRef = useRef(null);
-  // Hàm để lấy thông tin user từ localStorage
-  const updateUserFromStorage = () => {
-    const storedUser = localStorage.getItem("user");
-    if (storedUser) {
-      const parsedUser = JSON.parse(storedUser);
-      setUser(parsedUser);
-    } else {
-      setUser(null);
-    }
-  };
 
-  // Cập nhật user khi component mount
-  useEffect(() => {
-    updateUserFromStorage();
-  }, []);
-
-  // Lắng nghe sự kiện tùy chỉnh để cập nhật user
-  useEffect(() => {
-    const handleUserChange = () => {
-      updateUserFromStorage();
-    };
-    window.addEventListener("userChanged", handleUserChange);
-    return () => {
-      window.removeEventListener("userChanged", handleUserChange);
-    };
-  }, []);
-  const handleSearchChange=(event)=>{
+  const handleSearchChange = (event) => {
     setSearchKeyword(event.target.value);
   }
-  const handleSearchSubmit=(event)=>{
-    if (event.key === 'Enter' && searchKeyword.trim() !== ''){
-      navigate(`/movies/search?keyword=${encodeURIComponent(searchKeyword)}`);  
-      setSearchKeyword('');         
+  const handleSearchSubmit = (event) => {
+    if (event.key === 'Enter' && searchKeyword.trim() !== '') {
+      navigate(`/movies/search?keyword=${encodeURIComponent(searchKeyword)}`);
+      setSearchKeyword('');
     }
   }
   const handleLogout = () => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("user");
-    setUser(null);
-    window.dispatchEvent(new Event("userChanged"));
+    logout();
     navigate("/login");
   };
 
   // Lấy danh sách thể loại 
   const [categoryList, setCategoryList] = useState([]);
-  
+
   useEffect(() => {
-      movieService.getCategories()
-          .then(data => {
-              setCategoryList(data);
-          })
-          .catch(err => console.error("Lỗi:", err));
+    movieService.getCategories()
+      .then(data => {
+        setCategoryList(data);
+      })
+      .catch(err => console.error("Lỗi:", err));
   }, []);
-    // Effect để xử lý click ra ngoài
+  // Effect để xử lý click ra ngoài
   useEffect(() => {
     const handleClickOutside = (event) => {
       // Nếu dropdown đang mở VÀ click không phải là bên trong phần tử dropdown
@@ -84,7 +57,7 @@ function Header() {
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
-  }, [showDropdown]); // Chạy lại effect khi showDropdown thay đổi
+  }, [showDropdown]);
 
   return (
     <nav className={styles.nav}>
@@ -114,7 +87,7 @@ function Header() {
       </div>
       <div className={styles.Search}>
         <ul>
-        <li>
+          <li>
             <input
               placeholder="Tìm kiếm"
               type="text"
@@ -134,15 +107,16 @@ function Header() {
                     <ul className={styles['dropdown-menu']}>
                       <li onClick={() => {
                         navigate("/profile");
-                        setShowDropdown(false); 
+                        setShowDropdown(false);
                       }}>Quản lý tài khoản</li>
-                      <li onClick={() => {       
+                      <li onClick={() => {
                         navigate("/movies/favorites");
-                        setShowDropdown(false)} }>Danh sách yêu thích</li>
+                        setShowDropdown(false)
+                      }}>Danh sách yêu thích</li>
                       <li onClick={() => {
                         navigate("/movies/watch-history");
                         setShowDropdown(false);
-                        }}>Lịch sử xem phim</li>
+                      }}>Lịch sử xem phim</li>
                     </ul>
                   )}
                 </div>

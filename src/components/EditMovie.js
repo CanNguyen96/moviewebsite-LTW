@@ -1,6 +1,8 @@
 import { useState, useEffect, useRef } from 'react';
 import { movieService } from '../services/movieService';
 import { useParams, useNavigate } from 'react-router-dom';
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import { FaFilm, FaCalendarAlt, FaClock, FaAlignLeft, FaImage, FaImages, FaTag, FaTimes, FaSave, FaTimesCircle, FaPlusSquare } from 'react-icons/fa';
 import addStyles from '../styles/AddMovie.module.css';
 import styles from '../styles/EditMovie.module.css';
@@ -126,11 +128,14 @@ function EditMovie() {
 
         movieService.updateMovie(movieId, formData)
             .then(() => {
-                alert("Cập nhật thành công!");
-                navigate('/managemovie');
+                toast.success("Cập nhật thành công!");
+                setTimeout(() => {
+                    navigate('/managemovie');
+                }, 1500);
             })
             .catch(err => {
                 console.error("Lỗi cập nhật:", err);
+                toast.error('Đã xảy ra lỗi khi cập nhật thông tin phim.');
                 setError('Đã xảy ra lỗi khi cập nhật thông tin phim.');
             });
     };
@@ -140,6 +145,7 @@ function EditMovie() {
 
     return (
         <div className={addStyles['add-movie-container']}>
+            <ToastContainer />
             <h2>Sửa Thông Tin Phim</h2>
             <form className={addStyles['add-movie-form']} onSubmit={handleSubmit}>
                 <div className={addStyles['form-main-content']}>

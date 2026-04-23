@@ -5,9 +5,10 @@ import { userService } from "../services/userService";
 import { useNavigate } from "react-router-dom";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { useAuth } from "../contexts/AuthContext";
 
 function Profile() {
-    const [user, setUser] = useState(null);
+    const { user, updateUser } = useAuth();
     const [userName, setUserName] = useState("");
     const [email, setEmail] = useState("");
     const [oldPassword, setOldPassword] = useState("");
@@ -20,19 +21,16 @@ function Profile() {
     const navigate = useNavigate();
 
     useEffect(() => {
-        const storedUser = localStorage.getItem("user");
-        if (storedUser) {
-            const parsedUser = JSON.parse(storedUser);
-            setUser(parsedUser);
-            setUserName(parsedUser.user_name);
-            setEmail(parsedUser.email);
-            if (parsedUser.avatar_url) {
-                setAvatarPreview(parsedUser.avatar_url);
+        if (user) {
+            setUserName(user.user_name);
+            setEmail(user.email);
+            if (user.avatar_url) {
+                setAvatarPreview(user.avatar_url);
             }
         } else {
             navigate("/login");
         }
-    }, [navigate]);
+    }, [user, navigate]);
 
     const handleAvatarChange = (e) => {
         const file = e.target.files[0];
@@ -69,15 +67,13 @@ function Profile() {
         try {
             const data = await userService.updateProfile(formData);
             localStorage.setItem("token", data.token);
-            localStorage.setItem("user", JSON.stringify(data.user));
-            setUser(data.user);
+            updateUser(data.user);
             setUserName(data.user.user_name);
             if (data.user.avatar_url) {
                 setAvatarPreview(data.user.avatar_url);
             }
             setOldPassword("");
             setPassword("");
-            window.dispatchEvent(new Event("userChanged"));
             toast.success("Cập nhật thông tin thành công!", {
                 position: "top-right",
                 autoClose: 2000,

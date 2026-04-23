@@ -1,13 +1,14 @@
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { userService } from "../services/userService";
 import { toast } from "react-toastify";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
+import ConfirmModal from './ConfirmModal';
 import styles from '../styles/WatchHistory.module.css';
 
 function WatchHistory() {
     const [watchHistory, setWatchHistory] = useState([]);
     const [loading, setLoading] = useState(true);
-    const navigate = useNavigate();
+    const [isConfirmOpen, setIsConfirmOpen] = useState(false);
 
     useEffect(() => {
         setLoading(true);
@@ -46,15 +47,16 @@ function WatchHistory() {
     };
 
     // Hàm xóa toàn bộ lịch sử
-    const handleDeleteAllHistory = async () => {
-        if (!window.confirm("Bạn có chắc chắn muốn xóa toàn bộ lịch sử xem phim?")) {
-            return;
-        }
+    const handleDeleteAllHistoryClick = () => {
+        setIsConfirmOpen(true);
+    };
 
+    const confirmDeleteAll = async () => {
+        setIsConfirmOpen(false);
         try {
             await userService.deleteAllWatchHistory();
             setWatchHistory([]);
-            
+            toast.success("Đã xóa toàn bộ lịch sử xem phim!");
         } catch (err) {
             console.error("Lỗi xóa toàn bộ lịch sử xem phim:", err);
             toast.error("Không thể xóa toàn bộ lịch sử xem phim");
@@ -67,10 +69,16 @@ function WatchHistory() {
 
     return (
         <div className={styles['watch-history-container']}>
+            <ConfirmModal 
+                isOpen={isConfirmOpen}
+                message="Bạn có chắc chắn muốn xóa toàn bộ lịch sử xem phim?"
+                onConfirm={confirmDeleteAll}
+                onCancel={() => setIsConfirmOpen(false)}
+            />
             <div className={styles['header-container']}>
                 <h2>Lịch sử xem phim của bạn</h2>
                 {watchHistory.length > 0 && (
-                    <button className={styles['delete-all-button']} onClick={handleDeleteAllHistory}>
+                    <button className={styles['delete-all-button']} onClick={handleDeleteAllHistoryClick}>
                         Xóa toàn bộ lịch sử
                     </button>
                 )}

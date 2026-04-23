@@ -1,6 +1,9 @@
 import { useState, useEffect, useCallback } from 'react';
 import { movieService } from '../services/movieService';
 import { useParams } from 'react-router-dom';
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import ConfirmModal from './ConfirmModal';
 import styles from '../styles/EpisodesMovie.module.css';
 
 function EpisodesContent() {
@@ -12,6 +15,7 @@ function EpisodesContent() {
         video_url: ''
     });
     const [editingEpisodeId, setEditingEpisodeId] = useState(null);
+    const [modalConfig, setModalConfig] = useState({ isOpen: false, episodeId: null });
 
     // Memoize fetchEpisodes để tránh ESLint warning
     const fetchEpisodes = useCallback(() => {
@@ -41,20 +45,26 @@ function EpisodesContent() {
         if (editingEpisodeId) {
             movieService.updateEpisode(editingEpisodeId, payload)
             .then(() => {
-                alert('Cập nhật tập phim thành công!');
+                toast.success('Cập nhật tập phim thành công!');
                 setNewEpisode({ episode_number: '', title: '', video_url: '' });
                 setEditingEpisodeId(null);
                 fetchEpisodes();
             })
-            .catch(err => console.error('Lỗi khi cập nhật tập:', err));
+            .catch(err => {
+                console.error('Lỗi khi cập nhật tập:', err);
+                toast.error('Cập nhật tập phim thất bại!');
+            });
         } else {
             movieService.addEpisode(payload)
             .then(() => {
-                alert('Thêm tập phim thành công!');
+                toast.success('Thêm tập phim thành công!');
                 setNewEpisode({ episode_number: '', title: '', video_url: '' });
                 fetchEpisodes();
             })
-            .catch(err => console.error('Lỗi khi thêm tập:', err));
+            .catch(err => {
+                console.error('Lỗi khi thêm tập:', err);
+                toast.error('Thêm tập phim thất bại!');
+            });
         }
     };
 
@@ -67,15 +77,26 @@ function EpisodesContent() {
         setEditingEpisodeId(episode.episode_id);
     };
 
-    const handleDelete = (episode_id) => {
-        if (window.confirm('Bạn có chắc muốn xóa tập này không?')) {
-            movieService.deleteEpisode(episode_id)
-                .then(() => {
-                    alert('Đã xóa!');
-                    fetchEpisodes();
-                })
-                .catch(err => console.error('Lỗi khi xóa:', err));
-        }
+    const handleDeleteClick = (episode_id) => {
+        setModalConfig({ isOpen: true, episodeId: episode_id });
+    };
+
+    const confirmDelete = () => {
+        const { episodeId } = modalConfig;
+        setModalConfig({ isOpen: false, episodeId: null });
+        movieService.deleteEpisode(episodeId)
+            .then(() => {
+                toast.success('Đã xóa tập phim!');
+                fetchEpisodes();
+            })
+            .catch(err => {
+                console.error('Lỗi khi xóa:', err);
+                toast.error('Xóa thất bại!');
+            });
+    };
+
+    const cancelDelete = () => {
+        setModalConfig({ isOpen: false, episodeId: null });
     };
 
     const handleCancelEdit = () => {
@@ -85,6 +106,13 @@ function EpisodesContent() {
 
     return (
         <div className={styles['episode-manager-container']}>
+            <ToastContainer />
+            <ConfirmModal 
+                isOpen={modalConfig.isOpen}
+                message="Bạn có chắc muốn xóa tập này không?"
+                onConfirm={confirmDelete}
+                onCancel={cancelDelete}
+            />
             <h2>Quản lý tập phim (Movie ID: {movie_id})</h2>
 
             {/* Thêm hoặc sửa tập phim */}
@@ -148,7 +176,7 @@ function EpisodesContent() {
                                 </td>
                                 <td>
                                     <button className={`${styles['action-button']} ${styles['edit-button']}`} onClick={() => handleEdit(ep)}>Sửa</button>
-                                    <button className={styles['action-button']} onClick={() => handleDelete(ep.episode_id)}>Xóa</button>
+                                    <button className={styles['action-button']} onClick={() => handleDeleteClick(ep.episode_id)}>Xóa</button>
                                 </td>
                             </tr>
                         ))

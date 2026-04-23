@@ -5,6 +5,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { authService } from "../services/authService";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { useAuth } from "../contexts/AuthContext";
 
 function RegisterForm() {
     const [name, setName] = useState("");
@@ -14,6 +15,7 @@ function RegisterForm() {
     const [error, setError] = useState("");
     const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
+    const { login } = useAuth();
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -32,8 +34,7 @@ function RegisterForm() {
                 throw new Error("Dữ liệu người dùng không hợp lệ từ API /register");
             }
             // Lưu token và thông tin user vào localStorage
-            localStorage.setItem("token", data.token);
-            localStorage.setItem("user", JSON.stringify(data.user));
+            login(data.user, data.token);
             toast.success(data.message, {
                 position: "top-right",
                 autoClose: 2000,
@@ -42,8 +43,6 @@ function RegisterForm() {
                 pauseOnHover: true,
                 draggable: true,
             });
-            // Gửi sự kiện để thông báo rằng user đã thay đổi
-            window.dispatchEvent(new Event("userChanged"));
             setTimeout(() => {
                 navigate("/login");
             }, 2000);

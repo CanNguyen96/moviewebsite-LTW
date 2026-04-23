@@ -3,6 +3,8 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faUserCircle } from '@fortawesome/free-solid-svg-icons';
 import { useCallback, useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 function UserDetail(){   
     const {userId}= useParams();
@@ -50,12 +52,12 @@ function UserDetail(){
             })
             .then((data) => {
                 setUser(data);
-                alert('Cập nhật trạng thái thành công!'); 
-                navigate(-1);
+                toast.success('Cập nhật trạng thái thành công!'); 
+                setTimeout(() => navigate(-1), 1500);
             })
             .catch((err) => {
                 console.error('Lỗi cập nhật trạng thái:', err);
-                alert('Lỗi cập nhật trạng thái: ' + err.message);
+                toast.error('Lỗi cập nhật trạng thái: ' + err.message);
             });
     };
 
@@ -71,6 +73,7 @@ function UserDetail(){
 
     return(
         <div className={styles['user-detail']}>
+            <ToastContainer />
             <div className={styles.tag}>
                 <h3>Quản lí tài khoản</h3>
             </div>

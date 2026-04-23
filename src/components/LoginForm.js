@@ -6,6 +6,7 @@ import { authService } from "../services/authService";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { GoogleLogin } from "@react-oauth/google";
+import { useAuth } from "../contexts/AuthContext";
 
 function LoginForm() {
     const [email, setEmail] = useState("");
@@ -13,6 +14,7 @@ function LoginForm() {
     const [error, setError] = useState("");
     const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
+    const { login } = useAuth();
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -26,15 +28,12 @@ function LoginForm() {
             }
     
             // Lưu token và user vào localStorage
-            localStorage.setItem("token", data.token);
-            localStorage.setItem("user", JSON.stringify(data.user));
+            login(data.user, data.token);
     
             toast.success("Đăng nhập thành công!", {
                 position: "top-right",
                 autoClose: 2000,
             });
-    
-            window.dispatchEvent(new Event("userChanged"));
     
             setTimeout(() => {
                 if (data.user.role_id === 1) {
@@ -62,15 +61,12 @@ function LoginForm() {
             }
 
             // Lưu token và user vào localStorage
-            localStorage.setItem("token", data.token);
-            localStorage.setItem("user", JSON.stringify(data.user));
+            login(data.user, data.token);
 
             toast.success("Đăng nhập bằng Google thành công!", {
                 position: "top-right",
                 autoClose: 2000,
             });
-
-            window.dispatchEvent(new Event("userChanged"));
 
             setTimeout(() => {
                 if (data.user.role_id === 1) {

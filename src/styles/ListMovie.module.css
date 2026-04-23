@@ -112,6 +112,10 @@
     background-color: #888;
 }
 
+.button-add {
+    padding-left: 20px;
+}
+
 .button-add button{
     font-weight: bold;
     color: white;
