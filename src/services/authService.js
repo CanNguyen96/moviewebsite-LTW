@@ -13,17 +13,30 @@ export const authService = {
         return response.data;
     },
 
-    // Đăng ký tài khoản
-    register: async (name, email, password) => {
-        const response = await axiosInstance.post('/register', { name, email, password });
+    // Gửi OTP Đăng ký
+    sendRegisterOtp: async (name, email) => {
+        const response = await axiosInstance.post('/send-register-otp', { name, email });
         return response.data;
     },
 
-    // Các tính năng quên mật khẩu...
-    forgotPassword: async (userName, email, newPassword) => {
+    // Đăng ký tài khoản (cần OTP)
+    register: async (name, email, password, otp) => {
+        const response = await axiosInstance.post('/register', { name, email, password, otp });
+        return response.data;
+    },
+
+    // Gửi OTP Quên mật khẩu
+    sendForgotOtp: async (userName, email) => {
+        const response = await axiosInstance.post('/send-forgot-otp', { user_name: userName, email });
+        return response.data;
+    },
+
+    // Xác nhận OTP và đặt lại mật khẩu mới
+    forgotPassword: async (userName, email, otp, newPassword) => {
         const response = await axiosInstance.put('/forgot-password', {
             user_name: userName,
             email,
+            otp,
             new_password: newPassword
         });
         return response.data;

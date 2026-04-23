@@ -3,33 +3,91 @@ const jwt = require('jsonwebtoken');
 const db = require('../config/db');
 const { OAuth2Client } = require('google-auth-library');
 const crypto = require('crypto');
+const { sendMail } = require('../config/mailer');
 
 const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
+// Bộ nhớ tạm để lưu OTP (Trong môi trường thực tế nên dùng Redis)
+const otpStore = {}; 
+
+// Hàm tạo OTP ngẫu nhiên 6 số
+const generateOTP = () => {
+    return Math.floor(100000 + Math.random() * 900000).toString();
+};
+
+// Hàm kiểm tra độ mạnh mật khẩu
+const validatePassword = (password) => {
+    if (password.length < 6) return 'Mật khẩu phải có ít nhất 6 ký tự';
+    if (!/\d/.test(password)) return 'Mật khẩu phải chứa ít nhất 1 chữ số (0-9)';
+    if (!/[!@#$%^&*()[\]{}|<>?~=_+-]/.test(password)) return 'Mật khẩu phải chứa ít nhất 1 ký tự đặc biệt';
+    return null; // Mật khẩu hợp lệ
+};
+
+
+// API: Gửi OTP Đăng ký
+const sendRegisterOtp = async (req, res) => {
+    const { name, email } = req.body;
+    if (!name || !email) return res.status(400).json({ error: 'Vui lòng điền tên và email' });
+
+    try {
+        db.query('SELECT * FROM users WHERE email = ? OR user_name = ?', [email, name], async (err, result) => {
+            if (err) return res.status(500).json({ error: err.message });
+            if (result.length > 0) {
+                const existingUser = result[0];
+                if (existingUser.email === email) return res.status(400).json({ error: 'Email đã được sử dụng' });
+                if (existingUser.user_name === name) return res.status(400).json({ error: 'Tên người dùng đã tồn tại' });
+            }
+
+            const otp = generateOTP();
+            otpStore[email] = { otp, type: 'REGISTER', expiresAt: Date.now() + 5 * 60 * 1000 }; // Hết hạn sau 5 phút
+
+            const mailSent = await sendMail(
+                email, 
+                'Mã xác nhận Đăng ký tài khoản', 
+                `Chào ${name},\n\nMã xác nhận (OTP) của bạn là: ${otp}\nMã này sẽ hết hạn sau 5 phút.\n\nVui lòng không chia sẻ mã này cho bất kỳ ai.`
+            );
+
+            if (mailSent) {
+                res.json({ message: 'Mã OTP đã được gửi đến email của bạn!' });
+            } else {
+                res.status(500).json({ error: 'Không thể gửi email OTP, vui lòng kiểm tra lại cấu hình' });
+            }
+        });
+    } catch (error) {
+        res.status(500).json({ error: 'Lỗi server' });
+    }
+};
 
 // API: Đăng ký người dùng
 const register = async (req, res) => {
-    const { name, email, password } = req.body;
+    const { name, email, password, otp } = req.body;
 
-    if (!name || !email || !password) {
-        return res.status(400).json({ error: 'Vui lòng điền đầy đủ thông tin' });
+    if (!name || !email || !password || !otp) {
+        return res.status(400).json({ error: 'Vui lòng điền đầy đủ thông tin và mã OTP' });
+    }
+
+    const passwordError = validatePassword(password);
+    if (passwordError) {
+        return res.status(400).json({ error: passwordError });
+    }
+
+    // Kiểm tra OTP
+    const storedOtpData = otpStore[email];
+    if (!storedOtpData || storedOtpData.type !== 'REGISTER') {
+        return res.status(400).json({ error: 'Không tìm thấy mã OTP cho email này' });
+    }
+    if (Date.now() > storedOtpData.expiresAt) {
+        delete otpStore[email];
+        return res.status(400).json({ error: 'Mã OTP đã hết hạn, vui lòng gửi lại' });
+    }
+    if (storedOtpData.otp !== otp) {
+        return res.status(400).json({ error: 'Mã OTP không chính xác' });
     }
 
     try {
         db.query('SELECT * FROM users WHERE email = ? OR user_name = ?', [email, name], async (err, result) => {
-            if (err) {
-                console.log('Lỗi kiểm tra email/user_name:', err);
-                return res.status(500).json({ error: err.message });
-            }
-            if (result.length > 0) {
-                const existingUser = result[0];
-                if (existingUser.email === email) {
-                    return res.status(400).json({ error: 'Email đã được sử dụng' });
-                }
-                if (existingUser.user_name === name) {
-                    return res.status(400).json({ error: 'Tên người dùng đã được sử dụng' });
-                }
-            }
+            if (err) return res.status(500).json({ error: err.message });
+            if (result.length > 0) return res.status(400).json({ error: 'Tài khoản đã tồn tại' });
 
             const saltRounds = 10;
             const hashedPassword = await bcrypt.hash(password, saltRounds);
@@ -45,6 +103,8 @@ const register = async (req, res) => {
                     const user = { user_id: result.insertId, user_name: name, email, role_id: 4 };
                     const token = jwt.sign(user, process.env.JWT_SECRET || 'your_secret_key', { expiresIn: '3h' });
 
+                    delete otpStore[email]; // Xóa OTP sau khi dùng thành công
+                    
                     res.status(201).json({
                         message: 'Đăng ký thành công!',
                         token,
@@ -129,6 +189,11 @@ const updateUser = async (req, res) => {
                 if (oldPassword) {
                     if (!password) {
                         return res.status(400).json({ error: 'Vui lòng nhập mật khẩu mới' });
+                    }
+
+                    const passwordError = validatePassword(password);
+                    if (passwordError) {
+                        return res.status(400).json({ error: passwordError });
                     }
 
                     // Lấy mật khẩu hiện tại từ database
@@ -239,16 +304,56 @@ const updateUser = async (req, res) => {
     }
 };
 
+// API: Gửi OTP Quên mật khẩu
+const sendForgotOtp = async (req, res) => {
+    const { user_name, email } = req.body;
+    if (!user_name || !email) return res.status(400).json({ error: 'Vui lòng điền tên và email' });
+
+    db.query('SELECT * FROM users WHERE user_name = ? AND email = ?', [user_name, email], async (err, result) => {
+        if (err) return res.status(500).json({ error: err.message });
+        if (result.length === 0) return res.status(404).json({ error: 'Không tìm thấy tài khoản với thông tin này' });
+
+        const otp = generateOTP();
+        otpStore[email] = { otp, type: 'FORGOT', expiresAt: Date.now() + 5 * 60 * 1000 };
+
+        const mailSent = await sendMail(
+            email, 
+            'Mã Khôi phục Mật khẩu', 
+            `Chào ${user_name},\n\nMã khôi phục mật khẩu (OTP) của bạn là: ${otp}\nMã này sẽ hết hạn sau 5 phút.\n\nNếu bạn không yêu cầu, vui lòng bỏ qua email này.`
+        );
+
+        if (mailSent) {
+            res.json({ message: 'Mã OTP đã được gửi đến email của bạn!' });
+        } else {
+            res.status(500).json({ error: 'Không thể gửi email OTP, vui lòng kiểm tra lại cấu hình' });
+        }
+    });
+};
+
 // API: Quên mật khẩu
 const forgotPassword = (req, res) => {
-    // Tạm thời vô hiệu hóa API này vì lý do bảo mật (chưa có xác thực qua Email)
-    return res.status(501).json({ error: 'Chức năng Quên mật khẩu đang được bảo trì để nâng cấp bảo mật.' });
+    const { user_name, email, otp, new_password } = req.body;
 
-    /* Logic cũ bị khóa:
-    const { user_name, email, new_password } = req.body;
+    if (!user_name || !email || !otp || !new_password) {
+        return res.status(400).json({ error: 'Vui lòng điền đầy đủ thông tin (tên, email, OTP, mật khẩu mới)' });
+    }
 
-    if (!user_name || !email || !new_password) {
-        return res.status(400).json({ error: 'Vui lòng điền đầy đủ thông tin (tên, email, mật khẩu mới)' });
+    const passwordError = validatePassword(new_password);
+    if (passwordError) {
+        return res.status(400).json({ error: passwordError });
+    }
+
+    // Kiểm tra OTP
+    const storedOtpData = otpStore[email];
+    if (!storedOtpData || storedOtpData.type !== 'FORGOT') {
+        return res.status(400).json({ error: 'Không tìm thấy mã OTP cho email này' });
+    }
+    if (Date.now() > storedOtpData.expiresAt) {
+        delete otpStore[email];
+        return res.status(400).json({ error: 'Mã OTP đã hết hạn, vui lòng gửi lại' });
+    }
+    if (storedOtpData.otp !== otp) {
+        return res.status(400).json({ error: 'Mã OTP không chính xác' });
     }
 
     db.query('SELECT * FROM users WHERE user_name = ? AND email = ?', [user_name, email], async (err, result) => {
@@ -272,6 +377,9 @@ const forgotPassword = (req, res) => {
                     console.log('Lỗi khi cập nhật mật khẩu:', err);
                     return res.status(500).json({ error: err.message });
                 }
+                
+                delete otpStore[email]; // Xóa OTP sau khi dùng
+
                 res.json({
                     message: 'Mật khẩu đã được cập nhật thành công!',
                     user: { user_id: user.user_id, user_name: user.user_name, email: user.email }
@@ -279,7 +387,6 @@ const forgotPassword = (req, res) => {
             }
         );
     });
-    */
 };
 
 // API: Đăng nhập bằng Google
@@ -354,9 +461,11 @@ const googleLogin = async (req, res) => {
 };
 
 module.exports = {
+    sendRegisterOtp,
     register,
     login,
     updateUser,
+    sendForgotOtp,
     forgotPassword,
     googleLogin
 };
