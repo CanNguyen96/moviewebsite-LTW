@@ -1,6 +1,11 @@
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const db = require('../config/db');
+const { OAuth2Client } = require('google-auth-library');
+const crypto = require('crypto');
+
+const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
+
 
 // API: Đăng ký người dùng
 const register = async (req, res) => {
@@ -38,7 +43,7 @@ const register = async (req, res) => {
                         return res.status(500).json({ error: err.message });
                     }
                     const user = { user_id: result.insertId, user_name: name, email };
-                    const token = jwt.sign(user, 'your_secret_key', { expiresIn: '1h' });
+                    const token = jwt.sign(user, process.env.JWT_SECRET || 'your_secret_key', { expiresIn: '1h' });
 
                     res.status(201).json({
                         message: 'Đăng ký thành công!',
@@ -80,7 +85,7 @@ const login = (req, res) => {
 
         const token = jwt.sign(
             { user_id: user.user_id, user_name: user.user_name, email: user.email },
-            'your_secret_key',
+            process.env.JWT_SECRET || 'your_secret_key',
             { expiresIn: '1h' }
         );
 
@@ -167,7 +172,7 @@ const updateUser = async (req, res) => {
                                 return res.status(500).json({ error: err.message });
                             }
                             const updatedUser = { user_id, user_name: user_name || req.user.user_name, email: req.user.email };
-                            const newToken = jwt.sign(updatedUser, 'your_secret_key', { expiresIn: '1h' });
+                            const newToken = jwt.sign(updatedUser, process.env.JWT_SECRET || 'your_secret_key', { expiresIn: '1h' });
                             res.json({
                                 message: 'Cập nhật thông tin thành công!',
                                 token: newToken,
@@ -201,7 +206,7 @@ const updateUser = async (req, res) => {
                             return res.status(500).json({ error: err.message });
                         }
                         const updatedUser = { user_id, user_name: user_name || req.user.user_name, email: req.user.email };
-                        const newToken = jwt.sign(updatedUser, 'your_secret_key', { expiresIn: '1h' });
+                        const newToken = jwt.sign(updatedUser, process.env.JWT_SECRET || 'your_secret_key', { expiresIn: '1h' });
                         res.json({
                             message: 'Cập nhật thông tin thành công!',
                             token: newToken,
@@ -255,9 +260,81 @@ const forgotPassword = (req, res) => {
     });
 };
 
+// API: Đăng nhập bằng Google
+const googleLogin = async (req, res) => {
+    const { token } = req.body;
+    if (!token) {
+        return res.status(400).json({ error: 'Token is required' });
+    }
+
+    try {
+        const ticket = await client.verifyIdToken({
+            idToken: token,
+            audience: process.env.GOOGLE_CLIENT_ID,
+        });
+        const payload = ticket.getPayload();
+        const { email, name } = payload;
+
+        db.query('SELECT * FROM users WHERE email = ?', [email], async (err, result) => {
+            if (err) return res.status(500).json({ error: err.message });
+            
+            if (result.length > 0) {
+                // User exists
+                const user = result[0];
+                if (user.status === 'Banned') {
+                    return res.status(403).json({ error: 'Tài khoản của bạn đã bị cấm.' });
+                }
+
+                const jwtToken = jwt.sign(
+                    { user_id: user.user_id, user_name: user.user_name, email: user.email },
+                    process.env.JWT_SECRET || 'your_secret_key',
+                    { expiresIn: '1h' }
+                );
+
+                res.json({
+                    message: 'Đăng nhập thành công!',
+                    token: jwtToken,
+                    user: { user_id: user.user_id, user_name: user.user_name, email: user.email, role_id: user.role_id }
+                });
+            } else {
+                // Create new user
+                const randomPassword = crypto.randomBytes(16).toString('hex');
+                const saltRounds = 10;
+                const hashedPassword = await bcrypt.hash(randomPassword, saltRounds);
+                
+                const uniqueUserName = name.replace(/\s+/g, '') + Math.floor(1000 + Math.random() * 9000);
+
+                db.query(
+                    'INSERT INTO users (user_name, email, password, role_id) VALUES (?, ?, ?, ?)',
+                    [uniqueUserName, email, hashedPassword, 4],
+                    (err, insertResult) => {
+                        if (err) {
+                            console.log('Lỗi khi thêm user từ Google:', err);
+                            return res.status(500).json({ error: err.message });
+                        }
+                        
+                        const newUser = { user_id: insertResult.insertId, user_name: uniqueUserName, email };
+                        const jwtToken = jwt.sign(newUser, process.env.JWT_SECRET || 'your_secret_key', { expiresIn: '1h' });
+
+                        res.status(201).json({
+                            message: 'Đăng nhập thành công!',
+                            token: jwtToken,
+                            user: { ...newUser, role_id: 4 }
+                        });
+                    }
+                );
+            }
+        });
+    } catch (err) {
+        console.log('Lỗi xác thực Google:', err);
+        res.status(401).json({ error: 'Xác thực Google thất bại' });
+    }
+};
+
 module.exports = {
     register,
     login,
     updateUser,
-    forgotPassword
+    forgotPassword,
+    googleLogin
 };

@@ -5,6 +5,7 @@ import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { GoogleLogin } from "@react-oauth/google";
 
 function LoginForm() {
     const [email, setEmail] = useState("");
@@ -53,6 +54,44 @@ function LoginForm() {
         }
     };
 
+    const handleGoogleSuccess = async (credentialResponse) => {
+        setLoading(true);
+        setError("");
+        try {
+            const res = await axios.post("http://localhost:3001/google", {
+                token: credentialResponse.credential,
+            });
+
+            if (!res.data.user) {
+                throw new Error("Dữ liệu người dùng không hợp lệ từ API");
+            }
+
+            // Lưu token và user vào localStorage
+            localStorage.setItem("token", res.data.token);
+            localStorage.setItem("user", JSON.stringify(res.data.user));
+
+            toast.success("Đăng nhập bằng Google thành công!", {
+                position: "top-right",
+                autoClose: 2000,
+            });
+
+            window.dispatchEvent(new Event("userChanged"));
+
+            setTimeout(() => {
+                if (res.data.user.role_id === 1) {
+                    navigate("/manageuser"); 
+                } else {
+                    navigate("/");
+                }
+            }, 2000);
+        } catch (err) {
+            console.error("Lỗi khi đăng nhập bằng Google:", err);
+            setError(err.response?.data?.error || "Đăng nhập bằng Google thất bại");
+        } finally {
+            setLoading(false);
+        }
+    };
+
     return (
         <div className={styles.container}>
             <ToastContainer />
@@ -81,6 +120,12 @@ function LoginForm() {
                 <button type="submit" className={styles.btn} disabled={loading}>
                     {loading ? "Đang xử lý..." : "Đăng Nhập"}
                 </button>
+                <div style={{ marginTop: "1rem", display: "flex", justifyContent: "center" }}>
+                    <GoogleLogin
+                        onSuccess={handleGoogleSuccess}
+                        onError={() => setError("Đăng nhập Google thất bại")}
+                    />
+                </div>
             </form>
             <p>
                 Chưa có tài khoản?{" "}
