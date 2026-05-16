@@ -45,11 +45,41 @@ const sendRegisterOtp = async (req, res) => {
             // Trả lời ngay cho client, gửi email ở background
             res.json({ message: 'Mã OTP đã được gửi đến email của bạn!' });
 
+            // Giao diện Email OTP chuẩn Production (Đăng ký)
+            const htmlContent = `
+            <div style="font-family: Arial, sans-serif; background-color: #f4f5f6; padding: 20px;">
+                <div style="max-width: 600px; margin: 0 auto; background-color: white; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+                    <div style="background-color: #e50914; padding: 20px; text-align: center;">
+                        <h1 style="color: white; margin: 0; font-size: 28px;">Anime69</h1>
+                    </div>
+                    <div style="padding: 30px;">
+                        <h2 style="color: #333; margin-top: 0;">Chào mừng bạn đến với Anime69!</h2>
+                        <p style="color: #555; font-size: 16px; line-height: 1.5;">
+                            Chào <strong>${name}</strong>,<br>
+                            Cảm ơn bạn đã đăng ký tài khoản. Để hoàn thiện quá trình đăng ký và bắt đầu khám phá thế giới anime, vui lòng sử dụng mã OTP dưới đây để xác thực:
+                        </p>
+                        <div style="text-align: center; margin: 30px 0;">
+                            <span style="display: inline-block; background-color: #f8f9fa; padding: 15px 30px; font-size: 32px; font-weight: bold; color: #e50914; letter-spacing: 5px; border-radius: 5px; border: 1px dashed #ccc;">
+                                ${otp}
+                            </span>
+                        </div>
+                        <p style="color: #777; font-size: 14px;">
+                            Lưu ý: Mã OTP này sẽ hết hạn sau <strong>5 phút</strong>. Vui lòng không chia sẻ mã này cho bất kỳ ai.
+                        </p>
+                        <hr style="border: none; border-top: 1px solid #ddd; margin: 30px 0;">
+                        <p style="color: #999; font-size: 12px; text-align: center;">
+                            © 2026 Anime69 System. Đã đăng ký bản quyền.
+                        </p>
+                    </div>
+                </div>
+            </div>
+            `;
+
             // Gửi email bất đồng bộ (không block response)
             sendMail(
                 email,
-                'Mã xác nhận Đăng ký tài khoản',
-                `Chào ${name},\n\nMã xác nhận (OTP) của bạn là: ${otp}\nMã này sẽ hết hạn sau 5 phút.\n\nVui lòng không chia sẻ mã này cho bất kỳ ai.`
+                'Kích hoạt tài khoản — Anime69',
+                htmlContent
             ).catch(err => console.error('Background email error:', err));
         });
     } catch (error) {
@@ -318,11 +348,41 @@ const sendForgotOtp = async (req, res) => {
         // Trả lời ngay cho client, gửi email ở background
         res.json({ message: 'Mã OTP đã được gửi đến email của bạn!' });
 
+        // Giao diện Email OTP chuẩn Production (Khôi phục mật khẩu)
+        const htmlContent = `
+        <div style="font-family: Arial, sans-serif; background-color: #f4f5f6; padding: 20px;">
+            <div style="max-width: 600px; margin: 0 auto; background-color: white; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+                <div style="background-color: #111; padding: 20px; text-align: center;">
+                    <h1 style="color: #e50914; margin: 0; font-size: 28px;">Anime69</h1>
+                </div>
+                <div style="padding: 30px;">
+                    <h2 style="color: #333; margin-top: 0;">Khôi phục mật khẩu</h2>
+                    <p style="color: #555; font-size: 16px; line-height: 1.5;">
+                        Chào <strong>${user_name}</strong>,<br>
+                        Chúng tôi nhận được yêu cầu khôi phục mật khẩu cho tài khoản liên kết với email này. Dưới đây là mã xác thực OTP của bạn:
+                    </p>
+                    <div style="text-align: center; margin: 30px 0;">
+                        <span style="display: inline-block; background-color: #f8f9fa; padding: 15px 30px; font-size: 32px; font-weight: bold; color: #111; letter-spacing: 5px; border-radius: 5px; border: 1px solid #333;">
+                            ${otp}
+                        </span>
+                    </div>
+                    <p style="color: #777; font-size: 14px;">
+                        Lưu ý: Mã OTP này sẽ hết hạn sau <strong>5 phút</strong>. Nếu bạn không yêu cầu thay đổi mật khẩu, vui lòng bỏ qua email này để bảo vệ tài khoản.
+                    </p>
+                    <hr style="border: none; border-top: 1px solid #ddd; margin: 30px 0;">
+                    <p style="color: #999; font-size: 12px; text-align: center;">
+                        © 2026 Anime69 System. Bộ phận bảo mật.
+                    </p>
+                </div>
+            </div>
+        </div>
+        `;
+
         // Gửi email bất đồng bộ (không block response)
         sendMail(
             email,
-            'Mã Khôi phục Mật khẩu',
-            `Chào ${user_name},\n\nMã khôi phục mật khẩu (OTP) của bạn là: ${otp}\nMã này sẽ hết hạn sau 5 phút.\n\nNếu bạn không yêu cầu, vui lòng bỏ qua email này.`
+            'Yêu cầu Khôi phục Mật khẩu — Anime69',
+            htmlContent
         ).catch(err => console.error('Background email error:', err));
     });
 };

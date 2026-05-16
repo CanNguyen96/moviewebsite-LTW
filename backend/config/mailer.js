@@ -2,13 +2,13 @@ const { Resend } = require('resend');
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
-const sendMail = async (to, subject, text) => {
+const sendMail = async (to, subject, htmlContent) => {
     try {
         const { data, error } = await resend.emails.send({
-            from: 'MovieWebsite <onboarding@resend.dev>', // Domain mặc định của Resend (miễn phí)
-            to,
-            subject,
-            text
+            from: 'Anime69 <noreply@anime69.website>', // Dùng domain đã verify trên Resend
+            to: to,
+            subject: subject,
+            html: htmlContent
         });
 
         if (error) {

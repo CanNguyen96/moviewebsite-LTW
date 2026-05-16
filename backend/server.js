@@ -29,7 +29,12 @@ const publicDir = fs.existsSync(path.join(__dirname, 'public'))
   ? path.join(__dirname, 'public')        // Docker: /app/public (mount từ compose)
   : path.join(__dirname, '..', 'public'); // Local: projectRoot/public
 
-app.use(cors());
+app.use(cors({
+    origin: '*',
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
+    credentials: true
+}));
 app.use(express.json());
 app.use('/images', express.static(path.join(publicDir, 'images')));
 app.use('/videos', express.static(path.join(publicDir, 'videos')));
