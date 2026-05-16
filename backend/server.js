@@ -1,5 +1,14 @@
 
-require('dotenv').config();
+require('dotenv').config({ path: require('path').resolve(__dirname, '../.env') });
+
+// Kiểm tra biến môi trường bắt buộc khi khởi động
+const REQUIRED_ENV = ['JWT_SECRET', 'DB_HOST', 'DB_USER', 'DB_PASSWORD', 'DB_NAME'];
+const missingEnv = REQUIRED_ENV.filter(key => !process.env[key]);
+if (missingEnv.length > 0) {
+    console.error(`FATAL: Thiếu biến môi trường bắt buộc: ${missingEnv.join(', ')}`);
+    process.exit(1);
+}
+
 const express = require('express');
 const cors = require('cors');
 const path = require('path');

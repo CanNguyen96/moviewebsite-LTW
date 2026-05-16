@@ -28,38 +28,51 @@ const addWatchHistory = (req, res) => {
         return res.status(400).json({ message: "Thiếu movie_id" });
     }
 
-    db.beginTransaction((err) => {
+    // Lấy connection từ pool để dùng transaction
+    db.getConnection((err, connection) => {
         if (err) {
-            console.error("Lỗi bắt đầu transaction:", err.message);
+            console.error("Lỗi lấy connection:", err.message);
             return res.status(500).json({ message: "Lỗi máy chủ", error: err.message });
         }
 
-        const deleteSql = `DELETE FROM watchhistory WHERE user_id = ? AND movie_id = ?`;
-        db.query(deleteSql, [userId, movie_id], (err, deleteResult) => {
+        connection.beginTransaction((err) => {
             if (err) {
-                return db.rollback(() => {
-                    console.error("Lỗi xóa lịch sử cũ:", err.message, err.sqlMessage);
-                    return res.status(500).json({ message: "Lỗi máy chủ", error: err.message });
-                });
+                connection.release();
+                console.error("Lỗi bắt đầu transaction:", err.message);
+                return res.status(500).json({ message: "Lỗi máy chủ", error: err.message });
             }
 
-            const insertSql = `INSERT INTO watchhistory (user_id, movie_id, watched_at) VALUES (?, ?, NOW())`;
-            db.query(insertSql, [userId, movie_id], (err, insertResult) => {
+            const deleteSql = `DELETE FROM watchhistory WHERE user_id = ? AND movie_id = ?`;
+            connection.query(deleteSql, [userId, movie_id], (err) => {
                 if (err) {
-                    return db.rollback(() => {
-                        console.error("Lỗi thêm lịch sử mới:", err.message, err.sqlMessage);
+                    return connection.rollback(() => {
+                        connection.release();
+                        console.error("Lỗi xóa lịch sử cũ:", err.message);
                         return res.status(500).json({ message: "Lỗi máy chủ", error: err.message });
                     });
                 }
 
-                db.commit((err) => {
+                const insertSql = `INSERT INTO watchhistory (user_id, movie_id, watched_at) VALUES (?, ?, NOW())`;
+                connection.query(insertSql, [userId, movie_id], (err) => {
                     if (err) {
-                        return db.rollback(() => {
-                            console.error("Lỗi commit transaction:", err.message);
+                        return connection.rollback(() => {
+                            connection.release();
+                            console.error("Lỗi thêm lịch sử mới:", err.message);
                             return res.status(500).json({ message: "Lỗi máy chủ", error: err.message });
                         });
                     }
-                    res.status(201).json({ message: "Đã ghi lịch sử xem phim" });
+
+                    connection.commit((err) => {
+                        if (err) {
+                            return connection.rollback(() => {
+                                connection.release();
+                                console.error("Lỗi commit transaction:", err.message);
+                                return res.status(500).json({ message: "Lỗi máy chủ", error: err.message });
+                            });
+                        }
+                        connection.release(); // Trả connection về pool
+                        res.status(201).json({ message: "Đã ghi lịch sử xem phim" });
+                    });
                 });
             });
         });

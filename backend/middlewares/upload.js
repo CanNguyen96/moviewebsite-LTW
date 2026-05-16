@@ -2,41 +2,69 @@ const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
 
-const resolveUploadDir = () => {
-    // Docker image mounts app at /app
-    const dockerDir = '/app/public/images';
-    // On Windows, a path like '/app' may resolve to something like 'C:\\app'
-    // and cause files to be written outside the project folder.
-    if (process.platform !== 'win32' && (fs.existsSync('/app') || fs.existsSync(dockerDir))) {
-        return dockerDir;
-    }
+// Dùng Cloudinary nếu có cấu hình (production)
+// Dùng disk nếu không có (local dev)
+const useCloudinary = !!process.env.CLOUDINARY_CLOUD_NAME;
 
-    // Local dev: keep consistent with backend/server.js publicDir logic
-    // Prefer backend/public/images if backend/public exists (common in this repo)
+let cloudinaryStorage = null;
+
+if (useCloudinary) {
+    const cloudinary = require('cloudinary').v2;
+    const { CloudinaryStorage } = require('multer-storage-cloudinary');
+
+    cloudinary.config({
+        cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+        api_key: process.env.CLOUDINARY_API_KEY,
+        api_secret: process.env.CLOUDINARY_API_SECRET,
+    });
+
+    cloudinaryStorage = new CloudinaryStorage({
+        cloudinary,
+        params: (req, file) => ({
+            folder: 'moviewebsite',
+            allowed_formats: ['jpg', 'jpeg', 'png', 'webp', 'gif'],
+            public_id: `${file.fieldname}-${Date.now()}`,
+        }),
+    });
+}
+
+// Local disk storage (chỉ dùng khi dev)
+const resolveUploadDir = () => {
     const backendPublicImages = path.join(__dirname, '..', 'public', 'images');
     if (fs.existsSync(path.join(__dirname, '..', 'public'))) {
         return backendPublicImages;
     }
-
-    // Fallback: projectRoot/public/images
     return path.join(__dirname, '..', '..', 'public', 'images');
 };
 
-const storage = multer.diskStorage({
+const diskStorage = multer.diskStorage({
     destination: (req, file, cb) => {
         const uploadDir = resolveUploadDir();
         if (!fs.existsSync(uploadDir)) {
-            fs.mkdirSync(uploadDir, { recursive: true }); // Tạo thư mục nếu chưa tồn tại
+            fs.mkdirSync(uploadDir, { recursive: true });
         }
-        cb(null, uploadDir); // Nơi lưu ảnh
+        cb(null, uploadDir);
     },
     filename: (req, file, cb) => {
         const ext = path.extname(file.originalname);
-        const filename = `${file.fieldname}-${Date.now()}${ext}`; // Tạo tên file
-        cb(null, filename);
+        cb(null, `${file.fieldname}-${Date.now()}${ext}`);
     }
 });
 
-const upload = multer({ storage });
+const upload = multer({
+    storage: useCloudinary ? cloudinaryStorage : diskStorage,
+});
 
-module.exports = upload;
+/**
+ * Lấy URL công khai của file sau khi upload.
+ * - Cloudinary: file.path chứa URL đầy đủ (https://res.cloudinary.com/...)
+ * - Local disk: trả về đường dẫn tương đối /images/filename
+ */
+const getFileUrl = (file) => {
+    if (useCloudinary) {
+        return file.path; // Cloudinary secure URL
+    }
+    return `/images/${file.filename}`; // Local path
+};
+
+module.exports = { upload, getFileUrl };

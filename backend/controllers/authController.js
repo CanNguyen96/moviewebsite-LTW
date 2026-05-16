@@ -4,6 +4,7 @@ const db = require('../config/db');
 const { OAuth2Client } = require('google-auth-library');
 const crypto = require('crypto');
 const { sendMail } = require('../config/mailer');
+const { getFileUrl } = require('../middlewares/upload');
 
 const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
@@ -168,7 +169,7 @@ const updateUser = async (req, res) => {
     let avatar_url = null;
     
     if (req.file) {
-        avatar_url = `/images/${req.file.filename}`;
+        avatar_url = getFileUrl(req.file);
     }
 
     try {

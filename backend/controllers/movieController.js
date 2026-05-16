@@ -1,4 +1,5 @@
 const db = require('../config/db');
+const { getFileUrl } = require('../middlewares/upload');
 
 // API: Lấy danh sách anime cho người dùng ( chỉ approved )
 const getMovies = (req, res) => {
@@ -147,11 +148,11 @@ const updateMovie = (req, res) => {
         description,
     } = req.body;
     const image_url = req.files['image']
-        ? `/images/${req.files['image'][0].filename}`
+        ? getFileUrl(req.files['image'][0])
         : req.body.existing_image_url;
 
     const background_url = req.files['background']
-        ? `/images/${req.files['background'][0].filename}`
+        ? getFileUrl(req.files['background'][0])
         : req.body.existing_background_url;
 
     const updateMovieSql = `
@@ -269,8 +270,8 @@ const addMovie = (req, res) => {
     }
 
     // Lưu đường dẫn vào DB (dùng path tương đối tới public/images)
-    const image_url = `/images/${imageFile.filename}`;
-    const background_url = `/images/${backgroundFile.filename}`;
+    const image_url = getFileUrl(imageFile);
+    const background_url = getFileUrl(backgroundFile);
 
     // NOTE: movies.genre trong schema hiện là VARCHAR(45)
     // Nếu chọn nhiều thể loại, chuỗi genre có thể vượt 45 ký tự và gây lỗi 500.

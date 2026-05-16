@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const authController = require('../controllers/authController');
 const { authenticateToken } = require('../middlewares/auth'); 
-const upload = require('../middlewares/upload'); // Thêm multer
+const { upload } = require('../middlewares/upload'); // Multer (Cloudinary hoặc disk)
 
 router.post('/send-register-otp', authController.sendRegisterOtp); // API Gửi OTP Đăng ký
 router.post('/register', authController.register); // API Đăng kí người dùng

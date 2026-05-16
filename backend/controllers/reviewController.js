@@ -1,6 +1,5 @@
 const jwt = require('jsonwebtoken');
 const db = require('../config/db');
-require('dotenv').config();
 
 // API: Gửi bình luận (yêu cầu đăng nhập)
 const createReview = (req, res) => {
