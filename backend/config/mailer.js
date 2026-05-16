@@ -5,7 +5,7 @@ const resend = new Resend(process.env.RESEND_API_KEY);
 const sendMail = async (to, subject, htmlContent) => {
     try {
         const { data, error } = await resend.emails.send({
-            from: 'Anime69 <noreply@anime69.website>', // Dùng domain đã verify trên Resend
+            from: 'Anime69 <noreply@api.anime69.website>', // Dùng domain đã verify trên Resend
             to: to,
             subject: subject,
             html: htmlContent
