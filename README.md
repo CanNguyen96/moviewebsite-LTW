@@ -89,3 +89,34 @@ npm start
 ```
 
 Frontend sẽ chạy ở `http://localhost:3000`.
+
+---
+
+## 🔐 Cấu hình Bảo mật & Email OTP
+
+Dự án này tích hợp xác thực Email thông qua mã OTP (One-Time Password) cho các tính năng:
+- **Đăng ký tài khoản mới**
+- **Quên mật khẩu**
+
+### 1. Cấu hình gửi Mail (Nodemailer)
+Để tính năng này hoạt động, bạn cần cung cấp thông tin Gmail trong file `.env`:
+- `EMAIL_USER`: Địa chỉ Gmail của bạn.
+- `EMAIL_PASS`: **Mật khẩu ứng dụng (App Password)** gồm 16 ký tự.
+    - *Lưu ý:* Đây KHÔNG phải là mật khẩu đăng nhập Gmail thông thường. Bạn cần vào [Google Account Security](https://myaccount.google.com/security) để tạo App Password.
+
+### 2. Quy tắc độ mạnh mật khẩu
+Hệ thống bắt buộc mật khẩu phải đạt các tiêu chuẩn sau:
+- Độ dài tối thiểu **6 ký tự**.
+- Chứa ít nhất **1 chữ số** (0-9).
+- Chứa ít nhất **1 ký tự đặc biệt** (vd: `@, #, $, %, !`).
+
+---
+
+## 🌟 Tính năng chính
+- Xem phim, tìm kiếm phim, xem chi tiết phim.
+- Hệ thống tập phim (Episodes).
+- Đăng nhập/Đăng ký (hỗ trợ Google OAuth).
+- Quản lý tài khoản, thay đổi Avatar.
+- Bình luận phim (Review).
+- Lưu phim yêu thích và lịch sử xem phim.
+- Dashboard quản lý phim dành cho Admin.
