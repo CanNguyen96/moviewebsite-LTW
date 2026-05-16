@@ -34,9 +34,13 @@ const sendRegisterOtp = async (req, res) => {
         db.query('SELECT * FROM users WHERE email = ? OR user_name = ?', [email, name], async (err, result) => {
             if (err) return res.status(500).json({ error: err.message });
             if (result.length > 0) {
-                const existingUser = result[0];
-                if (existingUser.email === email) return res.status(400).json({ error: 'Email đã được sử dụng' });
-                if (existingUser.user_name === name) return res.status(400).json({ error: 'Tên người dùng đã tồn tại' });
+                const emailExists = result.some(u => u.email.toLowerCase() === email.toLowerCase());
+                const nameExists = result.some(u => u.user_name.toLowerCase() === name.toLowerCase());
+                
+                if (emailExists) return res.status(400).json({ error: 'Email đã được sử dụng' });
+                if (nameExists) return res.status(400).json({ error: 'Tên người dùng đã tồn tại' });
+                
+                return res.status(400).json({ error: 'Tài khoản đã tồn tại' });
             }
 
             const otp = generateOTP();
@@ -116,7 +120,13 @@ const register = async (req, res) => {
     try {
         db.query('SELECT * FROM users WHERE email = ? OR user_name = ?', [email, name], async (err, result) => {
             if (err) return res.status(500).json({ error: err.message });
-            if (result.length > 0) return res.status(400).json({ error: 'Tài khoản đã tồn tại' });
+            if (result.length > 0) {
+                const emailExists = result.some(u => u.email.toLowerCase() === email.toLowerCase());
+                const nameExists = result.some(u => u.user_name.toLowerCase() === name.toLowerCase());
+                if (emailExists) return res.status(400).json({ error: 'Email đã được sử dụng' });
+                if (nameExists) return res.status(400).json({ error: 'Tên người dùng đã tồn tại' });
+                return res.status(400).json({ error: 'Tài khoản đã tồn tại' });
+            }
 
             const saltRounds = 10;
             const hashedPassword = await bcrypt.hash(password, saltRounds);
@@ -129,7 +139,7 @@ const register = async (req, res) => {
                         console.log('Lỗi khi thêm user:', err);
                         return res.status(500).json({ error: err.message });
                     }
-                    const user = { user_id: result.insertId, user_name: name, email, role_id: 4 };
+                    const user = { user_id: result.insertId, user_name: name, email, role_id: 4, avatar_url: null };
                     const token = jwt.sign(user, process.env.JWT_SECRET || 'your_secret_key', { expiresIn: '3h' });
 
                     delete otpStore[email]; // Xóa OTP sau khi dùng thành công
@@ -173,7 +183,7 @@ const login = (req, res) => {
         }
 
         const token = jwt.sign(
-            { user_id: user.user_id, user_name: user.user_name, email: user.email, role_id: user.role_id },
+            { user_id: user.user_id, user_name: user.user_name, email: user.email, role_id: user.role_id, avatar_url: user.avatar_url },
             process.env.JWT_SECRET || 'your_secret_key',
             { expiresIn: '3h' }
         );
@@ -181,7 +191,7 @@ const login = (req, res) => {
         res.json({
             message: 'Đăng nhập thành công!',
             token,
-            user: { user_id: user.user_id, user_name: user.user_name, email: user.email, role_id: user.role_id }
+            user: { user_id: user.user_id, user_name: user.user_name, email: user.email, role_id: user.role_id, avatar_url: user.avatar_url }
         });
     });
 };
@@ -472,7 +482,7 @@ const googleLogin = async (req, res) => {
                 }
 
                 const jwtToken = jwt.sign(
-                    { user_id: user.user_id, user_name: user.user_name, email: user.email, role_id: user.role_id },
+                    { user_id: user.user_id, user_name: user.user_name, email: user.email, role_id: user.role_id, avatar_url: user.avatar_url },
                     process.env.JWT_SECRET || 'your_secret_key',
                     { expiresIn: '3h' }
                 );
@@ -480,7 +490,7 @@ const googleLogin = async (req, res) => {
                 res.json({
                     message: 'Đăng nhập thành công!',
                     token: jwtToken,
-                    user: { user_id: user.user_id, user_name: user.user_name, email: user.email, role_id: user.role_id }
+                    user: { user_id: user.user_id, user_name: user.user_name, email: user.email, role_id: user.role_id, avatar_url: user.avatar_url }
                 });
             } else {
                 // Create new user
@@ -499,13 +509,13 @@ const googleLogin = async (req, res) => {
                             return res.status(500).json({ error: err.message });
                         }
                         
-                        const newUser = { user_id: insertResult.insertId, user_name: uniqueUserName, email, role_id: 4 };
+                        const newUser = { user_id: insertResult.insertId, user_name: uniqueUserName, email, role_id: 4, avatar_url: null };
                         const jwtToken = jwt.sign(newUser, process.env.JWT_SECRET || 'your_secret_key', { expiresIn: '3h' });
 
                         res.status(201).json({
                             message: 'Đăng nhập thành công!',
                             token: jwtToken,
-                            user: { ...newUser, role_id: 4 }
+                            user: newUser
                         });
                     }
                 );
