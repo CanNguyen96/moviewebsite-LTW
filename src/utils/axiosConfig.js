@@ -34,12 +34,17 @@ axiosInstance.interceptors.response.use(
 
             // Xử lý lỗi token hết hạn hoặc không hợp lệ
             if (status === 401 || status === 403) {
-                toast.error('Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.');
-                localStorage.removeItem('token');
+                // Nếu là API đăng nhập/đăng ký thì để component tự hiển thị lỗi (ví dụ: Sai mật khẩu)
+                const isAuthRequest = error.config && error.config.url && (error.config.url.includes('/login') || error.config.url.includes('/register'));
+                
+                if (!isAuthRequest) {
+                    toast.error('Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.');
+                    localStorage.removeItem('token');
 
-                // Tránh reload liên tục, chỉ redirect nếu chưa ở trang login
-                if (window.location.pathname !== '/login') {
-                    window.location.href = '/login';
+                    // Tránh reload liên tục, chỉ redirect nếu chưa ở trang login
+                    if (window.location.pathname !== '/login') {
+                        window.location.href = '/login';
+                    }
                 }
             } else if (status >= 500) {
                 toast.error('Lỗi máy chủ. Vui lòng thử lại sau.');
