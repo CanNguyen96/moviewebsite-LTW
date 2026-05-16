@@ -42,17 +42,15 @@ const sendRegisterOtp = async (req, res) => {
             const otp = generateOTP();
             otpStore[email] = { otp, type: 'REGISTER', expiresAt: Date.now() + 5 * 60 * 1000 }; // Hết hạn sau 5 phút
 
-            const mailSent = await sendMail(
-                email, 
-                'Mã xác nhận Đăng ký tài khoản', 
-                `Chào ${name},\n\nMã xác nhận (OTP) của bạn là: ${otp}\nMã này sẽ hết hạn sau 5 phút.\n\nVui lòng không chia sẻ mã này cho bất kỳ ai.`
-            );
+            // Trả lời ngay cho client, gửi email ở background
+            res.json({ message: 'Mã OTP đã được gửi đến email của bạn!' });
 
-            if (mailSent) {
-                res.json({ message: 'Mã OTP đã được gửi đến email của bạn!' });
-            } else {
-                res.status(500).json({ error: 'Không thể gửi email OTP, vui lòng kiểm tra lại cấu hình' });
-            }
+            // Gửi email bất đồng bộ (không block response)
+            sendMail(
+                email,
+                'Mã xác nhận Đăng ký tài khoản',
+                `Chào ${name},\n\nMã xác nhận (OTP) của bạn là: ${otp}\nMã này sẽ hết hạn sau 5 phút.\n\nVui lòng không chia sẻ mã này cho bất kỳ ai.`
+            ).catch(err => console.error('Background email error:', err));
         });
     } catch (error) {
         res.status(500).json({ error: 'Lỗi server' });
@@ -317,17 +315,15 @@ const sendForgotOtp = async (req, res) => {
         const otp = generateOTP();
         otpStore[email] = { otp, type: 'FORGOT', expiresAt: Date.now() + 5 * 60 * 1000 };
 
-        const mailSent = await sendMail(
-            email, 
-            'Mã Khôi phục Mật khẩu', 
-            `Chào ${user_name},\n\nMã khôi phục mật khẩu (OTP) của bạn là: ${otp}\nMã này sẽ hết hạn sau 5 phút.\n\nNếu bạn không yêu cầu, vui lòng bỏ qua email này.`
-        );
+        // Trả lời ngay cho client, gửi email ở background
+        res.json({ message: 'Mã OTP đã được gửi đến email của bạn!' });
 
-        if (mailSent) {
-            res.json({ message: 'Mã OTP đã được gửi đến email của bạn!' });
-        } else {
-            res.status(500).json({ error: 'Không thể gửi email OTP, vui lòng kiểm tra lại cấu hình' });
-        }
+        // Gửi email bất đồng bộ (không block response)
+        sendMail(
+            email,
+            'Mã Khôi phục Mật khẩu',
+            `Chào ${user_name},\n\nMã khôi phục mật khẩu (OTP) của bạn là: ${otp}\nMã này sẽ hết hạn sau 5 phút.\n\nNếu bạn không yêu cầu, vui lòng bỏ qua email này.`
+        ).catch(err => console.error('Background email error:', err));
     });
 };
 
