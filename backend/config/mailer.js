@@ -1,32 +1,25 @@
-const nodemailer = require('nodemailer');
+const { Resend } = require('resend');
 
-const transporter = nodemailer.createTransport({
-    host: 'smtp.gmail.com',
-    port: 587,
-    secure: false, // STARTTLS (port 587), không dùng SSL (port 465)
-    auth: {
-        user: process.env.EMAIL_USER,
-        pass: process.env.EMAIL_PASS
-    },
-    tls: {
-        rejectUnauthorized: false
-    }
-});
+const resend = new Resend(process.env.RESEND_API_KEY);
 
 const sendMail = async (to, subject, text) => {
-    const mailOptions = {
-        from: process.env.EMAIL_USER,
-        to,
-        subject,
-        text
-    };
-
     try {
-        const info = await transporter.sendMail(mailOptions);
-        console.log('Email sent: ' + info.response);
+        const { data, error } = await resend.emails.send({
+            from: 'MovieWebsite <onboarding@resend.dev>', // Domain mặc định của Resend (miễn phí)
+            to,
+            subject,
+            text
+        });
+
+        if (error) {
+            console.error('Lỗi gửi email:', error);
+            return false;
+        }
+
+        console.log('Email sent:', data?.id);
         return true;
-    } catch (error) {
-        console.error('Lỗi gửi email:', error);
+    } catch (err) {
+        console.error('Lỗi gửi email:', err);
         return false;
     }
 };
