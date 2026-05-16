@@ -1,4 +1,7 @@
 {
+  "name": "moviewebsite-backend",
+  "version": "1.0.0",
+  "engines": { "node": ">=18" },
   "dependencies": {
     "bcrypt": "^5.1.1",
     "cors": "^2.8.5",

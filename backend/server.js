@@ -14,7 +14,7 @@ const watchHistoryRoutes = require('./routes/watchHistoryRoutes');
 const episodesRoutes = require('./routes/episodesRoutes');
 
 const app = express();
-const port = 3001;
+const port = process.env.PORT || 3001;
 const fs = require('fs');
 const publicDir = fs.existsSync(path.join(__dirname, 'public'))
   ? path.join(__dirname, 'public')        // Docker: /app/public (mount từ compose)
