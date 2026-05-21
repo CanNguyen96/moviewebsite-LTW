@@ -9,7 +9,7 @@ const { getFileUrl } = require('../middlewares/upload');
 const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
 // Bộ nhớ tạm để lưu OTP (Trong môi trường thực tế nên dùng Redis)
-const otpStore = {}; 
+const otpStore = {};
 
 // Hàm tạo OTP ngẫu nhiên 6 số
 const generateOTP = () => {
@@ -36,10 +36,10 @@ const sendRegisterOtp = async (req, res) => {
             if (result.length > 0) {
                 const emailExists = result.some(u => u.email.toLowerCase() === email.toLowerCase());
                 const nameExists = result.some(u => u.user_name.toLowerCase() === name.toLowerCase());
-                
+
                 if (emailExists) return res.status(400).json({ error: 'Email đã được sử dụng' });
                 if (nameExists) return res.status(400).json({ error: 'Tên người dùng đã tồn tại' });
-                
+
                 return res.status(400).json({ error: 'Tài khoản đã tồn tại' });
             }
 
@@ -143,7 +143,7 @@ const register = async (req, res) => {
                     const token = jwt.sign(user, process.env.JWT_SECRET || 'your_secret_key', { expiresIn: '3h' });
 
                     delete otpStore[email]; // Xóa OTP sau khi dùng thành công
-                    
+
                     res.status(201).json({
                         message: 'Đăng ký thành công!',
                         token,
@@ -175,7 +175,7 @@ const login = (req, res) => {
         const user = result[0];
         const match = await bcrypt.compare(password, user.password);
         if (!match) {
-            return res.status(401).json({ error: 'Mật khẩu không đúng' });
+            return res.status(401).json({ error: 'Email hoặc mật khẩu không đúng' });
         }
 
         if (user.status === 'Banned') {
@@ -205,7 +205,7 @@ const updateUser = async (req, res) => {
     const { user_name, oldPassword, password } = req.body;
     const user_id = req.user.user_id;
     let avatar_url = null;
-    
+
     if (req.file) {
         avatar_url = getFileUrl(req.file);
     }
@@ -284,7 +284,7 @@ const updateUser = async (req, res) => {
                                 console.log('Lỗi khi cập nhật user:', err);
                                 return res.status(500).json({ error: err.message });
                             }
-                            
+
                             const finalAvatarUrl = avatar_url || req.user.avatar_url;
                             const updatedUser = { user_id, user_name: user_name || req.user.user_name, email: req.user.email, avatar_url: finalAvatarUrl, role_id: req.user.role_id };
                             const newToken = jwt.sign(updatedUser, process.env.JWT_SECRET || 'your_secret_key', { expiresIn: '3h' });
@@ -324,7 +324,7 @@ const updateUser = async (req, res) => {
                             console.log('Lỗi khi cập nhật user:', err);
                             return res.status(500).json({ error: err.message });
                         }
-                        
+
                         const finalAvatarUrl = avatar_url || req.user.avatar_url;
                         const updatedUser = { user_id, user_name: user_name || req.user.user_name, email: req.user.email, avatar_url: finalAvatarUrl, role_id: req.user.role_id };
                         const newToken = jwt.sign(updatedUser, process.env.JWT_SECRET || 'your_secret_key', { expiresIn: '3h' });
@@ -444,7 +444,7 @@ const forgotPassword = (req, res) => {
                     console.log('Lỗi khi cập nhật mật khẩu:', err);
                     return res.status(500).json({ error: err.message });
                 }
-                
+
                 delete otpStore[email]; // Xóa OTP sau khi dùng
 
                 res.json({
@@ -473,7 +473,7 @@ const googleLogin = async (req, res) => {
 
         db.query('SELECT * FROM users WHERE email = ?', [email], async (err, result) => {
             if (err) return res.status(500).json({ error: err.message });
-            
+
             if (result.length > 0) {
                 // User exists
                 const user = result[0];
@@ -497,7 +497,7 @@ const googleLogin = async (req, res) => {
                 const randomPassword = crypto.randomBytes(16).toString('hex');
                 const saltRounds = 10;
                 const hashedPassword = await bcrypt.hash(randomPassword, saltRounds);
-                
+
                 const uniqueUserName = name.replace(/\s+/g, '') + Math.floor(1000 + Math.random() * 9000);
 
                 db.query(
@@ -508,7 +508,7 @@ const googleLogin = async (req, res) => {
                             console.log('Lỗi khi thêm user từ Google:', err);
                             return res.status(500).json({ error: err.message });
                         }
-                        
+
                         const newUser = { user_id: insertResult.insertId, user_name: uniqueUserName, email, role_id: 4, avatar_url: null };
                         const jwtToken = jwt.sign(newUser, process.env.JWT_SECRET || 'your_secret_key', { expiresIn: '3h' });
 

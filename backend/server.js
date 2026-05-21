@@ -12,6 +12,8 @@ if (missingEnv.length > 0) {
 const express = require('express');
 const cors = require('cors');
 const path = require('path');
+const helmet = require('helmet');
+const rateLimit = require('express-rate-limit');
 
 const authRoutes = require('./routes/authRoutes');
 const movieRoutes = require('./routes/movieRoutes');
@@ -23,6 +25,38 @@ const watchHistoryRoutes = require('./routes/watchHistoryRoutes');
 const episodesRoutes = require('./routes/episodesRoutes');
 
 const app = express();
+
+// Sử dụng Helmet để thiết lập các HTTP headers bảo mật
+// CORP được cấu hình là cross-origin để frontend có thể tải ảnh/video từ backend
+app.use(helmet({
+    crossOriginResourcePolicy: { policy: "cross-origin" }
+}));
+
+// Cấu hình giới hạn tần suất yêu cầu (Rate Limiting)
+const otpLimiter = rateLimit({
+    windowMs: 5 * 60 * 1000, // 5 phút
+    max: 3, // Giới hạn 3 lần gửi OTP
+    message: { error: 'Bạn đã yêu cầu OTP quá nhiều lần. Vui lòng thử lại sau 5 phút.' },
+    standardHeaders: true,
+    legacyHeaders: false,
+});
+
+const authLimiter = rateLimit({
+    windowMs: 5 * 60 * 1000, // 5 phút
+    max: 10, // Giới hạn 10 lần thử đăng nhập/đăng ký
+    message: { error: 'Thực hiện quá nhiều yêu cầu. Vui lòng thử lại sau 5 phút.' },
+    standardHeaders: true,
+    legacyHeaders: false,
+});
+
+// Áp dụng giới hạn cho các endpoint cụ thể
+app.use('/send-register-otp', otpLimiter);
+app.use('/send-forgot-otp', otpLimiter);
+app.use('/login', authLimiter);
+app.use('/register', authLimiter);
+app.use('/forgot-password', authLimiter);
+app.use('/google', authLimiter);
+
 const port = process.env.PORT || 3001;
 const fs = require('fs');
 const publicDir = fs.existsSync(path.join(__dirname, 'public'))
