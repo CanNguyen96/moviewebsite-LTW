@@ -7,14 +7,8 @@ import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import ConfirmModal from './ConfirmModal';
 
-const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:3001';
+import { buildImageSrc } from '../utils/image';
 
-const buildImageSrc = (imageUrl) => {
-    if (!imageUrl) return '/images/placeholder.jpg';
-    if (/^https?:\/\//i.test(imageUrl)) return imageUrl;
-    const normalizedPath = imageUrl.startsWith('/') ? imageUrl : `/${imageUrl}`;
-    return `${API_BASE_URL}${normalizedPath}`;
-};
 
 function AdminList() {
     const [animeList, setAnimeList] = useState([]);

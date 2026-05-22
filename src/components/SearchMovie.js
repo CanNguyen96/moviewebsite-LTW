@@ -5,6 +5,8 @@ import { useEffect, useState } from "react";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import ConfirmModal from './ConfirmModal';
+import { buildImageSrc } from '../utils/image';
+
 
 
 function useQuery(){
@@ -115,7 +117,7 @@ function AnimeItem({movie_id, title, image_url, genre, year, duration, episodes,
         <div className={styles['movie-item']}>
             <div className={styles['movie-image']}>
                 <img
-                    src={`${process.env.REACT_APP_API_URL}${image_url}` || '/placeholder.jpg'}
+                    src={buildImageSrc(image_url)}
                     alt={title}
                     onError={(e) => {
                         e.target.src = '/placeholder.jpg';

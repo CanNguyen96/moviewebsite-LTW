@@ -6,6 +6,8 @@ import { reviewService } from "../services/reviewService";
 import { userService } from "../services/userService";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { buildImageSrc } from "../utils/image";
+
 
 const MovieDetail = () => {
     const { id } = useParams();
@@ -144,7 +146,7 @@ const MovieDetail = () => {
                 <div className={styles['movie-header']}>
                     <div className={styles['movie-detail-poster-container']}>
                         <img 
-                            src={`${process.env.REACT_APP_API_URL}${movie.image_url}`} 
+                            src={buildImageSrc(movie.image_url)} 
                             onError={(e) => { e.target.src = '/images/placeholder.jpg' }} 
                             alt={movie.title} 
                             className={styles['poster-img']}

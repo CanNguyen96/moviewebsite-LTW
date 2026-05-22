@@ -4,6 +4,8 @@ import { toast } from "react-toastify";
 import { Link } from "react-router-dom";
 import ConfirmModal from './ConfirmModal';
 import styles from '../styles/WatchHistory.module.css';
+import { buildImageSrc } from '../utils/image';
+
 
 function WatchHistory() {
     const [watchHistory, setWatchHistory] = useState([]);
@@ -92,7 +94,7 @@ function WatchHistory() {
                     {watchHistory.map(history => (
                         <div key={history.movie_id} className={styles['movie-card-wrapper']}>
                             <Link to={`/movieDetail/${history.movie_id}`} className={styles['movie-card']}>
-                                <img src={`${process.env.REACT_APP_API_URL}${history.image_url}`} alt={history.title} />
+                                <img src={buildImageSrc(history.image_url)} alt={history.title} />
                                 <div className={styles['movie-title']}>{history.title}</div>
                                 <div className={styles['watched-at']}>Xem lúc: {new Date(history.watched_at).toLocaleString()}</div>
                             </Link>

@@ -2,6 +2,8 @@ import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { movieService } from '../services/movieService';
 import styles from '../styles/List.module.css';
+import { buildImageSrc } from '../utils/image';
+
 
 function List() {
     const [animeList, setAnimeList] = useState([]);
@@ -63,7 +65,7 @@ function AnimeItem({ title, image_url }) {
         <div className={styles['anime-item']}>
             <div className={styles['anime-image']}>
                 <img 
-                    src={`${process.env.REACT_APP_API_URL}${image_url}` || '/images/placeholder.jpg'} 
+                    src={buildImageSrc(image_url)} 
                     alt={title}
                     onError={(e) => {
                         e.currentTarget.src = '/images/placeholder.jpg';

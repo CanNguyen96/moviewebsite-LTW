@@ -6,6 +6,8 @@ import "slick-carousel/slick/slick-theme.css";
 import styles from "../styles/Slider.module.css";
 import { movieService } from "../services/movieService";
 import {useNavigate} from 'react-router-dom';
+import { buildImageSrc } from '../utils/image';
+
 
 const AnimeSlider=() => {
     const [sliderData, setSliderData] = useState ([]);
@@ -48,7 +50,7 @@ const AnimeSlider=() => {
                             <button className={styles['watch-btn']} onClick={()=> handleWatchClick(slide.movie_id)}>Xem Phim</button>
                         </div>
                         <div className={styles['slide-background']}>
-                            <img src={`${process.env.REACT_APP_API_URL}${slide.background_url}`} alt={slide.title}  /> slide.background_url
+                            <img src={buildImageSrc(slide.background_url)} alt={slide.title}  />
                         </div>
                     </div>
                 ))}

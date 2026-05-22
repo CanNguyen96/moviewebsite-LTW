@@ -2,6 +2,8 @@ import { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
 import { movieService } from "../services/movieService";
 import styles from '../styles/SearchResults.module.css';
+import { buildImageSrc } from '../utils/image';
+
 
 function useQuery() {
   return new URLSearchParams(useLocation().search);
@@ -35,7 +37,7 @@ function SearchResults() {
           {results.map((movie) => (
             <li key={movie.id} className={styles['movie-card']}>
               <a href={`/movieDetail/${movie.id}`}>
-                <img src={`${process.env.REACT_APP_API_URL}${movie.image_url}`} alt={movie.title} />
+                <img src={buildImageSrc(movie.image_url)} alt={movie.title} />
                 <div className={styles['movie-title']}>{movie.title}</div>
               </a>
             </li>

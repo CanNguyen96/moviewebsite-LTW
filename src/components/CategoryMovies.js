@@ -3,6 +3,8 @@ import { movieService } from "../services/movieService";
 import { useEffect, useState } from "react";
 import { Link } from 'react-router-dom';
 import styles from '../styles/CategoryMovies.module.css';
+import { buildImageSrc } from '../utils/image';
+
 
 export default function CategoryMovies() {
   const { name } = useParams();
@@ -64,7 +66,7 @@ export default function CategoryMovies() {
             {movies.map(m => (
               <li key={m.id}>
                 <Link to={`/movieDetail/${m.id}`}>
-                  <img src={`${process.env.REACT_APP_API_URL}${m.image_url}`} alt={m.title} />
+                  <img src={buildImageSrc(m.image_url)} alt={m.title} />
                   <p>{m.title}</p>
                 </Link>
               </li>
