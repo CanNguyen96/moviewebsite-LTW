@@ -49,7 +49,7 @@ export const movieService = {
 
     // Tìm kiếm phim
     searchMovies: async (query) => {
-        const response = await axiosInstance.get(`/api/search?q=${query}`);
+        const response = await axiosInstance.get(`/api/movies/search?q=${encodeURIComponent(query)}`);
         return response.data;
     },
 

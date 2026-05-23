@@ -446,7 +446,7 @@ const getSliderMovie = (req, res) =>{
         res.status(200).json(result);
     })
 }
-// API: Tìm kiếm phim theo tiêu đề hoặc thể loại
+// API: Tìm kiếm phim theo tiêu đề
 const searchMovies = (req, res) => {
     const keyword = req.query.q;
     if (!keyword) {
@@ -465,11 +465,11 @@ const searchMovies = (req, res) => {
             views_count,
             average_rating
         FROM movies
-        WHERE (title LIKE ? OR genre LIKE ?) AND status = 'Approved'
+        WHERE title LIKE ? AND status = 'Approved'
         ORDER BY movie_id DESC
     `;
 
-    db.query(sql, [likeKeyword, likeKeyword], (err, results) => {
+    db.query(sql, [likeKeyword], (err, results) => {
         if (err) {
             console.error('Lỗi tìm kiếm phim:', err);
             return res.status(500).json({ error: 'Lỗi máy chủ khi tìm kiếm phim' });
