@@ -32,27 +32,33 @@
 .movie-card {
     width: 100%;
     text-align: center;
-    transition: transform 0.2s ease;
+    transition: all 0.3s ease;
     text-decoration: none;
     color: inherit;
-    background-color: #333;
-    border-radius: 8px;
+    background-color: #222;
+    border-radius: 10px;
     overflow: hidden;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.5);
+    box-shadow: 0 4px 6px rgba(0,0,0,0.5);
     display: flex;
     flex-direction: column;
 }
 
 .movie-card:hover {
-    transform: scale(1.05);
+    transform: translateY(-8px);
+    box-shadow: 0 10px 15px rgba(255, 65, 108, 0.4); /* Đổ bóng màu đỏ/hồng nhẹ */
 }
 
 .movie-card img {
     width: 100%;
     height: 250px;
-    border-radius: 8px;
+    border-radius: 10px 10px 0 0;
     object-fit: cover;
-    border-bottom: 1px solid #444;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    transition: transform 0.4s ease;
+}
+
+.movie-card:hover img {
+    transform: scale(1.1); /* Phóng to ảnh mượt mà */
 }
 
 .movie-title {

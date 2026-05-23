@@ -5,6 +5,14 @@ import { Link, useNavigate } from "react-router-dom";
 import logo_web from "../picture/logo-1.webp";
 import { movieService } from "../services/movieService";
 import { useAuth } from "../contexts/AuthContext";
+import { FaHeart, FaHistory, FaUserCog, FaSignOutAlt, FaSearch } from "react-icons/fa";
+
+const getAvatarSrc = (avatar) => {
+  if (!avatar) return "/images/default-avatar.png";
+  if (avatar.startsWith("http") || avatar.startsWith("blob")) return avatar;
+  if (avatar.startsWith("/")) return `${process.env.REACT_APP_API_URL || 'http://localhost:3001'}${avatar}`;
+  return `${process.env.REACT_APP_API_URL || 'http://localhost:3001'}/${avatar}`;
+};
 
 
 function Header() {
@@ -88,41 +96,99 @@ function Header() {
       <div className={styles.Search}>
         <ul>
           <li>
-            <input
-              placeholder="Tìm kiếm"
-              type="text"
-              value={searchKeyword}
-              onChange={handleSearchChange}
-              onKeyDown={handleSearchSubmit}
-            />
+            <div className={styles['search-container']}>
+              <input
+                placeholder="Tìm kiếm phim"
+                type="text"
+                value={searchKeyword}
+                onChange={handleSearchChange}
+                onKeyDown={handleSearchSubmit}
+                className={styles['search-input']}
+              />
+              <FaSearch 
+                className={styles['search-icon']} 
+                onClick={() => {
+                  if (searchKeyword.trim() !== '') {
+                    navigate(`/movies/search?keyword=${encodeURIComponent(searchKeyword)}`);
+                    setSearchKeyword('');
+                  }
+                }}
+              />
+            </div>
           </li>
           <li>
             {user ? (
               <div className={styles['user-info']} ref={dropdownRef}>
                 <div className={styles['user-dropdown']}>
-                  <div className={styles['user-name']} onClick={() => setShowDropdown(!showDropdown)}>
-                    Xin chào, {user.user_name}
-                  </div>
+                  <button 
+                    className={styles['avatar-btn']} 
+                    onClick={() => setShowDropdown(!showDropdown)}
+                    aria-label="Tài khoản"
+                  >
+                    <img 
+                      src={getAvatarSrc(user.avatar_url)} 
+                      alt="Avatar" 
+                      className={styles['avatar-img']} 
+                      onError={(e) => { e.target.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(user.user_name)}&background=random` }} 
+                    />
+                  </button>
                   {showDropdown && (
-                    <ul className={styles['dropdown-menu']}>
-                      <li onClick={() => {
-                        navigate("/profile");
-                        setShowDropdown(false);
-                      }}>Quản lý tài khoản</li>
-                      <li onClick={() => {
-                        navigate("/movies/favorites");
-                        setShowDropdown(false)
-                      }}>Danh sách yêu thích</li>
-                      <li onClick={() => {
-                        navigate("/movies/watch-history");
-                        setShowDropdown(false);
-                      }}>Lịch sử xem phim</li>
-                    </ul>
+                    <div className={styles['dropdown-menu']}>
+                      <div className={styles['dropdown-header']}>
+                        <div className={styles['dropdown-user-name']}>{user.user_name}</div>
+                        <div className={styles['dropdown-user-email']}>{user.email}</div>
+                      </div>
+                      
+                      <div className={styles['dropdown-divider']}></div>
+                      
+                      <div 
+                        className={styles['dropdown-item']} 
+                        onClick={() => {
+                          navigate("/profile");
+                          setShowDropdown(false);
+                        }}
+                      >
+                        <FaUserCog className={styles.icon} />
+                        <span>Quản lý tài khoản</span>
+                      </div>
+                      
+                      <div 
+                        className={styles['dropdown-item']} 
+                        onClick={() => {
+                          navigate("/movies/favorites");
+                          setShowDropdown(false);
+                        }}
+                      >
+                        <FaHeart className={styles.icon} />
+                        <span>Danh sách yêu thích</span>
+                      </div>
+                      
+                      <div 
+                        className={styles['dropdown-item']} 
+                        onClick={() => {
+                          navigate("/movies/watch-history");
+                          setShowDropdown(false);
+                        }}
+                      >
+                        <FaHistory className={styles.icon} />
+                        <span>Lịch sử xem phim</span>
+                      </div>
+                      
+                      <div className={styles['dropdown-divider']}></div>
+                      
+                      <div 
+                        className={`${styles['dropdown-item']} ${styles['dropdown-item-logout']}`}
+                        onClick={() => {
+                          handleLogout();
+                          setShowDropdown(false);
+                        }}
+                      >
+                        <FaSignOutAlt className={styles.icon} />
+                        <span>Đăng xuất</span>
+                      </div>
+                    </div>
                   )}
                 </div>
-                <button onClick={handleLogout} className={styles['logout-btn']}>
-                  Đăng Xuất
-                </button>
               </div>
             ) : (
               <Link to="/login" className={styles.Login}>
