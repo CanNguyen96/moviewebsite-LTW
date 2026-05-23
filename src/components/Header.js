@@ -6,14 +6,7 @@ import logo_web from "../picture/logo-1.webp";
 import { movieService } from "../services/movieService";
 import { useAuth } from "../contexts/AuthContext";
 import { FaHeart, FaHistory, FaUserCog, FaSignOutAlt, FaSearch } from "react-icons/fa";
-
-const getAvatarSrc = (avatar) => {
-  if (!avatar) return "/images/default-avatar.png";
-  if (avatar.startsWith("http") || avatar.startsWith("blob")) return avatar;
-  if (avatar.startsWith("/")) return `${process.env.REACT_APP_API_URL || 'http://localhost:3001'}${avatar}`;
-  return `${process.env.REACT_APP_API_URL || 'http://localhost:3001'}/${avatar}`;
-};
-
+import { getAvatarSrc } from "../utils/image";
 
 function Header() {
   const { user, logout } = useAuth();
@@ -105,8 +98,8 @@ function Header() {
                 onKeyDown={handleSearchSubmit}
                 className={styles['search-input']}
               />
-              <FaSearch 
-                className={styles['search-icon']} 
+              <FaSearch
+                className={styles['search-icon']}
                 onClick={() => {
                   if (searchKeyword.trim() !== '') {
                     navigate(`/movies/search?keyword=${encodeURIComponent(searchKeyword)}`);
@@ -120,16 +113,16 @@ function Header() {
             {user ? (
               <div className={styles['user-info']} ref={dropdownRef}>
                 <div className={styles['user-dropdown']}>
-                  <button 
-                    className={styles['avatar-btn']} 
+                  <button
+                    className={styles['avatar-btn']}
                     onClick={() => setShowDropdown(!showDropdown)}
                     aria-label="Tài khoản"
                   >
-                    <img 
-                      src={getAvatarSrc(user.avatar_url)} 
-                      alt="Avatar" 
-                      className={styles['avatar-img']} 
-                      onError={(e) => { e.target.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(user.user_name)}&background=random` }} 
+                    <img
+                      src={getAvatarSrc(user.avatar_url)}
+                      alt="Avatar"
+                      className={styles['avatar-img']}
+                      onError={(e) => { e.target.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(user.user_name)}&background=random` }}
                     />
                   </button>
                   {showDropdown && (
@@ -138,11 +131,11 @@ function Header() {
                         <div className={styles['dropdown-user-name']}>{user.user_name}</div>
                         <div className={styles['dropdown-user-email']}>{user.email}</div>
                       </div>
-                      
+
                       <div className={styles['dropdown-divider']}></div>
-                      
-                      <div 
-                        className={styles['dropdown-item']} 
+
+                      <div
+                        className={styles['dropdown-item']}
                         onClick={() => {
                           navigate("/profile");
                           setShowDropdown(false);
@@ -151,9 +144,9 @@ function Header() {
                         <FaUserCog className={styles.icon} />
                         <span>Quản lý tài khoản</span>
                       </div>
-                      
-                      <div 
-                        className={styles['dropdown-item']} 
+
+                      <div
+                        className={styles['dropdown-item']}
                         onClick={() => {
                           navigate("/movies/favorites");
                           setShowDropdown(false);
@@ -162,9 +155,9 @@ function Header() {
                         <FaHeart className={styles.icon} />
                         <span>Danh sách yêu thích</span>
                       </div>
-                      
-                      <div 
-                        className={styles['dropdown-item']} 
+
+                      <div
+                        className={styles['dropdown-item']}
                         onClick={() => {
                           navigate("/movies/watch-history");
                           setShowDropdown(false);
@@ -173,10 +166,10 @@ function Header() {
                         <FaHistory className={styles.icon} />
                         <span>Lịch sử xem phim</span>
                       </div>
-                      
+
                       <div className={styles['dropdown-divider']}></div>
-                      
-                      <div 
+
+                      <div
                         className={`${styles['dropdown-item']} ${styles['dropdown-item-logout']}`}
                         onClick={() => {
                           handleLogout();

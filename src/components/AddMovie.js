@@ -7,8 +7,6 @@ import "react-toastify/dist/ReactToastify.css";
 import { FaFilm, FaCalendarAlt, FaClock, FaAlignLeft, FaImage, FaImages, FaTag, FaTimes } from 'react-icons/fa';
 
 function AddMovie() {
-    const API_BASE_URL = process.env.REACT_APP_API_URL || "http://localhost:3001";
-
     const [formData, setFormData] = useState({
         title: '',
         release_year: '',
@@ -51,7 +49,7 @@ function AddMovie() {
         return () => {
             isMounted = false;
         };
-    }, [API_BASE_URL]);
+    }, []);
 
     // Handle clicking outside the category dropdown to close it
     useEffect(() => {

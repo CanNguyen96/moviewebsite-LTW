@@ -6,6 +6,7 @@ import { useNavigate } from "react-router-dom";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useAuth } from "../contexts/AuthContext";
+import { getAvatarSrc } from "../utils/image";
 
 function Profile() {
     const { user, updateUser } = useAuth();
@@ -40,13 +41,6 @@ function Profile() {
         }
     };
 
-    const getAvatarSrc = (avatar) => {
-        if (!avatar) return "/images/default-avatar.png";
-        if (avatar.startsWith("http") || avatar.startsWith("blob")) return avatar;
-        if (avatar.startsWith("/")) return `${process.env.REACT_APP_API_URL || 'http://localhost:3001'}${avatar}`;
-        return `${process.env.REACT_APP_API_URL || 'http://localhost:3001'}/${avatar}`;
-    };
-
     const handleAvatarClick = () => {
         if (fileInputRef.current) {
             fileInputRef.current.click();
@@ -62,7 +56,7 @@ function Profile() {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        
+
         if (password) {
             const passwordError = validatePassword(password);
             if (passwordError) {
@@ -121,25 +115,25 @@ function Profile() {
         <div className={styles.container}>
             <ToastContainer />
             <h2>Quản Lý Tài Khoản</h2>
-            
+
             <div className={styles['avatar-section']}>
                 <div className={styles['avatar-wrapper']} onClick={handleAvatarClick}>
-                    <img 
-                        src={getAvatarSrc(avatarPreview)} 
-                        alt="Avatar" 
-                        className={styles['avatar-img']} 
-                        onError={(e) => { e.target.src = 'https://ui-avatars.com/api/?name=' + userName + '&background=random' }} 
+                    <img
+                        src={getAvatarSrc(avatarPreview)}
+                        alt="Avatar"
+                        className={styles['avatar-img']}
+                        onError={(e) => { e.target.src = 'https://ui-avatars.com/api/?name=' + userName + '&background=random' }}
                     />
                     <div className={styles['avatar-overlay']}>
                         <span className={styles['overlay-text']}>Đổi Ảnh</span>
                     </div>
                 </div>
-                <input 
-                    type="file" 
-                    accept="image/*" 
-                    ref={fileInputRef} 
-                    className={styles['file-input']} 
-                    onChange={handleAvatarChange} 
+                <input
+                    type="file"
+                    accept="image/*"
+                    ref={fileInputRef}
+                    className={styles['file-input']}
+                    onChange={handleAvatarChange}
                 />
             </div>
 

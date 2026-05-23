@@ -10,7 +10,6 @@ import styles from '../styles/EditMovie.module.css';
 function EditMovie() {
     const { movieId } = useParams();
     const navigate = useNavigate();
-    const API_BASE_URL = process.env.REACT_APP_API_URL || "http://localhost:3001";
 
     const [movie, setMovie] = useState({
         title: '',
@@ -45,7 +44,7 @@ function EditMovie() {
                 setAllCategories(normalized);
             })
             .catch(err => console.error('Không thể tải danh sách thể loại:', err));
-    }, [API_BASE_URL]);
+    }, []);
 
     // 2. Fetch movie details
     useEffect(() => {
@@ -75,7 +74,7 @@ function EditMovie() {
                 setError('Đã xảy ra lỗi khi tải thông tin phim.');
                 setLoading(false);
             });
-    }, [movieId, API_BASE_URL, allCategories]); // Re-run when allCategories is populated
+    }, [movieId, allCategories]); // Re-run when allCategories is populated
 
     // Handle clicking outside the category dropdown
     useEffect(() => {
