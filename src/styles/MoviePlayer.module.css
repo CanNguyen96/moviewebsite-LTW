@@ -1,49 +1,58 @@
-/* MoviePlayer.css */
+/* MoviePlayer.module.css - Premium Cinematic Player Aesthetic */
+
 .movie-player-page {
-    background-color: #171717; /* Nền tối đồng bộ MovieDetail */
+    background-color: #171717;
     color: #fff;
-    font-family: Arial, Helvetica, sans-serif;
+    font-family: 'Outfit', 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
     min-height: 100vh;
-    padding-bottom: 50px;
+    padding-bottom: 60px;
 }
 
 .movie-player-container {
     max-width: 1200px;
     margin: 0 auto;
-    padding: 20px;
+    padding: 40px 20px;
 }
 
+/* Breadcrumb navigation */
 .breadcrumb {
     font-size: 0.95rem;
-    margin-bottom: 20px;
-    color: #999;
-}
-
-.breadcrumb a {
-    color: #f39c12;
-    text-decoration: none;
+    margin-bottom: 25px;
+    color: rgba(255, 255, 255, 0.4);
     font-weight: 500;
 }
 
+.breadcrumb a {
+    color: #ff3d47;
+    text-decoration: none;
+    font-weight: 600;
+    transition: color 0.2s ease;
+}
+
 .breadcrumb a:hover {
-    text-decoration: underline;
+    color: #ff6b6b;
+    text-decoration: none;
 }
 
 .breadcrumb .current-ep-text {
     color: #fff;
+    font-weight: 600;
 }
 
+/* Video Player Wrapper */
 .video-player-wrapper {
     background-color: #000;
-    border-radius: 8px;
+    border-radius: 12px;
     overflow: hidden;
-    box-shadow: 0 5px 20px rgba(0,0,0,0.5);
-    margin-bottom: 30px;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.7);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    margin-bottom: 40px;
     aspect-ratio: 16 / 9;
     position: relative;
     display: flex;
     justify-content: center;
     align-items: center;
+    transition: transform 0.3s ease;
 }
 
 .video-player-wrapper iframe, .react-player-styled {
@@ -58,186 +67,228 @@
 .player-content-stacked {
     display: flex;
     flex-direction: column;
-    gap: 20px;
+    gap: 30px;
 }
 
 /* Episode List Card */
 .episode-list-card {
-    background: #252525;
-    border-radius: 6px;
-    padding: 20px;
+    background: rgba(30, 30, 30, 0.45);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
+    border-radius: 12px;
+    padding: 30px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
 }
 
 .episode-list-card h3 {
-    color: #f39c12;
+    color: #ff3d47;
     margin-top: 0;
-    margin-bottom: 20px;
-    font-size: 1.1rem;
-    border-bottom: 1px solid #333;
-    padding-bottom: 10px;
+    margin-bottom: 24px;
+    font-size: 1.15rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    position: relative;
+    padding-left: 14px;
+}
+
+.episode-list-card h3::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 3px;
+    bottom: 3px;
+    width: 4px;
+    background: #e50914;
+    border-radius: 2px;
 }
 
 .episodes-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(60px, 1fr));
-    gap: 10px;
+    grid-template-columns: repeat(auto-fill, minmax(65px, 1fr));
+    gap: 12px;
 }
 
 .ep-btn {
-    background: #333;
+    background: rgba(255, 255, 255, 0.05);
     color: #ccc;
-    border: 1px solid #444;
-    padding: 10px 0;
-    border-radius: 4px;
-    font-weight: bold;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    padding: 12px 0;
+    border-radius: 8px;
+    font-weight: 700;
+    font-size: 0.95rem;
     cursor: pointer;
-    transition: all 0.2s ease;
+    transition: all 0.2s cubic-bezier(0.25, 0.8, 0.25, 1);
     text-align: center;
+    text-decoration: none;
 }
 
 .ep-btn:hover {
-    background: #444;
+    background: #e50914;
     color: #fff;
+    border-color: #e50914;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 12px rgba(229, 9, 20, 0.4);
 }
 
-.ep-btn.active {
-    background: #ff4b6b; /* Đỏ hồng cho ăn khớp */
-    color: #fff;
-    border-color: #ff4b6b;
-    box-shadow: 0 2px 8px rgba(255, 75, 107, 0.4);
-}
-
-.active {
-    background: #ff4b6b;
-    color: #fff;
-    border-color: #ff4b6b;
-    box-shadow: 0 2px 8px rgba(255, 75, 107, 0.4);
+.ep-btn.active, .active {
+    background: linear-gradient(135deg, #e50914 0%, #ff3d47 100%) !important;
+    color: #fff !important;
+    border-color: #e50914 !important;
+    box-shadow: 0 4px 15px rgba(229, 9, 20, 0.5) !important;
+    transform: translateY(-2px);
 }
 
 .text-muted {
-    color: #999;
+    color: rgba(255, 255, 255, 0.4);
 }
 
 /* -- Review Section (Kế thừa phong cách MovieDetail) -- */
 .review-section {
-    background: #252525;
-    padding: 25px;
-    border-radius: 6px;
+    background: rgba(30, 30, 30, 0.45);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
 }
 
 .review-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 20px;
+    margin-bottom: 25px;
 }
 
 .review-header h3 {
-    color: #f39c12;
-    font-size: 1.1rem;
+    color: #ff3d47;
+    font-size: 1.15rem;
     margin: 0;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    position: relative;
+    padding-left: 14px;
+}
+
+.review-header h3::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 3px;
+    bottom: 3px;
+    width: 4px;
+    background: #e50914;
+    border-radius: 2px;
 }
 
 .refresh-icon {
-    color: #aaa;
-    font-size: 1.2rem;
+    color: rgba(255, 255, 255, 0.4);
+    font-size: 1.3rem;
     cursor: pointer;
+    transition: color 0.2s ease;
 }
 
+.refresh-icon:hover {
+    color: #fff;
+}
+
+/* Form nhập comment */
 .comment-form {
-    margin-bottom: 30px;
+    margin-bottom: 35px;
 }
 
 .comment-form textarea {
     width: 100%;
-    background: #000;
+    background: rgba(0, 0, 0, 0.35);
     color: #fff;
-    border: 1px solid #3a3a3a;
-    border-radius: 6px 6px 0 0;
-    padding: 15px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 8px 8px 0 0;
+    padding: 18px;
     font-size: 0.95rem;
-    height: 80px;
+    height: 90px;
     resize: none;
     box-sizing: border-box;
+    transition: all 0.2s ease;
+    font-family: inherit;
 }
 
 .comment-form textarea:focus {
     outline: none;
-    border-color: #555;
+    border-color: rgba(229, 9, 20, 0.5);
+    background: rgba(0, 0, 0, 0.5);
 }
 
 .comment-actions {
-    background: #555;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-top: none;
     display: flex;
-    justify-content: space-between;
+    justify-content: flex-end;
     align-items: center;
-    padding: 10px 15px;
-    border-radius: 0 0 6px 6px;
-    margin-top: -5px; 
-}
-
-.rating-select-wrapper label {
-    color: #ccc;
-    font-size: 0.9rem;
-    margin-right: 10px;
-}
-
-.rating-select-wrapper select {
-    background: #333;
-    color: #fff;
-    border: 1px solid #444;
-    padding: 4px 8px;
-    border-radius: 4px;
+    padding: 12px 18px;
+    border-radius: 0 0 8px 8px;
+    margin-top: -5px;
 }
 
 .submit-comment-btn {
-    background: #888;
+    background: #e50914;
     color: #fff;
     border: none;
-    padding: 6px 20px;
-    border-radius: 4px;
+    padding: 8px 25px;
+    border-radius: 6px;
     cursor: pointer;
-    font-weight: bold;
+    font-weight: 700;
+    transition: all 0.2s ease;
+    box-shadow: 0 4px 10px rgba(229, 9, 20, 0.3);
 }
 
 .submit-comment-btn:hover {
-    background: #aaa;
+    background: #ff3d47;
+    transform: translateY(-1px);
+    box-shadow: 0 5px 14px rgba(229, 9, 20, 0.5);
 }
 
+/* Item Comment */
 .review-item {
-    background: #131313;
+    background: rgba(255, 255, 255, 0.015);
     display: flex;
-    gap: 15px;
-    border-radius: 6px;
-    padding: 15px;
-    margin-bottom: 15px;
-    border: 1px solid #111;
+    gap: 20px;
+    border-radius: 10px;
+    padding: 20px;
+    margin-bottom: 20px;
+    border: 1px solid rgba(255, 255, 255, 0.04);
+    transition: all 0.25s ease;
+}
+
+.review-item:hover {
+    background: rgba(255, 255, 255, 0.03);
+    border-color: rgba(255, 255, 255, 0.08);
 }
 
 .review-avatar {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 5px;
+    gap: 8px;
     width: 60px;
     flex-shrink: 0;
 }
 
 .review-avatar img {
-    width: 50px;
-    height: 50px;
+    width: 48px;
+    height: 48px;
     border-radius: 50%;
     object-fit: cover;
-    border: 2px solid #333;
+    border: 2px solid rgba(255, 255, 255, 0.15);
 }
 
 .user-level {
-    background: #000;
-    color: #fff;
-    font-size: 0.75rem;
-    border: 1px solid #555;
-    padding: 2px 6px;
-    border-radius: 12px;
+    background: rgba(229, 9, 20, 0.2);
+    color: #ff3d47;
+    font-size: 0.7rem;
+    border: 1px solid rgba(229, 9, 20, 0.4);
+    padding: 2px 8px;
+    border-radius: 20px;
+    font-weight: 700;
 }
 
 .review-content {
@@ -247,43 +298,55 @@
 .review-user {
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 12px;
     margin-bottom: 8px;
 }
 
 .review-user strong {
-    color: #4a90e2; 
-    font-size: 1rem;
-}
-
-.rating-star-small {
-    color: #f39c12;
-    font-size: 0.85rem;
+    color: #ff3d47;
+    font-size: 1.05rem;
 }
 
 .review-text {
-    color: #fff;
+    color: #ddd;
     font-size: 0.95rem;
-    margin: 0 0 10px 0;
-    line-height: 1.5;
-    background: #000;
-    padding: 12px;
-    border-radius: 4px;
+    margin: 10px 0;
+    line-height: 1.6;
+    background: rgba(0, 0, 0, 0.25);
+    padding: 14px 18px;
+    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.04);
 }
 
 .review-time {
-    color: #f39c12;
+    color: rgba(255, 255, 255, 0.4);
     font-size: 0.85rem;
+    display: flex;
+    align-items: center;
+    gap: 12px;
 }
 
 .reply-btn {
-    color: #f39c12;
-    font-weight: bold;
+    color: #ff3d47;
+    font-weight: 700;
     cursor: pointer;
-    margin-right: 5px;
+    transition: color 0.2s ease;
+}
+
+.reply-btn:hover {
+    color: #ff6b6b;
 }
 
 /* Responsive */
 @media (max-width: 768px) {
-    /* Thêm các tùy chỉnh riêng cho mobile nếu cần */
+    .movie-player-container {
+        padding: 20px 10px;
+    }
+    .episodes-grid {
+        grid-template-columns: repeat(auto-fill, minmax(55px, 1fr));
+    }
+    .review-item {
+        gap: 12px;
+        padding: 15px;
+    }
 }

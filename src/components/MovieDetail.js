@@ -142,7 +142,15 @@ const MovieDetail = () => {
 
     return (
         <div className={styles['movie-detail-page']}>
-            <div className={styles['movie-background']}>
+            <div 
+                className={styles['movie-background']}
+                style={movie.background_url ? {
+                    backgroundImage: `linear-gradient(to bottom, rgba(23, 23, 23, 0.75), #171717), url(${buildImageSrc(movie.background_url)})`,
+                    backgroundSize: 'cover',
+                    backgroundPosition: 'center 20%',
+                    backgroundRepeat: 'no-repeat'
+                } : {}}
+            >
                 <div className={styles['movie-header']}>
                     <div className={styles['movie-detail-poster-container']}>
                         <img 
@@ -165,7 +173,7 @@ const MovieDetail = () => {
                                 onClick={toggleFavorite}
                                 className={`${styles['favorite-btn']} ${isFavorite ? styles.remove : ''}`}
                             >
-                                THÊM YÊU THÍCH
+                                {isFavorite ? "ĐÃ THÊM YÊU THÍCH" : "THÊM YÊU THÍCH"}
                             </button>
                         </div>
                     </div>

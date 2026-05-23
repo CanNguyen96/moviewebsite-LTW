@@ -1,113 +1,139 @@
-/* MovieDetail.css - Tái tạo layout theo design */
+/* MovieDetail.module.css - Premium Cinema Aesthetic */
 
 .movie-detail-page {
-    background-color: #171717; /* Nền tối tổng thể như trên hình */
+    background-color: #171717;
     color: #fff;
-    font-family: Arial, Helvetica, sans-serif;
+    font-family: 'Outfit', 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
     min-height: 100vh;
-    padding-bottom: 50px;
+    padding-bottom: 60px;
 }
 
 /* --- BACKGROUND BANNER --- */
 .movie-background {
     position: relative;
     width: 100%;
-    background-color: #222; /* Màu fallback hoặc màu đồng nhất với background */
-    border-bottom: 1px solid #333;
+    background-color: #171717;
     padding-bottom: 40px;
+    box-shadow: inset 0 -100px 100px -100px #171717;
 }
 
 .movie-header {
     position: relative;
     z-index: 2;
     display: flex;
-    gap: 30px;
+    gap: 40px;
     width: 100%;
-    max-width: 1100px;
+    max-width: 1200px;
     margin: 0 auto;
-    padding: 40px 20px 0 20px; 
+    padding: 60px 20px 0 20px; 
 }
 
 /* Khối Poster và các nút */
 .movie-detail-poster-container {
     flex-shrink: 0;
-    width: 300px;
+    width: 280px;
     display: flex;
     flex-direction: column;
-    gap: 15px;
+    gap: 20px;
 }
 
 .movie-detail-poster-container .poster-img {
     width: 100%;
     height: auto;
-    border-radius: 4px;
-    box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+    border-radius: 12px;
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.8);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    transition: transform 0.3s ease;
+}
+
+.movie-detail-poster-container .poster-img:hover {
+    transform: scale(1.02);
 }
 
 .movie-button {
     display: flex;
-    gap: 10px;
+    flex-direction: column;
+    gap: 12px;
     width: 100%;
 }
 
 .watch-movie-btn, .favorite-btn {
-    flex: 1;
-    padding: 12px 0;
-    font-size: 0.9rem;
-    font-weight: bold;
+    width: 100%;
+    padding: 14px 0;
+    font-size: 0.95rem;
+    font-weight: 700;
     text-transform: uppercase;
-    border-radius: 4px;
+    border-radius: 8px;
     cursor: pointer;
     text-decoration: none;
     text-align: center;
     border: none;
-    transition: opacity 0.2s;
-}
-
-.watch-movie-btn:hover, .favorite-btn:hover {
-    opacity: 0.9;
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+    letter-spacing: 0.5px;
 }
 
 .watch-movie-btn {
-    background: linear-gradient(135deg, #ff4b6b, #ff6b6b);
+    background: linear-gradient(135deg, #e50914 0%, #ff3d47 100%);
     color: #fff !important;
-    box-shadow: 0 2px 10px rgba(255, 75, 107, 0.4);
+    box-shadow: 0 4px 15px rgba(229, 9, 20, 0.4);
+}
+
+.watch-movie-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 22px rgba(229, 9, 20, 0.6);
 }
 
 .watch-movie-btn.disabled {
-    background: #555;
+    background: #444;
     color: #888 !important;
     cursor: not-allowed;
     box-shadow: none;
+    transform: none;
 }
 
 .favorite-btn {
-    background: linear-gradient(135deg, #3a4a5a, #4a5a6a);
+    background: rgba(255, 255, 255, 0.08);
     color: #fff;
-    border: 1px solid #5a6a7a;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    -webkit-backdrop-filter: blur(5px);
+    backdrop-filter: blur(5px);
+}
+
+.favorite-btn:hover {
+    background: rgba(255, 255, 255, 0.15);
+    border-color: rgba(255, 255, 255, 0.3);
+    transform: translateY(-2px);
 }
 
 .favorite-btn.remove {
-    background: linear-gradient(135deg, #e74c3c, #c82333);
+    background: linear-gradient(135deg, #e74c3c 0%, #c82333 100%);
     border: 1px solid #c82333;
+    box-shadow: 0 4px 15px rgba(231, 76, 60, 0.3);
 }
 
-/* Khối Text thông tin (Dạng bảng) */
+.favorite-btn.remove:hover {
+    box-shadow: 0 6px 20px rgba(231, 76, 60, 0.5);
+}
+
+/* Khối Text thông tin (Dạng bảng Glassmorphism) */
 .movie-info {
     flex: 1;
     display: flex;
     flex-direction: column;
-    margin-top: 10px;
-    border: 1px solid #222;
-    border-radius: 4px;
-    background: #1e1e1e;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 12px;
+    background: rgba(30, 30, 30, 0.65);
+    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
+    overflow: hidden;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
 }
 
 .info-row {
     display: flex;
     align-items: center;
-    padding: 16px 20px;
-    border-bottom: 1px solid #333;
+    padding: 18px 24px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
 }
 
 .info-row:last-child {
@@ -115,31 +141,34 @@
 }
 
 .info-label {
-    width: 160px;
-    color: #999;
-    font-size: 0.9rem;
-    font-weight: 500;
+    width: 180px;
+    color: rgba(255, 255, 255, 0.5);
+    font-size: 0.95rem;
+    font-weight: 600;
     flex-shrink: 0;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
 }
 
 .info-value {
-    color: #ddd;
-    font-size: 0.9rem;
+    color: #eee;
+    font-size: 1rem;
     flex: 1;
     display: flex;
     align-items: center;
     flex-wrap: wrap;
-    gap: 8px;
+    gap: 10px;
 }
 
 .highlight-title {
-    color: #f39c12; /* Màu cam vàng */
-    font-size: 1.4rem;
-    font-weight: bold;
+    color: #ffffff;
+    font-size: 1.8rem;
+    font-weight: 800;
+    text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
 }
 
 .text-muted {
-    color: #999;
+    color: rgba(255, 255, 255, 0.6);
 }
 
 .badges {
@@ -148,72 +177,83 @@
 }
 
 .badge {
-    background: #333;
-    color: #aaa;
-    padding: 4px 10px;
-    border-radius: 4px;
-    font-size: 0.8rem;
-    border: 1px solid #444;
+    background: rgba(255, 255, 255, 0.06);
+    color: #ccc;
+    padding: 5px 12px;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    transition: all 0.2s ease;
 }
 
 .badge-link {
     text-decoration: none;
-    transition: all 0.2s ease;
 }
 
 .badge-link:hover {
-    background: #f39c12; /* Vàng cam cho ăn khớp */
+    background: #e50914;
     color: #fff;
-    border-color: #f39c12;
+    border-color: #e50914;
+    box-shadow: 0 4px 10px rgba(229, 9, 20, 0.3);
+    transform: translateY(-1px);
 }
 
 .badge-new {
     background: #007bff;
     color: #fff;
-    padding: 4px 10px;
-    border-radius: 4px;
-    font-size: 0.8rem;
+    padding: 5px 12px;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    font-weight: 700;
+    box-shadow: 0 4px 10px rgba(0, 123, 255, 0.3);
 }
 
 .rating-info {
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 12px;
     width: 100%;
 }
 
 .rating-star {
-    color: #f39c12;
-    font-weight: bold;
+    color: #ffc107;
+    font-weight: 700;
+    font-size: 1.05rem;
 }
 
 .rating-count {
-    color: #888;
-    font-size: 0.85rem;
+    color: rgba(255, 255, 255, 0.4);
+    font-size: 0.9rem;
 }
 
 .rate-btn {
-    background: linear-gradient(135deg, #4facfe, #00f2fe);
+    background: linear-gradient(135deg, #00c6ff 0%, #0072ff 100%);
     color: white;
     border: none;
-    padding: 8px 20px;
+    padding: 8px 18px;
     border-radius: 6px;
-    font-size: 0.9rem;
-    font-weight: bold;
-    margin-left: auto; /* Đẩy sang cuối dòng */
+    font-size: 0.85rem;
+    font-weight: 700;
+    margin-left: auto;
     cursor: pointer;
-    transition: opacity 0.3s;
+    transition: all 0.2s ease;
+    box-shadow: 0 4px 12px rgba(0, 114, 255, 0.3);
 }
 
 .rate-btn:hover {
-    opacity: 0.85;
+    opacity: 0.9;
+    transform: translateY(-1px);
+    box-shadow: 0 6px 16px rgba(0, 114, 255, 0.5);
 }
 
 /* --- RATING MODAL --- */
 .rating-modal-overlay {
     position: fixed;
     top: 0; left: 0; right: 0; bottom: 0;
-    background: rgba(0, 0, 0, 0.7);
+    background: rgba(0, 0, 0, 0.85);
+    -webkit-backdrop-filter: blur(8px);
+    backdrop-filter: blur(8px);
     display: flex;
     justify-content: center;
     align-items: center;
@@ -221,250 +261,296 @@
 }
 
 .rating-modal-content {
-    background: #252525;
-    border-radius: 8px;
-    width: 350px;
-    padding: 15px 20px 25px;
+    background: #202020;
+    border-radius: 12px;
+    width: 360px;
+    padding: 20px 24px 30px;
     position: relative;
-    box-shadow: 0 5px 20px rgba(0,0,0,0.5);
-    border: 1px solid #333;
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.6);
+    border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .rating-modal-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 20px;
-    border-bottom: 1px solid #333;
-    padding-bottom: 12px;
+    margin-bottom: 24px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    padding-bottom: 14px;
 }
 
 .rating-modal-header h4 {
     margin: 0;
-    color: #ddd;
-    font-size: 1.15rem;
-    font-weight: 500;
+    color: #eee;
+    font-size: 1.2rem;
+    font-weight: 600;
 }
 
 .close-modal-btn {
-    background: #d32f2f;
-    color: white;
+    background: rgba(255, 255, 255, 0.06);
+    color: #aaa;
     border: none;
-    width: 25px;
-    height: 25px;
-    font-size: 0.9rem;
+    width: 28px;
+    height: 28px;
+    font-size: 0.85rem;
     cursor: pointer;
-    border-radius: 4px;
+    border-radius: 50%;
     display: flex;
     justify-content: center;
     align-items: center;
-    transition: background 0.2s;
+    transition: all 0.2s ease;
 }
 
 .close-modal-btn:hover {
-    background: #c82333;
+    background: #e50914;
+    color: white;
 }
 
 .rating-stars-container {
     display: flex;
     justify-content: center;
-    gap: 10px;
+    gap: 8px;
     padding: 10px 0;
 }
 
 .star-icon {
-    color: #666; /* Xám mặc định */
-    font-size: 1.8rem;
+    color: #444;
+    font-size: 2rem;
     cursor: pointer;
-    transition: color 0.15s, transform 0.15s;
+    transition: all 0.15s ease;
 }
 
 .star-icon.active, .star-icon:hover {
-    color: #ccc;
+    color: #ffc107;
+    transform: scale(1.15);
+    text-shadow: 0 0 10px rgba(255, 193, 7, 0.4);
 }
 
 /* --- PHẦN CONTENT DƯỚI (Danh sách tập, Tóm tắt, Bình luận) --- */
 .movie-content-container {
-    max-width: 1100px;
+    max-width: 1200px;
     margin: 40px auto 0;
     padding: 0 20px;
 }
 
 /* Nút chọn tập */
 .episode-selection {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, 60px);
-    justify-content: center;
-    gap: 10px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
     margin-bottom: 40px;
+    justify-content: flex-start;
 }
 
 .episode-btn-square {
-    background: #2a2a2a;
-    color: #aaa;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    color: #ccc;
     width: 60px;
-    height: 36px;
-    padding: 0;
+    height: 40px;
     text-decoration: none;
-    border-radius: 4px;
-    font-weight: bold;
-    transition: background 0.3s, color 0.3s;
+    border-radius: 8px;
+    font-weight: 700;
+    font-size: 0.95rem;
+    transition: all 0.2s cubic-bezier(0.25, 0.8, 0.25, 1);
     display: flex;
     align-items: center;
     justify-content: center;
 }
 
 .episode-btn-square:hover, .episode-btn-square.active {
-    background: #444;
+    background: #e50914;
     color: #fff;
+    border-color: #e50914;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 12px rgba(229, 9, 20, 0.4);
 }
 
 /* Box Tóm tắt phim */
 .movie-summary-section {
-    background: #252525;
-    padding: 25px;
-    border-radius: 6px;
+    background: rgba(30, 30, 30, 0.45);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    padding: 30px;
+    border-radius: 12px;
     margin-bottom: 30px;
-    position: relative;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
 }
 
 .movie-summary-section h3 {
-    color: #ff4b6b; /* Đỏ hồng giống TÓM TẮT PHIM */
-    font-size: 1.1rem;
+    color: #ff3d47;
+    font-size: 1.15rem;
     margin-top: 0;
-    margin-bottom: 15px;
+    margin-bottom: 18px;
     text-transform: uppercase;
+    letter-spacing: 1px;
+    position: relative;
+    padding-left: 14px;
+}
+
+.movie-summary-section h3::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 3px;
+    bottom: 3px;
+    width: 4px;
+    background: #e50914;
+    border-radius: 2px;
 }
 
 .movie-summary-section p {
-    color: #aaa;
-    font-size: 0.95rem;
-    line-height: 1.6;
-    margin-bottom: 15px;
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 1rem;
+    line-height: 1.7;
+    margin: 0;
 }
 
 /* --- Box Bình luận --- */
 .review-section {
-    background: #252525;
-    padding: 25px;
-    border-radius: 6px;
+    background: rgba(30, 30, 30, 0.45);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
 }
 
 .review-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 20px;
+    margin-bottom: 25px;
 }
 
 .review-header h3 {
-    color: #f39c12; /* Vàng cam */
-    font-size: 1.1rem;
+    color: #ff3d47;
+    font-size: 1.15rem;
     margin: 0;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    position: relative;
+    padding-left: 14px;
+}
+
+.review-header h3::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 3px;
+    bottom: 3px;
+    width: 4px;
+    background: #e50914;
+    border-radius: 2px;
 }
 
 .refresh-icon {
-    color: #aaa;
-    font-size: 1.2rem;
+    color: rgba(255, 255, 255, 0.4);
+    font-size: 1.3rem;
     cursor: pointer;
+    transition: color 0.2s ease;
+}
+
+.refresh-icon:hover {
+    color: #fff;
 }
 
 /* Form nhập comment */
 .comment-form {
-    margin-bottom: 30px;
+    margin-bottom: 35px;
 }
 
 .comment-form textarea {
     width: 100%;
-    background: #000;
+    background: rgba(0, 0, 0, 0.35);
     color: #fff;
-    border: 1px solid #3a3a3a;
-    border-radius: 6px 6px 0 0;
-    padding: 15px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 8px 8px 0 0;
+    padding: 18px;
     font-size: 0.95rem;
-    height: 80px;
+    height: 90px;
     resize: none;
     box-sizing: border-box;
+    transition: all 0.2s ease;
+    font-family: inherit;
 }
 
 .comment-form textarea:focus {
     outline: none;
-    border-color: #555;
+    border-color: rgba(229, 9, 20, 0.5);
+    background: rgba(0, 0, 0, 0.5);
 }
 
 .comment-actions {
-    background: #555;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-top: none;
     display: flex;
-    justify-content: space-between;
+    justify-content: flex-end;
     align-items: center;
-    padding: 10px 15px;
-    border-radius: 0 0 6px 6px;
-    margin-top: -5px; /* Ghép sát vào textarea */
-}
-
-.rating-select-wrapper label {
-    color: #ccc;
-    font-size: 0.9rem;
-    margin-right: 10px;
-}
-
-.rating-select-wrapper select {
-    background: #333;
-    color: #fff;
-    border: 1px solid #444;
-    padding: 4px 8px;
-    border-radius: 4px;
+    padding: 12px 18px;
+    border-radius: 0 0 8px 8px;
+    margin-top: -5px;
 }
 
 .submit-comment-btn {
-    background: #888;
+    background: #e50914;
     color: #fff;
     border: none;
-    padding: 6px 20px;
-    border-radius: 4px;
+    padding: 8px 25px;
+    border-radius: 6px;
     cursor: pointer;
-    font-weight: bold;
+    font-weight: 700;
+    transition: all 0.2s ease;
+    box-shadow: 0 4px 10px rgba(229, 9, 20, 0.3);
 }
 
 .submit-comment-btn:hover {
-    background: #aaa;
+    background: #ff3d47;
+    transform: translateY(-1px);
+    box-shadow: 0 5px 14px rgba(229, 9, 20, 0.5);
 }
 
 /* Item Comment */
 .review-item {
-    background: #131313;
+    background: rgba(255, 255, 255, 0.015);
     display: flex;
-    gap: 15px;
-    border-radius: 6px;
-    padding: 15px;
-    margin-bottom: 15px;
-    border: 1px solid #111;
+    gap: 20px;
+    border-radius: 10px;
+    padding: 20px;
+    margin-bottom: 20px;
+    border: 1px solid rgba(255, 255, 255, 0.04);
+    transition: all 0.25s ease;
+}
+
+.review-item:hover {
+    background: rgba(255, 255, 255, 0.03);
+    border-color: rgba(255, 255, 255, 0.08);
 }
 
 .review-avatar {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 5px;
+    gap: 8px;
     width: 60px;
     flex-shrink: 0;
 }
 
 .review-avatar img {
-    width: 50px;
-    height: 50px;
+    width: 48px;
+    height: 48px;
     border-radius: 50%;
     object-fit: cover;
-    border: 2px solid #333;
+    border: 2px solid rgba(255, 255, 255, 0.15);
 }
 
 .user-level {
-    background: #000;
-    color: #fff;
-    font-size: 0.75rem;
-    border: 1px solid #555;
-    padding: 2px 6px;
-    border-radius: 12px;
+    background: rgba(229, 9, 20, 0.2);
+    color: #ff3d47;
+    font-size: 0.7rem;
+    border: 1px solid rgba(229, 9, 20, 0.4);
+    padding: 2px 8px;
+    border-radius: 20px;
+    font-weight: 700;
 }
 
 .review-content {
@@ -474,38 +560,80 @@
 .review-user {
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 12px;
     margin-bottom: 8px;
 }
 
 .review-user strong {
-    color: #4a90e2; /* Tên màu xanh giống ảnh */
-    font-size: 1rem;
-}
-
-.rating-star-small {
-    color: #f39c12;
-    font-size: 0.85rem;
+    color: #ff3d47;
+    font-size: 1.05rem;
 }
 
 .review-text {
-    color: #fff;
+    color: #ddd;
     font-size: 0.95rem;
-    margin: 0 0 10px 0;
-    line-height: 1.5;
-    background: #000;
-    padding: 12px;
-    border-radius: 4px;
+    margin: 10px 0;
+    line-height: 1.6;
+    background: rgba(0, 0, 0, 0.25);
+    padding: 14px 18px;
+    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.04);
 }
 
 .review-time {
-    color: #f39c12;
+    color: rgba(255, 255, 255, 0.4);
     font-size: 0.85rem;
+    display: flex;
+    align-items: center;
+    gap: 12px;
 }
 
 .reply-btn {
-    color: #f39c12;
-    font-weight: bold;
+    color: #ff3d47;
+    font-weight: 700;
     cursor: pointer;
-    margin-right: 5px;
+    transition: color 0.2s ease;
+}
+
+.reply-btn:hover {
+    color: #ff6b6b;
+}
+
+/* Response/Adapative Styling */
+@media (max-width: 992px) {
+    .movie-header {
+        flex-direction: column;
+        align-items: center;
+        padding-top: 30px;
+    }
+    
+    .movie-detail-poster-container {
+        width: 240px;
+    }
+    
+    .movie-info {
+        width: 100%;
+    }
+}
+
+@media (max-width: 576px) {
+    .info-row {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+        padding: 15px 20px;
+    }
+    
+    .info-label {
+        width: 100%;
+    }
+    
+    .movie-detail-poster-container {
+        width: 100%;
+        max-width: 260px;
+    }
+    
+    .episode-selection {
+        justify-content: center;
+    }
 }
