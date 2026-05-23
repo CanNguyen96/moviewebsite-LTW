@@ -427,15 +427,18 @@ const getSliderMovie = (req, res) =>{
         SELECT
             movie_id,
             title,
+            image_url,
             background_url,
             genre,
             description,
             views_count,
-            average_rating
+            average_rating,
+            release_year,
+            (SELECT MAX(episode_number) FROM episodes WHERE movie_id = movies.movie_id) AS latest_episode
         FROM movies
         WHERE status = 'Approved' 
         ORDER BY movie_id DESC 
-        LIMIT 3 
+        LIMIT 8
     `;
     db.query(query,(err,result)=>{
         if(err){

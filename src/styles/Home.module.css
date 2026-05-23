@@ -64,8 +64,21 @@
   text-decoration: none;
 }
 
-.content{
+.content {
   padding: 10px;
   background-color: #111;
-  margin: 20px 250px 0 250px;
+  margin: 20px 4% 0 4%;
+}
+
+@media (max-width: 1200px) {
+  .content {
+    margin: 15px 3% 0 3%;
+  }
+}
+
+@media (max-width: 768px) {
+  .content {
+    margin: 10px 2% 0 2%;
+    padding: 5px;
+  }
 }
