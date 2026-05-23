@@ -1,11 +1,21 @@
 import styles from '../styles/UserDetail.module.css';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faUserCircle } from '@fortawesome/free-solid-svg-icons';
 import { useCallback, useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { userService } from '../services/userService';
+import { getAvatarSrc } from '../utils/image';
+import { 
+    FaIdCard, 
+    FaUser, 
+    FaEnvelope, 
+    FaShieldAlt, 
+    FaCalendarAlt, 
+    FaToggleOn, 
+    FaArrowLeft, 
+    FaBan, 
+    FaCheckSquare 
+} from 'react-icons/fa';
 
 function UserDetail(){   
     const {userId}= useParams();
@@ -27,9 +37,11 @@ function UserDetail(){
                 setLoading(false);
             });
     }, [userId]);
+
     useEffect(()=>{
         fetchUser();
     }, [fetchUser]);
+
     // Hàm cập nhật trạng thái
     const updateStatus = (newStatus) => {
         userService.updateUserStatus(userId, newStatus)
@@ -44,40 +56,123 @@ function UserDetail(){
             });
     };
 
-
-    if (loading) return <div>Đang tải...</div>;
-    if(error) return <div>Lỗi:{error}</div>
+    if (loading) {
+        return (
+            <div className={styles['page-container']}>
+                <div className={styles['loading-box']}>Đang tải...</div>
+            </div>
+        );
+    }
+    if (error) {
+        return (
+            <div className={styles['page-container']}>
+                <div className={styles['error-box']}>Lỗi: {error}</div>
+            </div>
+        );
+    }
     if (!user) {
-        return <div>Không tìm thấy thông tin người dùng.</div>;
+        return (
+            <div className={styles['page-container']}>
+                <div className={styles['error-box']}>Không tìm thấy thông tin người dùng.</div>
+            </div>
+        );
     }
 
     const normalizedStatus = (user.status || '').trim().toLowerCase();
     const isActive = normalizedStatus === 'active';
 
-    return(
-        <div className={styles['user-detail']}>
-            <ToastContainer />
-            <div className={styles.tag}>
-                <h3>Quản lí tài khoản</h3>
-            </div>
-            <div className={styles.avatar}>
-                <li><FontAwesomeIcon icon={faUserCircle} size="3x" /></li>
-            </div>
-            <div className={styles.infor}>
-                <ul>
-                    <li><strong>Id tài khoản: </strong> {user.user_id}</li>
-                    <li><strong>Tên tài khoản: </strong> {user.user_name}</li>
-                    <li><strong>Email: </strong>{user.email}</li>
-                    <li><strong>Vai trò: </strong>{Number(user.role_id) === 1 ? 'Admin' : 'User'}</li>
-                    <li><strong>Ngày tạo tài khoản: </strong>{new Date(user.created_at).toLocaleDateString('vi-VN')}</li>
-                    <li><strong>Trạng thái tài khoản: </strong>{isActive ? 'Active' : 'Banned'}</li>
-                </ul>
-            </div>
-            <div className={styles.actions}>
-                <button className={styles.ban} onClick={()=> updateStatus('Banned')}  disabled={!isActive}>Banned</button>
-                <button className={styles.active} onClick={()=> updateStatus('Active')} disabled={isActive}>Active</button>
-            </div>
+    // Xử lý avatar: Nếu không có avatar_url thì lấy từ ui-avatars.com theo tên với background đỏ
+    const avatarUrl = user.avatar_url 
+        ? getAvatarSrc(user.avatar_url) 
+        : `https://ui-avatars.com/api/?name=${encodeURIComponent(user.user_name)}&background=ff3d47&color=fff&size=150&bold=true`;
 
+    return(
+        <div className={styles['page-container']}>
+            <ToastContainer theme="dark" />
+            <div className={`${styles['user-detail']} ${isActive ? styles['card-active'] : styles['card-banned']}`}>
+                <button className={styles['back-btn']} onClick={() => navigate(-1)}>
+                    <FaArrowLeft /> Quay lại
+                </button>
+                <div className={styles.tag}>
+                    <h3>Quản lí tài khoản</h3>
+                </div>
+                <div className={styles.avatar}>
+                    <img 
+                        src={avatarUrl} 
+                        alt={user.user_name} 
+                        className={styles['avatar-img']} 
+                        onError={(e) => { 
+                            e.target.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(user.user_name)}&background=ff3d47&color=fff&size=150&bold=true`;
+                        }} 
+                    />
+                </div>
+                <div className={styles.infor}>
+                    <ul>
+                        <li>
+                            <span className={styles['label-group']}>
+                                <FaIdCard className={styles.icon} />
+                                <strong>Id tài khoản:</strong>
+                            </span>
+                            <span className={styles['info-value-text']}>{user.user_id}</span>
+                        </li>
+                        <li>
+                            <span className={styles['label-group']}>
+                                <FaUser className={styles.icon} />
+                                <strong>Tên tài khoản:</strong>
+                            </span>
+                            <span className={styles['info-value-text']}>{user.user_name}</span>
+                        </li>
+                        <li>
+                            <span className={styles['label-group']}>
+                                <FaEnvelope className={styles.icon} />
+                                <strong>Email:</strong>
+                            </span>
+                            <span className={styles['info-value-text']}>{user.email}</span>
+                        </li>
+                        <li>
+                            <span className={styles['label-group']}>
+                                <FaShieldAlt className={styles.icon} />
+                                <strong>Vai trò:</strong>
+                            </span>
+                            <span className={Number(user.role_id) === 1 ? styles['role-admin'] : styles['role-user']}>
+                                {Number(user.role_id) === 1 ? 'Admin' : 'User'}
+                            </span>
+                        </li>
+                        <li>
+                            <span className={styles['label-group']}>
+                                <FaCalendarAlt className={styles.icon} />
+                                <strong>Ngày tạo:</strong>
+                            </span>
+                            <span className={styles['info-value-text']}>{new Date(user.created_at).toLocaleDateString('vi-VN')}</span>
+                        </li>
+                        <li>
+                            <span className={styles['label-group']}>
+                                <FaToggleOn className={styles.icon} />
+                                <strong>Trạng thái:</strong>
+                            </span>
+                            <span className={isActive ? styles['status-active'] : styles['status-banned']}>
+                                {isActive ? 'Active' : 'Banned'}
+                            </span>
+                        </li>
+                    </ul>
+                </div>
+                <div className={styles.actions}>
+                    <button 
+                        className={styles.ban} 
+                        onClick={() => updateStatus('Banned')}  
+                        disabled={!isActive}
+                    >
+                        <FaBan /> Banned
+                    </button>
+                    <button 
+                        className={styles['active-btn']} 
+                        onClick={() => updateStatus('Active')} 
+                        disabled={isActive}
+                    >
+                        <FaCheckSquare /> Active
+                    </button>
+                </div>
+            </div>
         </div>
     )
 }

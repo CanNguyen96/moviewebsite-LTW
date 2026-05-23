@@ -2,7 +2,7 @@ const db = require('../config/db');
 
 // API: Lấy danh sách tài khoản người dùng
 const getUsers = (req, res) => {
-    const sql = `SELECT user_id, user_name, email, role_id, created_at, TRIM(status) AS status
+    const sql = `SELECT user_id, user_name, email, role_id, created_at, TRIM(status) AS status, avatar_url
                 FROM users
                 WHERE role_id=4
                 ORDER BY created_at DESC
@@ -20,7 +20,7 @@ const getUsers = (req, res) => {
 // Lấy thông tin tài khoàn người dùng theo ID
 const getUserById = (req, res) => {
     const userId = req.params.user_id;
-    const sql = 'SELECT user_id, user_name, email, role_id, created_at, status FROM users WHERE user_id = ?';
+    const sql = 'SELECT user_id, user_name, email, role_id, created_at, status, avatar_url FROM users WHERE user_id = ?';
 
     db.query(sql, [userId], (err, result) => {
         if (err) {
@@ -50,7 +50,7 @@ const updateUserStatus = (req, res) => {
             return res.status(500).json({error: err.message});
         }
         
-        const getUserSql = 'SELECT user_id, user_name, email, role_id, created_at, TRIM(status) AS status FROM users WHERE user_id = ?';
+        const getUserSql = 'SELECT user_id, user_name, email, role_id, created_at, TRIM(status) AS status, avatar_url FROM users WHERE user_id = ?';
         db.query(getUserSql, [userId], (err, results) => {
             if (err) {
                 console.error('Lỗi lấy thông tin user sau cập nhật:', err);
@@ -73,7 +73,8 @@ const searchUsers= (req, res)=>{
                     email,
                     role_id,
                     created_at,
-                    TRIM(status) as status
+                    TRIM(status) as status,
+                    avatar_url
                 FROM users
                 WHERE role_id=4 AND user_name LIKE ?
                 ORDER BY created_at DESC`;
