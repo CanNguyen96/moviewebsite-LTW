@@ -13,10 +13,14 @@ const ReviewSection = ({ reviews, newComment, setNewComment, onReviewSubmit, sty
                     placeholder="Nhập bình luận của bạn tại đây"
                     value={newComment}
                     onChange={(e) => setNewComment(e.target.value)}
+                    maxLength={1000}
                     required
                 ></textarea>
                 <div className={styles['comment-actions']}>
                     <div className="action-left">
+                        <span style={{ fontSize: '12px', color: newComment.length > 900 ? '#e50914' : '#999' }}>
+                            {newComment.length}/1000 ký tự
+                        </span>
                     </div>
                     <button type="submit" className={styles['submit-comment-btn']}>Gửi</button>
                 </div>

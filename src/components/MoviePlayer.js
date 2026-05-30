@@ -132,8 +132,17 @@ const MoviePlayer = () => {
         e.preventDefault();
         const token = localStorage.getItem("token");
         if (!token) {
-            toast.error("Vui lòng đăng nhập để gửi đánh giá!");
+            toast.error("Vui lòng đăng nhập để gửi bình luận!");
             navigate("/login");
+            return;
+        }
+
+        if (!newComment.trim()) {
+            toast.warning("Bình luận không được để trống hoặc chỉ chứa khoảng trắng!");
+            return;
+        }
+        if (newComment.length > 1000) {
+            toast.warning("Bình luận không được vượt quá 1000 ký tự!");
             return;
         }
 
@@ -144,7 +153,7 @@ const MoviePlayer = () => {
             setReviews(data);
             toast.success("Gửi bình luận thành công!");
         } catch (err) {
-            toast.error("Lỗi khi gửi bình luận: " + (err.response?.data?.error || "Thử lại sau"));
+            toast.error("Lỗi khi gửi bình luận. Thử lại sau!");
         }
     };
 
