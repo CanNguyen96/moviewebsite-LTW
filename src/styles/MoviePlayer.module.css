@@ -55,7 +55,8 @@
     transition: transform 0.3s ease;
 }
 
-.video-player-wrapper iframe, .react-player-styled {
+.video-player-wrapper iframe,
+.react-player-styled {
     width: 100% !important;
     height: 100% !important;
     border: none;
@@ -131,7 +132,8 @@
     box-shadow: 0 5px 12px rgba(229, 9, 20, 0.4);
 }
 
-.ep-btn.active, .active {
+.ep-btn.active,
+.active {
     background: linear-gradient(135deg, #e50914 0%, #ff3d47 100%) !important;
     color: #fff !important;
     border-color: #e50914 !important;
@@ -227,6 +229,7 @@
     padding: 12px 18px;
     border-radius: 0 0 8px 8px;
     margin-top: -5px;
+    gap: 16px;
 }
 
 .submit-comment-btn {
@@ -342,9 +345,11 @@
     .movie-player-container {
         padding: 20px 10px;
     }
+
     .episodes-grid {
         grid-template-columns: repeat(auto-fill, minmax(55px, 1fr));
     }
+
     .review-item {
         gap: 12px;
         padding: 15px;
