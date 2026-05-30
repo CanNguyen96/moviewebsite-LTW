@@ -7,6 +7,7 @@ import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useAuth } from "../contexts/AuthContext";
 import { validatePassword, validateConfirmPassword } from "../validators/authValidator";
+import PasswordInput from "./PasswordInput";
 
 function RegisterForm() {
     const [name, setName] = useState("");
@@ -92,17 +93,17 @@ function RegisterForm() {
                         onChange={(e) => setEmail(e.target.value)}
                         required
                     />
-                    <label>Mật khẩu</label>
-                    <input
-                        type="password"
+                    <label htmlFor="reg-password">Mật khẩu</label>
+                    <PasswordInput
+                        id="reg-password"
                         placeholder="Nhập mật khẩu"
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
                         required
                     />
-                    <label>Xác nhận mật khẩu</label>
-                    <input
-                        type="password"
+                    <label htmlFor="reg-confirm-password">Xác nhận mật khẩu</label>
+                    <PasswordInput
+                        id="reg-confirm-password"
                         placeholder="Nhập lại mật khẩu"
                         value={confirmPassword}
                         onChange={(e) => setConfirmPassword(e.target.value)}

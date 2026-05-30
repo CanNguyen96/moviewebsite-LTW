@@ -7,6 +7,7 @@ import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { GoogleLogin } from "@react-oauth/google";
 import { useAuth } from "../contexts/AuthContext";
+import PasswordInput from "./PasswordInput";
 
 function LoginForm() {
     const [email, setEmail] = useState("");
@@ -96,9 +97,9 @@ function LoginForm() {
                     onChange={(e) => setEmail(e.target.value)}
                     required
                 />
-                <label>Mật khẩu</label>
-                <input
-                    type="password"
+                <label htmlFor="login-password">Mật khẩu</label>
+                <PasswordInput
+                    id="login-password"
                     placeholder="Nhập mật khẩu"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}

@@ -9,6 +9,7 @@ import { useAuth } from "../contexts/AuthContext";
 import { getAvatarSrc } from "../utils/image";
 import { validatePassword } from "../validators/authValidator";
 import { validateUserName } from "../validators/profileValidator";
+import PasswordInput from "./PasswordInput";
 
 function Profile() {
     const { user, updateUser } = useAuth();
@@ -155,19 +156,21 @@ function Profile() {
                     value={email}
                     disabled
                 />
-                <label>Mật khẩu cũ</label>
-                <input
-                    type="password"
+                <label htmlFor="profile-old-password">Mật khẩu cũ</label>
+                <PasswordInput
+                    id="profile-old-password"
                     placeholder="Nhập mật khẩu cũ (nếu muốn đổi)"
                     value={oldPassword}
                     onChange={(e) => setOldPassword(e.target.value)}
+                    className={styles['form-password']}
                 />
-                <label>Mật khẩu mới </label>
-                <input
-                    type="password"
+                <label htmlFor="profile-new-password">Mật khẩu mới</label>
+                <PasswordInput
+                    id="profile-new-password"
                     placeholder="Nhập mật khẩu mới"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
+                    className={styles['form-password']}
                 />
                 {error && <p className={styles['error-message']}>{error}</p>}
                 <button type="submit" className={styles.btn} disabled={loading}>

@@ -6,6 +6,7 @@ import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useNavigate } from "react-router-dom";
 import { validatePassword } from "../validators/authValidator";
+import PasswordInput from "./PasswordInput";
 
 function ForgotPassword() {
     const [userName, setUserName] = useState("");
@@ -119,9 +120,9 @@ function ForgotPassword() {
                         required
                         disabled={loading}
                     />
-                    <label>Mật Khẩu Mới</label>
-                    <input
-                        type="password"
+                    <label htmlFor="forgot-new-password">Mật Khẩu Mới</label>
+                    <PasswordInput
+                        id="forgot-new-password"
                         placeholder="Nhập mật khẩu mới"
                         value={newPassword}
                         onChange={(e) => setNewPassword(e.target.value)}
