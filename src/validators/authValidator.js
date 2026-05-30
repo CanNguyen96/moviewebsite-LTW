@@ -6,7 +6,7 @@ export const validatePassword = (password) => {
         return 'Mật khẩu phải có ít nhất 6 ký tự';
     if (!/\d/.test(password))
         return 'Mật khẩu phải chứa ít nhất 1 chữ số (0-9)';
-    if (!/[!@#$%^&*()\[\]{}|<>?~=_+\-]/.test(password))
+    if (!/[!@#$%^&*()[\]{}|<>?~=_+-]/.test(password))
         return 'Mật khẩu phải chứa ít nhất 1 ký tự đặc biệt';
     return null;
 };
