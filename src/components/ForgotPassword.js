@@ -5,6 +5,7 @@ import { authService } from "../services/authService";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useNavigate } from "react-router-dom";
+import { validatePassword } from "../validators/authValidator";
 
 function ForgotPassword() {
     const [userName, setUserName] = useState("");
@@ -31,13 +32,6 @@ function ForgotPassword() {
         } finally {
             setLoading(false);
         }
-    };
-
-    const validatePassword = (pass) => {
-        if (pass.length < 6) return 'Mật khẩu phải có ít nhất 6 ký tự';
-        if (!/\d/.test(pass)) return 'Mật khẩu phải chứa ít nhất 1 chữ số (0-9)';
-        if (!/[!@#$%^&*()[\]{}|<>?~=_+-]/.test(pass)) return 'Mật khẩu phải chứa ít nhất 1 ký tự đặc biệt';
-        return null;
     };
 
     const handleForgotPasswordSubmit = async (e) => {

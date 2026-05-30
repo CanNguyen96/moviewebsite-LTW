@@ -1,5 +1,6 @@
 const db = require('../config/db');
 const { getFileUrl } = require('../middlewares/upload');
+const { validateMovieFields, validateEpisodeFields } = require('../validators/movieValidator');
 
 // API: Lấy danh sách anime cho người dùng ( chỉ approved )
 const getMovies = (req, res) => {
@@ -147,6 +148,12 @@ const updateMovie = (req, res) => {
         status,
         description,
     } = req.body;
+
+    // Validation đầu vào
+    const validation = validateMovieFields({ title, genre, release_year, duration, status, description });
+    if (!validation.valid) {
+        return res.status(400).json({ message: validation.message });
+    }
     const image_url = req.files['image']
         ? getFileUrl(req.files['image'][0])
         : req.body.existing_image_url;
@@ -231,8 +238,9 @@ const addEpisode = (req, res) => {
     const { movieId } = req.params;
     const { episode_number, title, video_url } = req.body;
 
-    if (!episode_number || !title || !video_url) {
-        return res.status(400).json({ error: 'Thiếu thông tin tập phim.' });
+    const epValidation = validateEpisodeFields({ episode_number, title, video_url });
+    if (!epValidation.valid) {
+        return res.status(400).json({ error: epValidation.message });
     }
 
     const sql = 'INSERT INTO episodes (movie_id, episode_number, title, video_url) VALUES (?, ?, ?, ?)';
@@ -256,9 +264,13 @@ const addMovie = (req, res) => {
     const finalStatus = statusFromRequest || 'Pending';
 
     // Basic validation
-    if (!title || !description || !release_year || !duration || !genre || !finalStatus) {
+    if (!title || !title.trim() || !description || !description.trim() || !release_year || !duration || !genre || !finalStatus) {
         console.warn('Yêu cầu thêm phim thiếu thông tin bắt buộc:', req.body);
-        return res.status(400).json({ error: 'Thiếu thông tin phim bắt buộc (title, description, year, duration, image_url, genre, status).' });
+        return res.status(400).json({ error: 'Thiếu thông tin phim bắt buộc (title, description, year, duration, genre, status).' });
+    }
+    const movieValidation = validateMovieFields({ title, description, genre, release_year, duration, status: finalStatus });
+    if (!movieValidation.valid) {
+        return res.status(400).json({ error: movieValidation.message });
     }
     // Xử lý file ảnh từ req.files (do upload.fields middleware đưa vào)
     const imageFile = req.files?.image?.[0];
@@ -484,7 +496,7 @@ const searchMoviesForAdmin= (req, res) =>{
     const searchTerm=req.query.movieName;
 
     if (!searchTerm){
-        return res.status(500).json({message:"Vui lòng nhập từ khóa tìm kiếm"});
+        return res.status(400).json({message:"Vui lòng nhập từ khóa tìm kiếm"});
     }
 
     const sql=`SELECT 

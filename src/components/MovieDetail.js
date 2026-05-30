@@ -98,6 +98,15 @@ const MovieDetail = () => {
             return;
         }
 
+        if (!newComment.trim()) {
+            toast.warning("Bình luận không được để trống hoặc chỉ chứa khoảng trắng!");
+            return;
+        }
+        if (newComment.length > 1000) {
+            toast.warning("Bình luận không được vượt quá 1000 ký tự!");
+            return;
+        }
+
         try {
             await reviewService.addReview(id, newComment);
             setNewComment("");
@@ -282,10 +291,14 @@ const MovieDetail = () => {
                             placeholder="Nhập bình luận của bạn tại đây"
                             value={newComment}
                             onChange={(e) => setNewComment(e.target.value)}
+                            maxLength={1000}
                             required
                         ></textarea>
                         <div className={styles['comment-actions']}>
                             <div className="action-left">
+                                <span style={{ fontSize: '12px', color: newComment.length > 900 ? '#e50914' : '#999' }}>
+                                    {newComment.length}/1000 ký tự
+                                </span>
                             </div>
                             <button type="submit" className={styles['submit-comment-btn']}>Gửi</button>
                         </div>

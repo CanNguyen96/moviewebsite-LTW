@@ -6,6 +6,7 @@ import "react-toastify/dist/ReactToastify.css";
 import { FaFilm, FaCalendarAlt, FaClock, FaAlignLeft, FaImage, FaImages, FaTag, FaTimes, FaSave, FaTimesCircle, FaPlusSquare } from 'react-icons/fa';
 import addStyles from '../styles/AddMovie.module.css';
 import styles from '../styles/EditMovie.module.css';
+import { validateMovieForm } from '../validators/movieValidator';
 
 function EditMovie() {
     const { movieId } = useParams();
@@ -110,6 +111,20 @@ function EditMovie() {
     const handleSubmit = (e) => {
         e.preventDefault();
         const genreString = selectedCategories.map(c => c.name).join(', ');
+
+        // Validation trước khi submit
+        const validation = validateMovieForm({
+            title: movie.title,
+            description: movie.description,
+            release_year: movie.release_year,
+            duration: movie.duration,
+            selectedCategories,
+            isEditMode: true,
+        });
+        if (!validation.valid) {
+            toast.warning(validation.message);
+            return;
+        }
 
         const formData = new FormData();
         formData.append('title', movie.title);

@@ -1,5 +1,6 @@
 const jwt = require('jsonwebtoken');
 const db = require('../config/db');
+const { validateComment } = require('../validators/reviewValidator');
 
 // API: Gửi bình luận (yêu cầu đăng nhập)
 const createReview = (req, res) => {
@@ -14,8 +15,9 @@ const createReview = (req, res) => {
         const decoded = jwt.verify(token, process.env.JWT_SECRET || 'your_secret_key' );
         const user_id = decoded.user_id;
 
-        if (!movie_id || !comment) {
-            return res.status(400).json({ error: "Vui lòng nhập nội dung bình luận!" });
+        const commentResult = validateComment(comment);
+        if (!commentResult.valid) {
+            return res.status(400).json({ error: commentResult.message });
         }
 
         // Chèn bình luận vào bảng reviews 

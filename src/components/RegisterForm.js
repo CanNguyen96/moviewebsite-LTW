@@ -6,6 +6,7 @@ import { authService } from "../services/authService";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useAuth } from "../contexts/AuthContext";
+import { validatePassword, validateConfirmPassword } from "../validators/authValidator";
 
 function RegisterForm() {
     const [name, setName] = useState("");
@@ -19,13 +20,6 @@ function RegisterForm() {
     const navigate = useNavigate();
     const { login } = useAuth();
 
-    const validatePassword = (pass) => {
-        if (pass.length < 6) return 'Mật khẩu phải có ít nhất 6 ký tự';
-        if (!/\d/.test(pass)) return 'Mật khẩu phải chứa ít nhất 1 chữ số (0-9)';
-        if (!/[!@#$%^&*()[\]{}|<>?~=_+-]/.test(pass)) return 'Mật khẩu phải chứa ít nhất 1 ký tự đặc biệt';
-        return null;
-    };
-
     const handleSendOtp = async (e) => {
         e.preventDefault();
         
@@ -35,8 +29,9 @@ function RegisterForm() {
             return;
         }
 
-        if (password !== confirmPassword) {
-            setError("Mật khẩu nhập lại không khớp!");
+        const confirmError = validateConfirmPassword(password, confirmPassword);
+        if (confirmError) {
+            setError(confirmError);
             return;
         }
 

@@ -5,6 +5,7 @@ import { useNavigate } from "react-router-dom";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { FaFilm, FaCalendarAlt, FaClock, FaAlignLeft, FaImage, FaImages, FaTag, FaTimes } from 'react-icons/fa';
+import { validateMovieForm } from "../validators/movieValidator";
 
 function AddMovie() {
     const [formData, setFormData] = useState({
@@ -88,16 +89,22 @@ function AddMovie() {
     const handleSubmit = (e) => {
         e.preventDefault();
 
-        const genreString = selectedCategories.map(c => c.name).join(', ');
-
-        if (
-            !formData.title || !formData.description || !formData.release_year ||
-            !formData.duration || selectedCategories.length === 0 || !formData.image || !formData.background
-        ) {
-            toast.warning("Vui lòng điền đầy đủ thông tin, chọn ít nhất một thể loại và tải lên đủ các ảnh!");
+        const validation = validateMovieForm({
+            title: formData.title,
+            description: formData.description,
+            release_year: formData.release_year,
+            duration: formData.duration,
+            selectedCategories,
+            image: formData.image,
+            background: formData.background,
+            isEditMode: false,
+        });
+        if (!validation.valid) {
+            toast.warning(validation.message);
             return;
         }
 
+        const genreString = selectedCategories.map(c => c.name).join(', ');
         const formPayload = new FormData();
         formPayload.append("title", formData.title);
         formPayload.append("genre", genreString);
@@ -120,6 +127,7 @@ function AddMovie() {
                 toast.error("Thêm phim thất bại. Vui lòng thử lại.");
             });
     };
+
 
     return (
         <div className={styles['add-movie-container']}>

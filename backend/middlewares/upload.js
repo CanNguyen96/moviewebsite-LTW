@@ -51,8 +51,22 @@ const diskStorage = multer.diskStorage({
     }
 });
 
+// Danh sách định dạng ảnh cho phép
+const ALLOWED_MIME_TYPES = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp', 'image/gif'];
+
+// fileFilter: chỉ cho phép ảnh
+const imageFileFilter = (req, file, cb) => {
+    if (ALLOWED_MIME_TYPES.includes(file.mimetype)) {
+        cb(null, true);
+    } else {
+        cb(new Error('Chỉ chấp nhận ảnh định dạng JPG, JPEG, PNG, WEBP hoặc GIF!'), false);
+    }
+};
+
 const upload = multer({
     storage: useCloudinary ? cloudinaryStorage : diskStorage,
+    fileFilter: imageFileFilter,
+    limits: { fileSize: 5 * 1024 * 1024 }, // Tối đa 5MB mỗi file
 });
 
 /**

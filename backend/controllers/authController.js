@@ -5,6 +5,7 @@ const { OAuth2Client } = require('google-auth-library');
 const crypto = require('crypto');
 const { sendMail } = require('../config/mailer');
 const { getFileUrl } = require('../middlewares/upload');
+const { validatePassword, validateOtp } = require('../validators/authValidator');
 
 const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
@@ -14,14 +15,6 @@ const otpStore = {};
 // Hàm tạo OTP ngẫu nhiên 6 số
 const generateOTP = () => {
     return Math.floor(100000 + Math.random() * 900000).toString();
-};
-
-// Hàm kiểm tra độ mạnh mật khẩu
-const validatePassword = (password) => {
-    if (password.length < 6) return 'Mật khẩu phải có ít nhất 6 ký tự';
-    if (!/\d/.test(password)) return 'Mật khẩu phải chứa ít nhất 1 chữ số (0-9)';
-    if (!/[!@#$%^&*()[\]{}|<>?~=_+-]/.test(password)) return 'Mật khẩu phải chứa ít nhất 1 ký tự đặc biệt';
-    return null; // Mật khẩu hợp lệ
 };
 
 
@@ -106,15 +99,10 @@ const register = async (req, res) => {
 
     // Kiểm tra OTP
     const storedOtpData = otpStore[email];
-    if (!storedOtpData || storedOtpData.type !== 'REGISTER') {
-        return res.status(400).json({ error: 'Không tìm thấy mã OTP cho email này' });
-    }
-    if (Date.now() > storedOtpData.expiresAt) {
-        delete otpStore[email];
-        return res.status(400).json({ error: 'Mã OTP đã hết hạn, vui lòng gửi lại' });
-    }
-    if (storedOtpData.otp !== otp) {
-        return res.status(400).json({ error: 'Mã OTP không chính xác' });
+    const otpResult = validateOtp(storedOtpData, otp, 'REGISTER');
+    if (!otpResult.valid) {
+        if (otpResult.expired) delete otpStore[email];
+        return res.status(400).json({ error: otpResult.message });
     }
 
     try {
@@ -412,15 +400,10 @@ const forgotPassword = (req, res) => {
 
     // Kiểm tra OTP
     const storedOtpData = otpStore[email];
-    if (!storedOtpData || storedOtpData.type !== 'FORGOT') {
-        return res.status(400).json({ error: 'Không tìm thấy mã OTP cho email này' });
-    }
-    if (Date.now() > storedOtpData.expiresAt) {
-        delete otpStore[email];
-        return res.status(400).json({ error: 'Mã OTP đã hết hạn, vui lòng gửi lại' });
-    }
-    if (storedOtpData.otp !== otp) {
-        return res.status(400).json({ error: 'Mã OTP không chính xác' });
+    const otpResult = validateOtp(storedOtpData, otp, 'FORGOT');
+    if (!otpResult.valid) {
+        if (otpResult.expired) delete otpStore[email];
+        return res.status(400).json({ error: otpResult.message });
     }
 
     db.query('SELECT * FROM users WHERE user_name = ? AND email = ?', [user_name, email], async (err, result) => {
