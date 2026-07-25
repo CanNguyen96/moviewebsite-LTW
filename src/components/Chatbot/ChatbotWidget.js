@@ -29,7 +29,7 @@ function ChatbotWidget() {
             {
                 id: 'welcome-1',
                 sender: 'bot',
-                text: 'Xin chào! Tôi là Trợ Lý AI của MovieWebsite 🍿\nTôi có thể giúp bạn tìm kiếm phim, gợi ý phim theo thể loại hoặc giải đáp các thắc mắc.',
+                text: 'Xin chào! Tôi là Trợ Lý AI của AnimeZsub 🍿\nTôi có thể giúp bạn tìm kiếm phim, gợi ý phim theo thể loại hoặc giải đáp các thắc mắc.',
                 recommendedMovies: []
             }
         ];
@@ -194,7 +194,7 @@ function ChatbotWidget() {
                             </div>
                             <div>
                                 <h3 className="chatbot-title">AI Trợ Lý Xem Phim</h3>
-                                <p className="chatbot-subtitle">MovieWebsite AI • Trực tuyến</p>
+                                <p className="chatbot-subtitle">AnimeZsub AI • Trực tuyến</p>
                             </div>
                         </div>
                         <div className="chatbot-header-actions">

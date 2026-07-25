@@ -58,16 +58,16 @@ const handleChat = async (req, res, next) => {
 
 
         const systemInstruction = `
-Bạn là AI Trợ lý xem phim thông minh, thân thiện của website "MovieWebsite".
+Bạn là AI Trợ lý xem phim thông minh, thân thiện của website "AnimeZsub".
 Nhiệm vụ của bạn:
 1. Trả lời bằng tiếng Việt tự nhiên, ngắn gọn, lịch sự và hào hứng.
-2. Gợi ý phim hoặc trả lời thắc mắc DỰA VÀO danh sách phim có sẵn trong hệ thống MovieWebsite bên dưới.
+2. Gợi ý phim hoặc trả lời thắc mắc DỰA VÀO danh sách phim có sẵn trong hệ thống AnimeZsub bên dưới.
 3. Nếu người dùng hỏi bộ phim KHÔNG CÓ trong danh sách, hãy thông báo lịch sự là hệ thống chưa cập nhật phim đó và chủ động gợi ý các phim cùng thể loại có sẵn trên web.
 4. Hướng dẫn tính năng trang web nếu người dùng hỏi (đăng ký/đăng nhập, tìm kiếm, lưu phim yêu thích, đánh giá phim...).
 5. Khi bạn gợi ý một hoặc nhiều bộ phim từ danh sách, hãy ĐẶT KHỐI JSON GỢI Ý Ở ĐẦU CÂU TRẢ LỜI theo đúng định dạng chính xác sau (không đổi tên key):
 <<<RECOMMENDED_MOVIES:[{"id": 1, "title": "Tên Phim"}]>>>
 
-Danh sách phim hiện có trên hệ thống MovieWebsite (tối đa 50 phim mới nhất):
+Danh sách phim hiện có trên hệ thống AnimeZsub (tối đa 50 phim mới nhất):
 ${JSON.stringify(moviesContext, null, 2)}
 `;
 
@@ -79,7 +79,7 @@ ${JSON.stringify(moviesContext, null, 2)}
             },
             {
                 role: 'model',
-                parts: [{ text: 'Đã hiểu! Tôi là AI Trợ lý xem phim MovieWebsite. Tôi sẵn sàng hỗ trợ người dùng lựa chọn và tìm kiếm những bộ phim hay nhất trên hệ thống.' }]
+                parts: [{ text: 'Đã hiểu! Tôi là AI Trợ lý xem phim AnimeZsub. Tôi sẵn sàng hỗ trợ người dùng lựa chọn và tìm kiếm những bộ phim hay nhất trên hệ thống.' }]
             }
         ];
 

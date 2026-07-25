@@ -60,10 +60,10 @@ const sendRegisterOtp = async (req, res, next) => {
         <div style="font-family: Arial, sans-serif; background-color: #f4f5f6; padding: 20px;">
             <div style="max-width: 600px; margin: 0 auto; background-color: white; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
                 <div style="background-color: #e50914; padding: 20px; text-align: center;">
-                    <h1 style="color: white; margin: 0; font-size: 28px;">Anime69</h1>
+                    <h1 style="color: white; margin: 0; font-size: 28px;">AnimeZsub</h1>
                 </div>
                 <div style="padding: 30px;">
-                    <h2 style="color: #333; margin-top: 0;">Chào mừng bạn đến với Anime69!</h2>
+                    <h2 style="color: #333; margin-top: 0;">Chào mừng bạn đến với AnimeZsub!</h2>
                     <p style="color: #555; font-size: 16px; line-height: 1.5;">
                         Chào <strong>${name}</strong>,<br>
                         Cảm ơn bạn đã đăng ký tài khoản. Để hoàn thiện quá trình đăng ký và bắt đầu khám phá thế giới anime, vui lòng sử dụng mã OTP dưới đây để xác thực:
@@ -78,14 +78,14 @@ const sendRegisterOtp = async (req, res, next) => {
                     </p>
                     <hr style="border: none; border-top: 1px solid #ddd; margin: 30px 0;">
                     <p style="color: #999; font-size: 12px; text-align: center;">
-                        © 2026 Anime69 System. Đã đăng ký bản quyền.
+                        © 2026 AnimeZsub System. Đã đăng ký bản quyền.
                     </p>
                 </div>
             </div>
         </div>
         `;
 
-        sendMail(email, 'Kích hoạt tài khoản — Anime69', htmlContent)
+        sendMail(email, 'Kích hoạt tài khoản — AnimeZsub', htmlContent)
             .catch(err => console.error('Background email error:', err));
     } catch (error) {
         next(error);
@@ -301,7 +301,7 @@ const sendForgotOtp = async (req, res, next) => {
         <div style="font-family: Arial, sans-serif; background-color: #f4f5f6; padding: 20px;">
             <div style="max-width: 600px; margin: 0 auto; background-color: white; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
                 <div style="background-color: #111; padding: 20px; text-align: center;">
-                    <h1 style="color: #e50914; margin: 0; font-size: 28px;">Anime69</h1>
+                    <h1 style="color: #e50914; margin: 0; font-size: 28px;">AnimeZsub</h1>
                 </div>
                 <div style="padding: 30px;">
                     <h2 style="color: #333; margin-top: 0;">Khôi phục mật khẩu</h2>
@@ -319,14 +319,14 @@ const sendForgotOtp = async (req, res, next) => {
                     </p>
                     <hr style="border: none; border-top: 1px solid #ddd; margin: 30px 0;">
                     <p style="color: #999; font-size: 12px; text-align: center;">
-                        © 2026 Anime69 System. Bộ phận bảo mật.
+                        © 2026 AnimeZsub System. Bộ phận bảo mật.
                     </p>
                 </div>
             </div>
         </div>
         `;
 
-        sendMail(email, 'Yêu cầu Khôi phục Mật khẩu — Anime69', htmlContent)
+        sendMail(email, 'Yêu cầu Khôi phục Mật khẩu — AnimeZsub', htmlContent)
             .catch(err => console.error('Background email error:', err));
     } catch (err) {
         next(err);

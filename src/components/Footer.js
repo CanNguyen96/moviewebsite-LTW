@@ -7,9 +7,9 @@ function Footer() {
     <footer className={styles.footer}>
       <div className={styles.container}>
         <div className={styles.left}>
-          <div className={styles.brand}>ANIME69.WEBSITE</div>
+          <div className={styles.brand}>ANIMEZSUB.TECH</div>
           <div className={styles.copyright}>
-            Copyright © 2026 Anime69 - Anime Vietsub Online | Anime69. All Rights Reserved
+            Copyright © 2026 AnimeZsub - Anime Vietsub Online | AnimeZsub. All Rights Reserved
           </div>
         </div>
         <div className={styles.right}>
