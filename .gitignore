@@ -45,6 +45,5 @@ test.txt
 
 implementation_plan_addfilm.md
 
-backend/scripts/seedMovies.js
 backend/scripts/upgradeGenreColumn.js
 env Resend.txt
