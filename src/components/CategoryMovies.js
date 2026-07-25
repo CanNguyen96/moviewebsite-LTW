@@ -11,57 +11,54 @@ export default function CategoryMovies() {
   const categoryName = decodeURIComponent(name);
 
   const [movies, setMovies] = useState([]);
-  const [loading, setLoading] = useState(true); // Thêm state loading, mặc định là true khi mới vào trang
-  const [error, setError] = useState(null);   // Thêm state error, mặc định là null
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-  console.log('Rendering CategoryMovies, current error state:', error); // LOG 1: Xem state error trước khi render
-  console.log('Rendering CategoryMovies, current movies length:', movies.length); // LOG 2: Xem state movies.length trước khi render
+  console.log('Rendering CategoryMovies, current error state:', error);
+  console.log('Rendering CategoryMovies, current movies length:', movies.length);
 
   useEffect(() => {
-    console.log('useEffect triggered for category:', categoryName); // LOG: Effect được gọi
+    console.log('useEffect triggered for category:', categoryName);
 
-    setLoading(true); // Bắt đầu tải dữ liệu
-    setError(null);   // Xóa lỗi cũ (nếu có) trước khi fetch mới
+    setLoading(true);
+    setError(null);
 
     movieService.getCategoryMovies(categoryName)
       .then(data => {
-        console.log('API call successful, data received:', data); // LOG: API thành công
+        console.log('API call successful, data received:', data);
         setMovies(data);
-        // Không cần setError(null) ở đây vì đã set ở đầu effect
-        // Nếu server trả về 200 với mảng rỗng, điều này vẫn đúng
       })
       .catch(err => {
         console.error("Lỗi khi lấy phim theo thể loại:", err.response); // LOG 3: Log phản hồi lỗi từ server
 
         // Kiểm tra nếu lỗi là 404 từ backend và có message
         if (err.response && err.response.status === 404 && err.response.data && err.response.data.message) {
-             console.log('Đã vào khối xử lý 404, set error:', err.response.data.message); // LOG 4: Xác nhận vào khối 404
-             setError(err.response.data.message); // Sử dụng message từ backend (ví dụ: "Không tìm thấy phim theo thể loại này.")
-             setMovies([]); // Đảm bảo mảng phim rỗng khi có lỗi 404 không có dữ liệu
+          console.log('Đã vào khối xử lý 404, set error:', err.response.data.message);
+          setError(err.response.data.message);
         } else {
-             // Xử lý các lỗi khác (ví dụ: 500 Internal Server Error, lỗi mạng, ...)
-             console.log('Đã vào khối xử lý lỗi khác:', err); // LOG 5: Xác nhận vào khối lỗi khác
-             setError('Đã xảy ra lỗi khi tải dữ liệu. Vui lòng thử lại sau.'); // Thông báo lỗi chung
-             setMovies([]); // Đảm bảo mảng phim rỗng khi có lỗi
+          // Xử lý các lỗi khác (ví dụ: 500 Internal Server Error, lỗi mạng, ...)
+          console.log('Đã vào khối xử lý lỗi khác:', err);
+          setError('Đã xảy ra lỗi khi tải dữ liệu. Vui lòng thử lại sau.'); // Thông báo lỗi chung
+          setMovies([]); // Đảm bảo mảng phim rỗng khi có lỗi
         }
       })
       .finally(() => {
-        console.log('API call finished, setting loading to false'); // LOG: API kết thúc
-        setLoading(false); // Kết thúc trạng thái tải, dù thành công hay thất bại
+        console.log('API call finished, setting loading to false');
+        setLoading(false);
       });
 
-  }, [categoryName]); // Effect chạy lại khi categoryName thay đổi
+  }, [categoryName]);
 
   return (
     <div className={styles['category-page']}>
       <h2>Thể loại: {categoryName}</h2>
 
-      {loading && <p>Đang tải danh sách phim...</p>} {/* Hiển thị khi đang tải */}
+      {loading && <p>Đang tải danh sách phim...</p>}
 
-      {error && <p style={{ color: 'red' }}>{error}</p>} {/* Hiển thị khi có lỗi */}
+      {error && <p style={{ color: 'red' }}>{error}</p>}
 
-      {!loading && !error && ( // Chỉ hiển thị nội dung này khi không tải và không có lỗi
-        movies.length > 0 ? ( // Kiểm tra xem có phim hay không
+      {!loading && !error && (
+        movies.length > 0 ? (
           <ul className={styles['movie-grid']}>
             {movies.map(m => (
               <li key={m.id}>

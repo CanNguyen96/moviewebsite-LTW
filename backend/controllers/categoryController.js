@@ -1,7 +1,9 @@
 const db = require('../config/db');
+const BadRequestError = require('../errors/BadRequestError');
+const NotFoundError = require('../errors/NotFoundError');
 
 // API: Lấy danh sách thể loại 
-const getCategories = (req, res) => {
+const getCategories = (req, res, next) => {
     const query = `
         SELECT
             category_id,
@@ -9,15 +11,16 @@ const getCategories = (req, res) => {
         FROM categories
     `; 
     db.query(query, (err, results) => {
-        if (err) return res.status(500).json({ error: err.message });
+        if (err) return next(err);
         res.json(results);
     });
 };
-const getMoviesByCategoryName = (req, res) => {
+
+const getMoviesByCategoryName = (req, res, next) => {
   const categoryName = req.params.name ? decodeURIComponent(req.params.name) : null;
 
   if (!categoryName) {
-    return res.status(400).json({ error: 'Thiếu tên thể loại.' });
+    return next(new BadRequestError('Thiếu tên thể loại.'));
   }
 
   const sql = `
@@ -34,13 +37,10 @@ const getMoviesByCategoryName = (req, res) => {
   `;
 
   db.query(sql, [categoryName], (err, results) => {
-    if (err) {
-      console.error('Lỗi truy vấn:', err);
-      return res.status(500).json({ error: 'Lỗi truy vấn cơ sở dữ liệu.' });
-    }
+    if (err) return next(err);
 
     if (results.length === 0) {
-      return res.status(404).json({ message: 'Không tìm thấy phim theo thể loại này.' });
+      return next(new NotFoundError('Không tìm thấy phim theo thể loại này.'));
     }
 
     res.status(200).json(results);

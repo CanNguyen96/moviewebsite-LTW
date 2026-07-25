@@ -24,7 +24,6 @@ function UserDetail(){
     const [error, setError] = useState(null);
     const navigate = useNavigate();
 
-    // Hàm lấy thông tin user
     const fetchUser = useCallback(() => {
         userService.getUserById(userId)
             .then((data) => {
@@ -42,7 +41,6 @@ function UserDetail(){
         fetchUser();
     }, [fetchUser]);
 
-    // Hàm cập nhật trạng thái
     const updateStatus = (newStatus) => {
         userService.updateUserStatus(userId, newStatus)
             .then((data) => {
@@ -81,7 +79,6 @@ function UserDetail(){
     const normalizedStatus = (user.status || '').trim().toLowerCase();
     const isActive = normalizedStatus === 'active';
 
-    // Xử lý avatar: Nếu không có avatar_url thì lấy từ ui-avatars.com theo tên với background đỏ
     const avatarUrl = user.avatar_url 
         ? getAvatarSrc(user.avatar_url) 
         : `https://ui-avatars.com/api/?name=${encodeURIComponent(user.user_name)}&background=ff3d47&color=fff&size=150&bold=true`;

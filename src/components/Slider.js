@@ -19,16 +19,14 @@ const AnimeSlider = () => {
             .catch(err => console.error("Lỗi lấy danh sách slider:", err));
     }, []);
 
-    // Autoplay logic
     useEffect(() => {
         if (sliderData.length === 0) return;
 
-        // Clear existing interval
         if (timerRef.current) clearInterval(timerRef.current);
 
         timerRef.current = setInterval(() => {
             setActiveIndex((prevIndex) => (prevIndex + 1) % sliderData.length);
-        }, 6000); // 6s per slide
+        }, 6000);
 
         return () => {
             if (timerRef.current) clearInterval(timerRef.current);
@@ -51,9 +49,7 @@ const AnimeSlider = () => {
 
     return (
         <div className={styles['slider-wrapper']}>
-            {/* Main active slide */}
             <div className={styles['active-slide']}>
-                {/* Background Banner */}
                 <div className={styles['slide-background']}>
                     <img 
                         src={buildImageSrc(activeSlide.background_url)} 
@@ -62,11 +58,9 @@ const AnimeSlider = () => {
                     <div className={styles['gradient-overlay']}></div>
                 </div>
 
-                {/* Left side content */}
                 <div className={styles['slide-content']}>
                     <h1 className={styles['slide-title']}>{activeSlide.title}</h1>
                     
-                    {/* Badges row */}
                     <div className={styles['badges-row']}>
                         {activeSlide.release_year && (
                             <span className={styles['badge-year']}>
@@ -83,12 +77,10 @@ const AnimeSlider = () => {
                         )}
                     </div>
 
-                    {/* Description */}
                     <p className={styles['slide-description']}>
                         {activeSlide.description}
                     </p>
 
-                    {/* Play button */}
                     <button 
                         className={styles['play-button']} 
                         onClick={() => handleWatchClick(activeSlide.movie_id)}
@@ -99,7 +91,6 @@ const AnimeSlider = () => {
                 </div>
             </div>
 
-            {/* Thumbnail pagination row */}
             <div className={styles['thumbnails-container']}>
                 <div className={styles['thumbnails-row']}>
                     {sliderData.map((slide, index) => (

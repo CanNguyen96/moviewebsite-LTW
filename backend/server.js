@@ -83,6 +83,10 @@ app.use('/', favoritesRoutes);
 app.use('/', watchHistoryRoutes);
 app.use('/', episodesRoutes);
 
+// Middleware xử lý lỗi tập trung (phải đặt sau tất cả các routes)
+const errorHandler = require('./middlewares/errorHandler');
+app.use(errorHandler);
+
 // Khởi động server
 app.listen(port, () => {
     console.log(`Server chạy tại http://localhost:${port}`);

@@ -1,11 +1,13 @@
 const db = require('../config/db');
+const BadRequestError = require('../errors/BadRequestError');
+const NotFoundError = require('../errors/NotFoundError');
 
 // API: Lấy danh sách tập phim theo movie_id
-const getEpisodesByMovieId = (req, res) => {
+const getEpisodesByMovieId = (req, res, next) => {
     const movieId = req.params.movieId;
 
     if (!movieId) {
-        return res.status(400).json({ error: 'Thiếu movie_id.' });
+        return next(new BadRequestError('Thiếu movie_id.'));
     }
 
     const query = `
@@ -21,13 +23,10 @@ const getEpisodesByMovieId = (req, res) => {
     `;
 
     db.query(query, [movieId], (err, results) => {
-        if (err) {
-            console.error('Lỗi truy vấn:', err);
-            return res.status(500).json({ error: 'Lỗi truy vấn cơ sở dữ liệu.' });
-        }
+        if (err) return next(err);
 
         if (results.length === 0) {
-            return res.status(404).json({ message: 'Không tìm thấy tập phim cho phim này.' });
+            return next(new NotFoundError('Không tìm thấy tập phim cho phim này.'));
         }
 
         res.status(200).json(results);
@@ -35,11 +34,11 @@ const getEpisodesByMovieId = (req, res) => {
 };
 
 // API: Lấy thông tin chi tiết của một tập phim theo episode_id
-const getEpisodeById = (req, res) => {
+const getEpisodeById = (req, res, next) => {
     const episodeId = req.params.episodeId;
 
     if (!episodeId) {
-        return res.status(400).json({ error: 'Thiếu episode_id.' });
+        return next(new BadRequestError('Thiếu episode_id.'));
     }
 
     const query = `
@@ -54,13 +53,10 @@ const getEpisodeById = (req, res) => {
     `;
 
     db.query(query, [episodeId], (err, results) => {
-        if (err) {
-            console.error('Lỗi truy vấn:', err);
-            return res.status(500).json({ error: 'Lỗi truy vấn cơ sở dữ liệu.' });
-        }
+        if (err) return next(err);
 
         if (results.length === 0) {
-            return res.status(404).json({ message: 'Không tìm thấy tập phim này.' });
+            return next(new NotFoundError('Không tìm thấy tập phim này.'));
         }
 
         res.status(200).json(results[0]);
@@ -68,11 +64,11 @@ const getEpisodeById = (req, res) => {
 };
 
 // API: Thêm tập phim mới
-const addEpisode = (req, res) => {
+const addEpisode = (req, res, next) => {
     const { movie_id, episode_number, title, video_url } = req.body;
 
     if (!movie_id || !episode_number || !title || !video_url) {
-        return res.status(400).json({ error: 'Thiếu thông tin cần thiết (movie_id, episode_number, title, video_url).' });
+        return next(new BadRequestError('Thiếu thông tin cần thiết (movie_id, episode_number, title, video_url).'));
     }
 
     const query = `
@@ -81,21 +77,18 @@ const addEpisode = (req, res) => {
     `;
 
     db.query(query, [movie_id, episode_number, title, video_url], (err, results) => {
-        if (err) {
-            console.error('Lỗi khi thêm tập phim:', err);
-            return res.status(500).json({ error: 'Lỗi truy vấn cơ sở dữ liệu.' });
-        }
+        if (err) return next(err);
 
         res.status(201).json({ message: 'Thêm tập phim thành công!', episode_id: results.insertId });
     });
 };
 
 // API: Xóa tập phim theo episode_id
-const deleteEpisode = (req, res) => {
+const deleteEpisode = (req, res, next) => {
     const episodeId = req.params.episodeId;
 
     if (!episodeId) {
-        return res.status(400).json({ error: 'Thiếu episode_id.' });
+        return next(new BadRequestError('Thiếu episode_id.'));
     }
 
     const query = `
@@ -104,13 +97,10 @@ const deleteEpisode = (req, res) => {
     `;
 
     db.query(query, [episodeId], (err, results) => {
-        if (err) {
-            console.error('Lỗi khi xóa tập phim:', err);
-            return res.status(500).json({ error: 'Lỗi truy vấn cơ sở dữ liệu.' });
-        }
+        if (err) return next(err);
 
         if (results.affectedRows === 0) {
-            return res.status(404).json({ message: 'Không tìm thấy tập phim để xóa.' });
+            return next(new NotFoundError('Không tìm thấy tập phim để xóa.'));
         }
 
         res.status(200).json({ message: 'Xóa tập phim thành công!' });
@@ -118,12 +108,12 @@ const deleteEpisode = (req, res) => {
 };
 
 // API: Cập nhật tập phim theo episode_id
-const updateEpisode = (req, res) => {
+const updateEpisode = (req, res, next) => {
     const episodeId = req.params.episodeId;
     const { movie_id, episode_number, title, video_url } = req.body;
 
     if (!episodeId || !movie_id || !episode_number || !title || !video_url) {
-        return res.status(400).json({ error: 'Thiếu thông tin cần thiết.' });
+        return next(new BadRequestError('Thiếu thông tin cần thiết.'));
     }
 
     const query = `
@@ -133,13 +123,10 @@ const updateEpisode = (req, res) => {
     `;
 
     db.query(query, [movie_id, episode_number, title, video_url, episodeId], (err, results) => {
-        if (err) {
-            console.error('Lỗi khi cập nhật tập phim:', err);
-            return res.status(500).json({ error: 'Lỗi truy vấn cơ sở dữ liệu.' });
-        }
+        if (err) return next(err);
 
         if (results.affectedRows === 0) {
-            return res.status(404).json({ message: 'Không tìm thấy tập phim để cập nhật.' });
+            return next(new NotFoundError('Không tìm thấy tập phim để cập nhật.'));
         }
 
         res.status(200).json({ message: 'Cập nhật tập phim thành công!' });

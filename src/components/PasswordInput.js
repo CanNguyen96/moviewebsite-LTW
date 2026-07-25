@@ -1,16 +1,7 @@
 import React, { useState } from 'react';
 import styles from '../styles/PasswordInput.module.css';
 
-/**
- * @param {object} props
- * @param {string}   props.id          - ID của input (để liên kết label)
- * @param {string}   props.placeholder
- * @param {string}   props.value
- * @param {function} props.onChange
- * @param {boolean}  [props.required]
- * @param {boolean}  [props.disabled]
- * @param {string}   [props.className] - class bổ sung cho wrapper
- */
+
 function PasswordInput({ id, placeholder, value, onChange, required = false, disabled = false, className = '' }) {
     const [show, setShow] = useState(false);
 

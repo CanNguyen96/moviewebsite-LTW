@@ -23,16 +23,12 @@ function SearchResults() {
   }, [keyword]);
 
   return (
-
-    // Thay class "search-results" bằng "search-results-container"
     <div className={styles['search-results-container']}>
-      {/* Thêm div với class "search-title" bao quanh tiêu đề */}
       <div className={styles['search-title']}>
         <h2>Kết quả tìm kiếm cho: "{keyword}"</h2>
       </div>
 
       {results.length > 0 ? (
-        // Thay ul bằng ul với class "movie-list"
         <ul className={styles['movie-list']}>
           {results.map((movie) => (
             <li key={movie.id} className={styles['movie-card']}>

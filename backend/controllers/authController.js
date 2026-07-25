@@ -7,6 +7,12 @@ const { sendMail } = require('../config/mailer');
 const { getFileUrl } = require('../middlewares/upload');
 const { validatePassword, validateOtp } = require('../validators/authValidator');
 
+// Import các lớp lỗi tùy chỉnh
+const BadRequestError = require('../errors/BadRequestError');
+const UnauthorizedError = require('../errors/UnauthorizedError');
+const ForbiddenError = require('../errors/ForbiddenError');
+const NotFoundError = require('../errors/NotFoundError');
+
 const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
 // Bộ nhớ tạm để lưu OTP (Trong môi trường thực tế nên dùng Redis)
@@ -19,21 +25,21 @@ const generateOTP = () => {
 
 
 // API: Gửi OTP Đăng ký
-const sendRegisterOtp = async (req, res) => {
+const sendRegisterOtp = async (req, res, next) => {
     const { name, email } = req.body;
-    if (!name || !email) return res.status(400).json({ error: 'Vui lòng điền tên và email' });
+    if (!name || !email) return next(new BadRequestError('Vui lòng điền tên và email'));
 
     try {
         db.query('SELECT * FROM users WHERE email = ? OR user_name = ?', [email, name], async (err, result) => {
-            if (err) return res.status(500).json({ error: err.message });
+            if (err) return next(err);
             if (result.length > 0) {
                 const emailExists = result.some(u => u.email.toLowerCase() === email.toLowerCase());
                 const nameExists = result.some(u => u.user_name.toLowerCase() === name.toLowerCase());
 
-                if (emailExists) return res.status(400).json({ error: 'Email đã được sử dụng' });
-                if (nameExists) return res.status(400).json({ error: 'Tên người dùng đã tồn tại' });
+                if (emailExists) return next(new BadRequestError('Email đã được sử dụng'));
+                if (nameExists) return next(new BadRequestError('Tên người dùng đã tồn tại'));
 
-                return res.status(400).json({ error: 'Tài khoản đã tồn tại' });
+                return next(new BadRequestError('Tài khoản đã tồn tại'));
             }
 
             const otp = generateOTP();
@@ -80,21 +86,21 @@ const sendRegisterOtp = async (req, res) => {
             ).catch(err => console.error('Background email error:', err));
         });
     } catch (error) {
-        res.status(500).json({ error: 'Lỗi server' });
+        next(error);
     }
 };
 
 // API: Đăng ký người dùng
-const register = async (req, res) => {
+const register = async (req, res, next) => {
     const { name, email, password, otp } = req.body;
 
     if (!name || !email || !password || !otp) {
-        return res.status(400).json({ error: 'Vui lòng điền đầy đủ thông tin và mã OTP' });
+        return next(new BadRequestError('Vui lòng điền đầy đủ thông tin và mã OTP'));
     }
 
     const passwordError = validatePassword(password);
     if (passwordError) {
-        return res.status(400).json({ error: passwordError });
+        return next(new BadRequestError(passwordError));
     }
 
     // Kiểm tra OTP
@@ -102,18 +108,18 @@ const register = async (req, res) => {
     const otpResult = validateOtp(storedOtpData, otp, 'REGISTER');
     if (!otpResult.valid) {
         if (otpResult.expired) delete otpStore[email];
-        return res.status(400).json({ error: otpResult.message });
+        return next(new BadRequestError(otpResult.message));
     }
 
     try {
         db.query('SELECT * FROM users WHERE email = ? OR user_name = ?', [email, name], async (err, result) => {
-            if (err) return res.status(500).json({ error: err.message });
+            if (err) return next(err);
             if (result.length > 0) {
                 const emailExists = result.some(u => u.email.toLowerCase() === email.toLowerCase());
                 const nameExists = result.some(u => u.user_name.toLowerCase() === name.toLowerCase());
-                if (emailExists) return res.status(400).json({ error: 'Email đã được sử dụng' });
-                if (nameExists) return res.status(400).json({ error: 'Tên người dùng đã tồn tại' });
-                return res.status(400).json({ error: 'Tài khoản đã tồn tại' });
+                if (emailExists) return next(new BadRequestError('Email đã được sử dụng'));
+                if (nameExists) return next(new BadRequestError('Tên người dùng đã tồn tại'));
+                return next(new BadRequestError('Tài khoản đã tồn tại'));
             }
 
             const saltRounds = 10;
@@ -125,7 +131,7 @@ const register = async (req, res) => {
                 (err, result) => {
                     if (err) {
                         console.log('Lỗi khi thêm user:', err);
-                        return res.status(500).json({ error: err.message });
+                        return next(err);
                     }
                     const user = { user_id: result.insertId, user_name: name, email, role_id: 4, avatar_url: null };
                     const token = jwt.sign(user, process.env.JWT_SECRET || 'your_secret_key', { expiresIn: '3h' });
@@ -141,33 +147,32 @@ const register = async (req, res) => {
             );
         });
     } catch (err) {
-        console.log('Lỗi server:', err);
-        res.status(500).json({ error: 'Lỗi server' });
+        next(err);
     }
 };
 
 // API: Đăng nhập người dùng
-const login = (req, res) => {
+const login = (req, res, next) => {
     const { email, password } = req.body;
 
     if (!email || !password) {
-        return res.status(400).json({ error: 'Vui lòng điền đầy đủ thông tin' });
+        return next(new BadRequestError('Vui lòng điền đầy đủ thông tin'));
     }
 
     db.query('SELECT * FROM users WHERE email = ?', [email], async (err, result) => {
-        if (err) return res.status(500).json({ error: err.message });
+        if (err) return next(err);
         if (result.length === 0) {
-            return res.status(401).json({ error: 'Email hoặc mật khẩu không đúng' });
+            return next(new UnauthorizedError('Email hoặc mật khẩu không đúng'));
         }
 
         const user = result[0];
         const match = await bcrypt.compare(password, user.password);
         if (!match) {
-            return res.status(401).json({ error: 'Email hoặc mật khẩu không đúng' });
+            return next(new UnauthorizedError('Email hoặc mật khẩu không đúng'));
         }
 
         if (user.status === 'Banned') {
-            return res.status(403).json({ error: 'Tài khoản của bạn đã bị cấm.' });
+            return next(new ForbiddenError('Tài khoản của bạn đã bị cấm.'));
         }
 
         const token = jwt.sign(
@@ -185,9 +190,9 @@ const login = (req, res) => {
 };
 
 // API: Cập nhật thông tin người dùng (yêu cầu đăng nhập)
-const updateUser = async (req, res) => {
+const updateUser = async (req, res, next) => {
     if (!req.user || !req.user.user_id) {
-        return res.status(401).json({ error: 'Không thể xác thực người dùng, vui lòng đăng nhập lại' });
+        return next(new UnauthorizedError('Không thể xác thực người dùng, vui lòng đăng nhập lại'));
     }
 
     const { user_name, oldPassword, password } = req.body;
@@ -204,39 +209,33 @@ const updateUser = async (req, res) => {
             'SELECT * FROM users WHERE user_name = ? AND user_id != ?',
             [user_name, user_id],
             async (err, result) => {
-                if (err) {
-                    console.log('Lỗi kiểm tra user_name:', err);
-                    return res.status(500).json({ error: err.message });
-                }
+                if (err) return next(err);
                 if (result.length > 0) {
-                    return res.status(400).json({ error: 'Tên người dùng đã được sử dụng' });
+                    return next(new BadRequestError('Tên người dùng đã được sử dụng'));
                 }
 
                 // Nếu người dùng nhập mật khẩu cũ, yêu cầu mật khẩu mới không được trống
                 if (oldPassword) {
                     if (!password) {
-                        return res.status(400).json({ error: 'Vui lòng nhập mật khẩu mới' });
+                        return next(new BadRequestError('Vui lòng nhập mật khẩu mới'));
                     }
 
                     const passwordError = validatePassword(password);
                     if (passwordError) {
-                        return res.status(400).json({ error: passwordError });
+                        return next(new BadRequestError(passwordError));
                     }
 
                     // Lấy mật khẩu hiện tại từ database
                     db.query('SELECT password FROM users WHERE user_id = ?', [user_id], async (err, result) => {
-                        if (err) {
-                            console.log('Lỗi khi lấy mật khẩu:', err);
-                            return res.status(500).json({ error: err.message });
-                        }
+                        if (err) return next(err);
                         if (result.length === 0) {
-                            return res.status(404).json({ error: 'Không tìm thấy người dùng' });
+                            return next(new NotFoundError('Không tìm thấy người dùng'));
                         }
 
                         const currentPassword = result[0].password;
                         const match = await bcrypt.compare(oldPassword, currentPassword);
                         if (!match) {
-                            return res.status(401).json({ error: 'Mật khẩu cũ không đúng' });
+                            return next(new UnauthorizedError('Mật khẩu cũ không đúng'));
                         }
 
                         // Nếu mật khẩu cũ đúng, mã hóa mật khẩu mới
@@ -261,17 +260,14 @@ const updateUser = async (req, res) => {
                         }
 
                         if (updateFields.length === 0) {
-                            return res.status(400).json({ error: 'Không có thông tin nào để cập nhật' });
+                            return next(new BadRequestError('Không có thông tin nào để cập nhật'));
                         }
 
                         updateValues.push(user_id);
                         const query = `UPDATE users SET ${updateFields.join(', ')} WHERE user_id = ?`;
 
                         db.query(query, updateValues, (err, result) => {
-                            if (err) {
-                                console.log('Lỗi khi cập nhật user:', err);
-                                return res.status(500).json({ error: err.message });
-                            }
+                            if (err) return next(err);
 
                             const finalAvatarUrl = avatar_url || req.user.avatar_url;
                             const updatedUser = { user_id, user_name: user_name || req.user.user_name, email: req.user.email, avatar_url: finalAvatarUrl, role_id: req.user.role_id };
@@ -285,7 +281,7 @@ const updateUser = async (req, res) => {
                     });
                 } else if (!oldPassword && password) {
                     // Nếu chỉ nhập mật khẩu mới mà không nhập mật khẩu cũ
-                    return res.status(400).json({ error: 'Vui lòng nhập mật khẩu cũ' });
+                    return next(new BadRequestError('Vui lòng nhập mật khẩu cũ'));
                 } else {
                     // Nếu không nhập mật khẩu cũ và mật khẩu mới, chỉ cập nhật user_name
                     const updateFields = [];
@@ -301,17 +297,14 @@ const updateUser = async (req, res) => {
                     }
 
                     if (updateFields.length === 0) {
-                        return res.status(400).json({ error: 'Không có thông tin nào để cập nhật' });
+                        return next(new BadRequestError('Không có thông tin nào để cập nhật'));
                     }
 
                     updateValues.push(user_id);
                     const query = `UPDATE users SET ${updateFields.join(', ')} WHERE user_id = ?`;
 
                     db.query(query, updateValues, (err, result) => {
-                        if (err) {
-                            console.log('Lỗi khi cập nhật user:', err);
-                            return res.status(500).json({ error: err.message });
-                        }
+                        if (err) return next(err);
 
                         const finalAvatarUrl = avatar_url || req.user.avatar_url;
                         const updatedUser = { user_id, user_name: user_name || req.user.user_name, email: req.user.email, avatar_url: finalAvatarUrl, role_id: req.user.role_id };
@@ -326,19 +319,18 @@ const updateUser = async (req, res) => {
             }
         );
     } catch (err) {
-        console.log('Lỗi server:', err);
-        res.status(500).json({ error: 'Lỗi server' });
+        next(err);
     }
 };
 
 // API: Gửi OTP Quên mật khẩu
-const sendForgotOtp = async (req, res) => {
+const sendForgotOtp = async (req, res, next) => {
     const { user_name, email } = req.body;
-    if (!user_name || !email) return res.status(400).json({ error: 'Vui lòng điền tên và email' });
+    if (!user_name || !email) return next(new BadRequestError('Vui lòng điền tên và email'));
 
     db.query('SELECT * FROM users WHERE user_name = ? AND email = ?', [user_name, email], async (err, result) => {
-        if (err) return res.status(500).json({ error: err.message });
-        if (result.length === 0) return res.status(404).json({ error: 'Không tìm thấy tài khoản với thông tin này' });
+        if (err) return next(err);
+        if (result.length === 0) return next(new NotFoundError('Không tìm thấy tài khoản với thông tin này'));
 
         const otp = generateOTP();
         otpStore[email] = { otp, type: 'FORGOT', expiresAt: Date.now() + 5 * 60 * 1000 };
@@ -386,16 +378,16 @@ const sendForgotOtp = async (req, res) => {
 };
 
 // API: Quên mật khẩu
-const forgotPassword = (req, res) => {
+const forgotPassword = (req, res, next) => {
     const { user_name, email, otp, new_password } = req.body;
 
     if (!user_name || !email || !otp || !new_password) {
-        return res.status(400).json({ error: 'Vui lòng điền đầy đủ thông tin (tên, email, OTP, mật khẩu mới)' });
+        return next(new BadRequestError('Vui lòng điền đầy đủ thông tin (tên, email, OTP, mật khẩu mới)'));
     }
 
     const passwordError = validatePassword(new_password);
     if (passwordError) {
-        return res.status(400).json({ error: passwordError });
+        return next(new BadRequestError(passwordError));
     }
 
     // Kiểm tra OTP
@@ -403,16 +395,13 @@ const forgotPassword = (req, res) => {
     const otpResult = validateOtp(storedOtpData, otp, 'FORGOT');
     if (!otpResult.valid) {
         if (otpResult.expired) delete otpStore[email];
-        return res.status(400).json({ error: otpResult.message });
+        return next(new BadRequestError(otpResult.message));
     }
 
     db.query('SELECT * FROM users WHERE user_name = ? AND email = ?', [user_name, email], async (err, result) => {
-        if (err) {
-            console.log('Lỗi kiểm tra user_name và email:', err);
-            return res.status(500).json({ error: err.message });
-        }
+        if (err) return next(err);
         if (result.length === 0) {
-            return res.status(404).json({ error: 'Không tìm thấy người dùng với thông tin đã cung cấp' });
+            return next(new NotFoundError('Không tìm thấy người dùng với thông tin đã cung cấp'));
         }
 
         const user = result[0];
@@ -423,10 +412,7 @@ const forgotPassword = (req, res) => {
             'UPDATE users SET password = ? WHERE user_id = ?',
             [hashedPassword, user.user_id],
             (err, result) => {
-                if (err) {
-                    console.log('Lỗi khi cập nhật mật khẩu:', err);
-                    return res.status(500).json({ error: err.message });
-                }
+                if (err) return next(err);
 
                 delete otpStore[email]; // Xóa OTP sau khi dùng
 
@@ -440,10 +426,10 @@ const forgotPassword = (req, res) => {
 };
 
 // API: Đăng nhập bằng Google
-const googleLogin = async (req, res) => {
+const googleLogin = async (req, res, next) => {
     const { token } = req.body;
     if (!token) {
-        return res.status(400).json({ error: 'Token is required' });
+        return next(new BadRequestError('Token is required'));
     }
 
     try {
@@ -455,13 +441,13 @@ const googleLogin = async (req, res) => {
         const { email, name } = payload;
 
         db.query('SELECT * FROM users WHERE email = ?', [email], async (err, result) => {
-            if (err) return res.status(500).json({ error: err.message });
+            if (err) return next(err);
 
             if (result.length > 0) {
                 // User exists
                 const user = result[0];
                 if (user.status === 'Banned') {
-                    return res.status(403).json({ error: 'Tài khoản của bạn đã bị cấm.' });
+                    return next(new ForbiddenError('Tài khoản của bạn đã bị cấm.'));
                 }
 
                 const jwtToken = jwt.sign(
@@ -487,10 +473,7 @@ const googleLogin = async (req, res) => {
                     'INSERT INTO users (user_name, email, password, role_id) VALUES (?, ?, ?, ?)',
                     [uniqueUserName, email, hashedPassword, 4],
                     (err, insertResult) => {
-                        if (err) {
-                            console.log('Lỗi khi thêm user từ Google:', err);
-                            return res.status(500).json({ error: err.message });
-                        }
+                        if (err) return next(err);
 
                         const newUser = { user_id: insertResult.insertId, user_name: uniqueUserName, email, role_id: 4, avatar_url: null };
                         const jwtToken = jwt.sign(newUser, process.env.JWT_SECRET || 'your_secret_key', { expiresIn: '3h' });
@@ -505,8 +488,7 @@ const googleLogin = async (req, res) => {
             }
         });
     } catch (err) {
-        console.log('Lỗi xác thực Google:', err);
-        res.status(401).json({ error: 'Xác thực Google thất bại' });
+        next(err);
     }
 };
 

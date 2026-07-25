@@ -37,7 +37,6 @@ function WatchHistory() {
         fetchWatchHistory();
     }, []);
 
-    // Hàm xóa một bản ghi lịch sử
     const handleDeleteHistoryItem = async (movie_id) => {
         try {
             await userService.deleteWatchHistory(movie_id);
@@ -48,7 +47,6 @@ function WatchHistory() {
         }
     };
 
-    // Hàm xóa toàn bộ lịch sử
     const handleDeleteAllHistoryClick = () => {
         setIsConfirmOpen(true);
     };
