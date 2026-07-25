@@ -132,14 +132,16 @@ ${JSON.stringify(moviesContext, null, 2)}
 
         const completeMatch = responseText.match(/<<<RECOMMENDED_MOVIES:\s*(\[[\s\S]*?\])\s*>>>/);
 
+        const movieMap = new Map(movies.map(m => [m.id, m]));
+
         if (completeMatch && completeMatch[1]) {
             try {
                 const parsedList = JSON.parse(completeMatch[1]);
                 cleanText = responseText.replace(completeMatch[0], '').trim();
 
-                const recommendedIds = parsedList.map(item => item.id).filter(Boolean);
+                const recommendedIds = parsedList.map(item => Number(item.id)).filter(Boolean);
                 if (recommendedIds.length > 0) {
-                    recommendedMovies = movies.filter(m => recommendedIds.includes(m.id));
+                    recommendedMovies = recommendedIds.map(id => movieMap.get(id)).filter(Boolean);
                 }
             } catch (e) {
                 console.error('Error parsing recommended movies JSON from Gemini:', e);
@@ -154,7 +156,7 @@ ${JSON.stringify(moviesContext, null, 2)}
                 const idMatches = [...tagText.matchAll(/["']?id["']?\s*:\s*(\d+)/gi)];
                 const extractedIds = idMatches.map(m => parseInt(m[1], 10)).filter(Boolean);
                 if (extractedIds.length > 0) {
-                    recommendedMovies = movies.filter(m => extractedIds.includes(m.id));
+                    recommendedMovies = extractedIds.map(id => movieMap.get(id)).filter(Boolean);
                 }
             }
         }
