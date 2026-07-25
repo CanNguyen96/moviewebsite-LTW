@@ -375,7 +375,7 @@ const getSliderMovie = async (req, res, next) => {
             (SELECT MAX(episode_number) FROM episodes WHERE movie_id = movies.movie_id) AS latest_episode
         FROM movies
         WHERE status = 'Approved' 
-        ORDER BY movie_id DESC 
+        ORDER BY (views_count * 0.7 + average_rating * 10 * 0.3) DESC, views_count DESC, movie_id DESC 
         LIMIT 8
     `;
     try {
