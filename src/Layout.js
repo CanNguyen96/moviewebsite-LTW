@@ -22,6 +22,7 @@ import ListSearchMovie from "./pages/Admin/ListSearchMovie";
 import EpisodesContent from './pages/Admin/EpisodesContent';
 import Forgot from "./pages/User/Forgot";
 import Footer from "./components/Footer";
+import ChatbotWidget from "./components/Chatbot/ChatbotWidget";
 
 export default function Layout() {
     const location = useLocation();
@@ -57,7 +58,9 @@ export default function Layout() {
           </Routes>
         </div>
         {!isAdminRoute && <Footer />}
+        <ChatbotWidget />
       </div>
     );
   }
+
   

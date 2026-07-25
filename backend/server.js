@@ -23,6 +23,7 @@ const categoryRoutes = require('./routes/categoryRoutes');
 const favoritesRoutes = require('./routes/favoritesRoutes');
 const watchHistoryRoutes = require('./routes/watchHistoryRoutes');
 const episodesRoutes = require('./routes/episodesRoutes');
+const chatbotRoutes = require('./routes/chatbotRoutes');
 
 const app = express();
 
@@ -82,6 +83,7 @@ app.use('/', categoryRoutes);
 app.use('/', favoritesRoutes);
 app.use('/', watchHistoryRoutes);
 app.use('/', episodesRoutes);
+app.use('/', chatbotRoutes);
 
 // Middleware xử lý lỗi tập trung (phải đặt sau tất cả các routes)
 const errorHandler = require('./middlewares/errorHandler');
