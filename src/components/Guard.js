@@ -1,8 +1,9 @@
-
 import { Navigate, useLocation } from "react-router-dom";
+import { useAuth } from "../contexts/AuthContext";
 
 export default function Guard({ children }) {
   const location = useLocation();
+  const { user } = useAuth();
 
   // Các route công khai, không cần kiểm tra đăng nhập
   const publicRoutes = [
@@ -21,19 +22,9 @@ export default function Guard({ children }) {
     location.pathname.startsWith("/movieDetail/") ||
     (location.pathname.startsWith("/movie/") && location.pathname.includes("/episode/"));
 
-  const storedUser = localStorage.getItem("user");
-
   // Nếu đã đăng nhập, kiểm tra vai trò
-  if (storedUser) {
-    let role_id;
-    try {
-      const user = JSON.parse(storedUser);
-      role_id = user.role_id;
-    } catch (error) {
-      console.error("Error parsing user data:", error);
-      localStorage.removeItem("user");
-      return <Navigate to="/login" replace />;
-    }
+  if (user) {
+    const role_id = user.role_id;
 
     // Admin (role_id === 1) không được truy cập route công khai
     if (Number(role_id) === 1 && isPublicRoute) {
@@ -56,7 +47,7 @@ export default function Guard({ children }) {
   }
 
   // Nếu chưa đăng nhập và không phải route công khai, chuyển hướng về /login
-  if (!storedUser && !isPublicRoute) {
+  if (!user && !isPublicRoute) {
     return <Navigate to="/login" replace />;
   }
 

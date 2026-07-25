@@ -1,54 +1,52 @@
 const db = require('../config/db');
 const BadRequestError = require('../errors/BadRequestError');
-const NotFoundError = require('../errors/NotFoundError');
 
 // API: Lấy danh sách thể loại 
-const getCategories = (req, res, next) => {
+const getCategories = async (req, res, next) => {
     const query = `
         SELECT
             category_id,
             category_name
         FROM categories
-    `; 
-    db.query(query, (err, results) => {
-        if (err) return next(err);
+    `;
+    try {
+        const [results] = await db.query(query);
         res.json(results);
-    });
+    } catch (err) {
+        next(err);
+    }
 };
 
-const getMoviesByCategoryName = (req, res, next) => {
-  const categoryName = req.params.name ? decodeURIComponent(req.params.name) : null;
+const getMoviesByCategoryName = async (req, res, next) => {
+    const categoryName = req.params.name ? decodeURIComponent(req.params.name) : null;
 
-  if (!categoryName) {
-    return next(new BadRequestError('Thiếu tên thể loại.'));
-  }
-
-  const sql = `
-    SELECT m.movie_id AS id,
-           m.title,
-           m.image_url,
-           m.description
-    FROM   movies m
-    JOIN   movie_categories mc ON mc.movie_id = m.movie_id
-    JOIN   categories c ON c.category_id = mc.category_id
-    WHERE  c.category_name = ?
-      AND  m.status = 'Approved'
-    ORDER  BY m.movie_id DESC
-  `;
-
-  db.query(sql, [categoryName], (err, results) => {
-    if (err) return next(err);
-
-    if (results.length === 0) {
-      return next(new NotFoundError('Không tìm thấy phim theo thể loại này.'));
+    if (!categoryName) {
+        return next(new BadRequestError('Thiếu tên thể loại.'));
     }
 
-    res.status(200).json(results);
-  });
+    const sql = `
+        SELECT m.movie_id AS id,
+               m.title,
+               m.image_url,
+               m.description
+        FROM   movies m
+        JOIN   movie_categories mc ON mc.movie_id = m.movie_id
+        JOIN   categories c ON c.category_id = mc.category_id
+        WHERE  c.category_name = ?
+          AND  m.status = 'Approved'
+        ORDER  BY m.movie_id DESC
+    `;
+
+    try {
+        const [results] = await db.query(sql, [categoryName]);
+        // Khi không tìm thấy phim thuộc thể loại này, trả về mảng rỗng [] với mã 200
+        res.status(200).json(results);
+    } catch (err) {
+        next(err);
+    }
 };
 
-
-module.exports={
+module.exports = {
     getCategories,
     getMoviesByCategoryName
-}
+};

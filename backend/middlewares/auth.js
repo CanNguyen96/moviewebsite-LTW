@@ -1,6 +1,6 @@
 const jwt = require('jsonwebtoken');
 
-//Middleware để xác thực token
+// Middleware để xác thực token
 const authenticateToken = (req, res, next) => {
     const authHeader = req.headers['authorization'];
     const token = authHeader && authHeader.split(' ')[1];
@@ -8,7 +8,7 @@ const authenticateToken = (req, res, next) => {
         return res.status(401).json({ error: 'Không có token, vui lòng đăng nhập' });
     }
 
-    jwt.verify(token, process.env.JWT_SECRET || 'your_secret_key', (err, user) => {
+    jwt.verify(token, process.env.JWT_SECRET, (err, user) => {
         if (err) {
             return res.status(403).json({ error: 'Token không hợp lệ hoặc đã hết hạn' });
         }
@@ -29,4 +29,4 @@ const isAdmin = (req, res, next) => {
 module.exports = {
     authenticateToken,
     isAdmin
-};
+};

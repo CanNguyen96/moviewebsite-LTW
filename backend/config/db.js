@@ -1,7 +1,3 @@
-
-require('dotenv').config({ path: require('path').resolve(__dirname, '../../.env') });
-console.log('DB_HOST:', process.env.DB_HOST);
-
 const mysql = require('mysql2');
 
 // TiDB Cloud (production) yêu cầu SSL
@@ -10,8 +6,8 @@ const sslConfig = process.env.DB_SSL === 'true'
     ? { ssl: { minVersion: 'TLSv1.2', rejectUnauthorized: true } }
     : {};
 
-// Dùng pool thay vì single connection — tự động reconnect khi bị ngắt
-const db = mysql.createPool({
+// Dùng pool kết nối dạng promise
+const pool = mysql.createPool({
     host: process.env.DB_HOST || 'localhost',
     user: process.env.DB_USER || 'root',
     password: process.env.DB_PASSWORD || '1234',
@@ -22,9 +18,15 @@ const db = mysql.createPool({
     ...sslConfig,
 });
 
+const db = pool.promise();
+
 // Kiểm tra kết nối lúc khởi động
-db.getConnection((err, connection) => {
-    if (err) {
+(async () => {
+    try {
+        const connection = await db.getConnection();
+        console.log('Đã kết nối MySQL thành công!');
+        connection.release();
+    } catch (err) {
         console.error('Lỗi kết nối MySQL:', err.message);
         console.error('Chi tiết:', {
             host: process.env.DB_HOST,
@@ -32,10 +34,8 @@ db.getConnection((err, connection) => {
             database: process.env.DB_NAME,
             port: process.env.DB_PORT,
         });
-    } else {
-        console.log('Đã kết nối MySQL thành công!');
-        connection.release();
     }
-});
+})();
 
-module.exports = db;
+module.exports = db;
+
