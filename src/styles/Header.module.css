@@ -15,11 +15,17 @@
 }
 
 .Logo img {
-  height: 46px;
+  height: 52px;
   width: auto;
   cursor: pointer;
   object-fit: contain;
   display: block;
+  filter: drop-shadow(0 2px 5px rgba(0, 0, 0, 0.4));
+  transition: transform 0.2s ease;
+}
+
+.Logo img:hover {
+  transform: scale(1.03);
 }
 
 .Header ul {

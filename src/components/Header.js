@@ -2,7 +2,7 @@
 import React, { useEffect, useState, useRef } from "react";
 import styles from "../styles/Header.module.css";
 import { Link, useNavigate } from "react-router-dom";
-import logo_web from "../picture/animezsub_logo.svg";
+import logo_web from "../picture/logo_3d.png";
 import { movieService } from "../services/movieService";
 import { useAuth } from "../contexts/AuthContext";
 import { FaHeart, FaHistory, FaUserCog, FaSignOutAlt, FaSearch } from "react-icons/fa";
