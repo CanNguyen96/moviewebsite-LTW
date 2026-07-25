@@ -1,16 +1,25 @@
 .nav {
-  width: 100vw;
+  width: 100%;
+  box-sizing: border-box;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 15px 80px 15px 200px;
-  background-color: #111;
+  padding: 12px 60px;
+  background-color: #111111;
   position: relative;
 }
 
+.Logo {
+  display: flex;
+  align-items: center;
+}
+
 .Logo img {
-  width: 120px;
+  height: 46px;
+  width: auto;
   cursor: pointer;
+  object-fit: contain;
+  display: block;
 }
 
 .Header ul {
