@@ -26,6 +26,7 @@ const episodesRoutes = require('./routes/episodesRoutes');
 const chatbotRoutes = require('./routes/chatbotRoutes');
 
 const app = express();
+app.set('trust proxy', 1);
 
 // Sử dụng Helmet để thiết lập các HTTP headers bảo mật
 // CORP được cấu hình là cross-origin để frontend có thể tải ảnh/video từ backend

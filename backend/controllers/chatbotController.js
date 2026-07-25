@@ -39,7 +39,7 @@ const handleChat = async (req, res, next) => {
 
         const moviesContext = movies.map(m => ({
             id: m.id,
-            title: m.title,
+            title: m.title ? m.title.trim() : '',
             genre: m.genre || 'Chưa phân loại',
             year: m.release_year,
             rating: m.rating ? parseFloat(m.rating).toFixed(1) : 'Chưa có đánh giá',
@@ -64,7 +64,7 @@ Nhiệm vụ của bạn:
 2. Gợi ý phim hoặc trả lời thắc mắc DỰA VÀO danh sách phim có sẵn trong hệ thống MovieWebsite bên dưới.
 3. Nếu người dùng hỏi bộ phim KHÔNG CÓ trong danh sách, hãy thông báo lịch sự là hệ thống chưa cập nhật phim đó và chủ động gợi ý các phim cùng thể loại có sẵn trên web.
 4. Hướng dẫn tính năng trang web nếu người dùng hỏi (đăng ký/đăng nhập, tìm kiếm, lưu phim yêu thích, đánh giá phim...).
-5. Khi bạn gợi ý một hoặc nhiều bộ phim từ danh sách, ở ĐẦU hoặc CUỐI câu trả lời, hãy kèm theo một khối JSON chứa ID và tiêu đề các phim được gợi ý theo đúng định dạng chính xác sau (không đổi tên key):
+5. Khi bạn gợi ý một hoặc nhiều bộ phim từ danh sách, hãy ĐẶT KHỐI JSON GỢI Ý Ở ĐẦU CÂU TRẢ LỜI theo đúng định dạng chính xác sau (không đổi tên key):
 <<<RECOMMENDED_MOVIES:[{"id": 1, "title": "Tên Phim"}]>>>
 
 Danh sách phim hiện có trên hệ thống MovieWebsite (tối đa 50 phim mới nhất):
@@ -105,7 +105,7 @@ ${JSON.stringify(moviesContext, null, 2)}
                 const chatSession = model.startChat({
                     history: formattedHistory,
                     generationConfig: {
-                        maxOutputTokens: 1000,
+                        maxOutputTokens: 1500,
                         temperature: 0.7,
                     },
                 });
@@ -126,20 +126,17 @@ ${JSON.stringify(moviesContext, null, 2)}
             throw lastError || new Error('Không thể kết nối đến bất kỳ mô hình Gemini nào.');
         }
 
-
         // 5. Trích xuất danh sách phim gợi ý dạng JSON từ responseText (nếu có)
         let recommendedMovies = [];
         let cleanText = responseText;
 
-        const regex = /<<<RECOMMENDED_MOVIES:\s*(\[[\s\S]*?\])\s*>>>/;
-        const match = responseText.match(regex);
+        const completeMatch = responseText.match(/<<<RECOMMENDED_MOVIES:\s*(\[[\s\S]*?\])\s*>>>/);
 
-        if (match && match[1]) {
+        if (completeMatch && completeMatch[1]) {
             try {
-                const parsedList = JSON.parse(match[1]);
-                cleanText = responseText.replace(match[0], '').trim();
+                const parsedList = JSON.parse(completeMatch[1]);
+                cleanText = responseText.replace(completeMatch[0], '').trim();
 
-                // Lấy chi tiết thông tin ảnh/rating của các phim được gợi ý để gửi về cho Frontend render card
                 const recommendedIds = parsedList.map(item => item.id).filter(Boolean);
                 if (recommendedIds.length > 0) {
                     recommendedMovies = movies.filter(m => recommendedIds.includes(m.id));
@@ -147,7 +144,23 @@ ${JSON.stringify(moviesContext, null, 2)}
             } catch (e) {
                 console.error('Error parsing recommended movies JSON from Gemini:', e);
             }
+        } else {
+            // Trường hợp thẻ bị dở dang/cắt ngang hoặc không đóng đúng chuẩn
+            const partialMatch = responseText.match(/<<<RECOMMENDED_MOVIES:[\s\S]*/);
+            if (partialMatch) {
+                const tagText = partialMatch[0];
+                cleanText = responseText.replace(tagText, '').trim();
+
+                const idMatches = [...tagText.matchAll(/["']?id["']?\s*:\s*(\d+)/gi)];
+                const extractedIds = idMatches.map(m => parseInt(m[1], 10)).filter(Boolean);
+                if (extractedIds.length > 0) {
+                    recommendedMovies = movies.filter(m => extractedIds.includes(m.id));
+                }
+            }
         }
+
+        // Đảm bảo lọc sạch hoàn toàn bất kỳ ký tự thẻ dư thừa nào trước khi gửi về Client
+        cleanText = cleanText.replace(/<<<RECOMMENDED_MOVIES[\s\S]*/gi, '').trim();
 
         res.json({
             reply: cleanText,

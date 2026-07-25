@@ -121,7 +121,7 @@ function ChatbotWidget() {
     };
 
     const handleMovieClick = (movieId) => {
-        navigate(`/movies/${movieId}`);
+        navigate(`/movieDetail/${movieId}`);
     };
 
     const [showGreeting, setShowGreeting] = useState(false);

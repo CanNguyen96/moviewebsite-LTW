@@ -43,6 +43,7 @@ export default function Layout() {
             <Route path="/movie/:id/episode/:episodeNumber" element={<MoviePlayer />} />
             <Route path="/movies/search" element={<SearchResults />} />
             <Route path="/movies/favorites" element={<Favorites/>}/>
+            <Route path="/movies/:id" element={<MovieDetail/>}/>
             <Route path="/movieDetail/:id" element={<MovieDetail/>}/>
             <Route path="/movies/watch-history" element={<WatchHistoryList />} />
             <Route path="/forgot-password" element={<Forgot />} />
